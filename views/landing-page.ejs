@@ -1,0 +1,92 @@
+<%- include('./shared/includes/head', { pageTitle: 'CareConnect' }) %>
+    
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="stylesheet" href="/styles/faq.css">
+    <link rel="stylesheet" href="/styles/slide.css">
+    <link rel="stylesheet" href="/styles/events.css">
+    <link rel="stylesheet" href="/styles/donate_mon.css">
+    <link rel="stylesheet" href="/styles/landing_page.css" />
+    <!-- <script src="/scripts/overlay.js" defer></script> -->
+    <!-- <script src="/scripts/toggleForms.js" defer></script> -->
+    
+  </head>
+  <body>
+    <%- include('./shared/includes/header') %>
+    <main>
+      <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</p>
+      <div class="nonprofit-container">
+        <% nonprofits.forEach(nonprofit => { %>
+            <div class="nonprofit-card" >
+                <img src="/images/<%= nonprofit.image %>" alt="<%= nonprofit.name %>">
+                <h3><%= nonprofit.name %></h3>
+                <p><%= nonprofit.categories.join("#") %></p>
+                <div class="info">
+                    <div>
+                        <h4>₹<%= nonprofit.amountRaised.toLocaleString() %></h4>
+                        <p>Amount Raised</p>
+                    </div>
+                    <div>
+                        <h4><%= nonprofit.supporters.toLocaleString() %></h4>
+                        <p>Supporters</p>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="details-btn">View details</button>
+                    <!-- <button class="select-btn">Donate</button> -->
+                    <!-- <button class="select-btn" onclick="window.location.href='/donate_money'">Donate</button> -->
+                    <a href="/donate/<%=(nonprofit.name) %>">
+                        <button class="select-btn">Donate</button>
+                    </a>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+      <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">NGO Events</p>
+      <section class="nonprofit-section" style="margin-bottom: 35px;">
+ 
+        <div class="container">
+            <div class="drives">
+                <img src="/images/blooddonation.png" alt="blood donation picture">
+                <h3>Blood Donation Drives</h3>
+                <div class="info">
+                    <p>Organized events where volunteers donate blood to help patients in need.</p>
+                </div>
+                <div class="buttons">
+                    <button class="details-btn">View details</button>
+                    <button class="select-btn">Register</button>
+                </div>
+            </div>
+
+            <div class="drives">
+                <img src="/images/treeplantation.png" alt="Tree plantation drives logo">
+                <h3>Tree Plantation Drives</h3>
+                <div class="info">
+                    <p>Tree plantation drives are organized efforts to plant trees and promote environmental sustainability.</p>
+                </div>
+                <div class="buttons">
+                    <button class="details-btn">View details</button>
+                    <button class="select-btn">Register</button>
+                </div>
+            </div>
+
+
+            <div class="drives">
+                <img src="/images/clothesdrives.png" alt="clothes drives picture">
+                <h3>Clothes & Blanket Drives</h3>
+                <div class="info">
+                    <p>Clothes and blanket drives collect and distribute warm clothing to those in need.</p>
+                </div>
+                <div class="buttons">
+                    <button class="details-btn">View details</button>
+                    <button class="select-btn">Register</button>
+                </div>
+              </div>    
+        </div>
+    </section>
+    </main>
+    <section>
+      <%- include('./shared/includes/faq_section') %>
+    </section>
+    <%- include('./shared/includes/footer') %>
+  </body>
+</html>

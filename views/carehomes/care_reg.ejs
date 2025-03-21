@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Care Home Registration</title>
+    <link rel="stylesheet" href="/care_reg.css">
+    <script src="/care_reg.js"></script>
+
+ <!-- Ensure correct path -->
+</head>
+<body>
+    <div class="container">
+        <h2>Care Home Registration</h2>
+        <form id="registrationForm" action="/register" method="POST"> 
+            <!-- Basic Information -->
+            <label for="care_home_name">Care Home Name</label>
+            <input type="text" id="care_home_name" name="care_home_name" required>
+            
+            <label for="reg_number">Registration Number</label>
+            <input type="text" id="reg_number" name="reg_number" required>
+            
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="contact">Contact Number</label>
+            <input type="tel" id="contact" name="contact" required>
+
+            <!-- Address -->
+            <label for="state">State</label>
+            <select id="state" name="state" required>
+                <option value="">-- Select State --</option>
+                <% states.forEach(state => { %>
+                    <option value="<%= state %>"><%= state %></option>
+                <% }); %>
+            </select>
+            
+            <label for="city">City</label>
+            <select id="city" name="city" required>
+                <option value="">-- Select City --</option>
+                <% cities.forEach(city => { %>
+                    <option value="<%= city %>"><%= city %></option>
+                <% }); %>
+            </select>
+            
+            <!-- Care Home Details -->
+            <label for="type">Type of Care Home</label>
+            <select id="type" name="type" required>
+                <option value="">-- Select Type --</option>
+                <% careHomeTypes.forEach(type => { %>
+                    <option value="<%= type %>"><%= type %></option>
+                <% }); %>
+            </select>
+
+            <label>Services Needed</label>
+            <div class="checkbox-group">
+                <% services.forEach(service => { %>
+                    <label><input type="checkbox" name="services" value="<%= service %>"> <%= service %></label>
+                <% }); %>
+            </div>
+
+            <!-- Administrator Details -->
+            <label for="admin_name">Administrator Name</label>
+            <input type="text" id="admin_name" name="admin_name" required>
+            
+            <label for="designation">Designation</label>
+            <input type="text" id="designation" name="designation" required>
+
+            <label for="bank_name">Bank Name:</label>
+<input type="text" id="bank_name" name="bank_name" value="<%= typeof bankName !== 'undefined' ? bankName : '' %>" required>
+
+<label for="account_number">Account Number:</label>
+<input type="text" id="account_number" name="account_number" value="<%= typeof accountNumber !== 'undefined' ? accountNumber : '' %>" required>
+
+<label for="ifsc">IFSC Code:</label>
+<input type="text" id="ifsc" name="ifsc" value="<%= typeof ifsc !== 'undefined' ? ifsc : '' %>" required>
+
+<label for="upi">UPI ID:</label>
+<input type="text" id="upi" name="upi" value="<%= typeof upi !== 'undefined' ? upi : '' %>">
+
+
+            <!-- Terms and Submit -->
+            <div class="terms">
+                <label><input type="checkbox" name="terms" required> I agree to the Terms & Conditions</label>
+            </div>
+            
+            <button type="submit">Register Care Home</button>
+        </form>
+    </div>
+
+</body>
+</html>

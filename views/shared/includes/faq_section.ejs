@@ -1,0 +1,77 @@
+<div class="faq-container">
+  <h2 class="faq-header">Frequently Asked Questions</h2>
+
+  <div class="faq">
+    <div class="faq-question">
+      <span>What is CareConnect?</span>
+      <span class="faq-toggle">+</span>
+    </div>
+    <div class="faq-answer">
+      CareConnect is a platform that connects NGOs, orphanages, and donors to
+      facilitate donations and event management.
+    </div>
+  </div>
+
+  <div class="faq">
+    <div class="faq-question">
+      <span>How can I donate?</span>
+      <span class="faq-toggle">+</span>
+    </div>
+    <div class="faq-answer">
+      You can donate by creating an account, selecting an NGO or event, and
+      choosing your preferred donation method.
+    </div>
+  </div>
+
+  <div class="faq">
+    <div class="faq-question">
+      <span>Is my donation secure?</span>
+      <span class="faq-toggle">+</span>
+    </div>
+    <div class="faq-answer">
+      Yes! We use secure payment gateways to ensure your donations reach the
+      right people safely.
+    </div>
+  </div>
+
+  <div class="faq">
+    <div class="faq-question">
+      <span>Can NGOs create fundraising campaigns?</span>
+      <span class="faq-toggle">+</span>
+    </div>
+    <div class="faq-answer">
+      Yes! Registered NGOs can create and manage fundraising campaigns through
+      their dashboard.
+    </div>
+  </div>
+
+  <div class="faq">
+    <div class="faq-question">
+      <span>How do I know if my donation has reached the beneficiary?</span>
+      <span class="faq-toggle">+</span>
+    </div>
+    <div class="faq-answer">
+      How do I know if my donation has reached the beneficiary? After your
+      donation is processed, you will receive a confirmation email and a
+      receipt. Many NGOs also provide updates, impact reports, or acknowledgment
+      messages on their campaign pages. You can check your donation status in
+      your Donor Dashboard.
+    </div>
+  </div>
+  <script>
+      document.querySelectorAll(".faq-question").forEach((item) => {
+        item.addEventListener("click", () => {
+          const answer = item.nextElementSibling;
+          const toggle = item.querySelector(".faq-toggle");
+
+          if (answer.style.display === "block") {
+            answer.style.display = "none";
+            toggle.textContent = "+";
+          } else {
+            answer.style.display = "block";
+            toggle.textContent = "-";
+          }
+        });
+      });
+    </script>
+</div>
