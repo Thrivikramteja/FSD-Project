@@ -1,9 +1,40 @@
-<%- include('includes/head'), { pageTitle: 'Carehomes' } %>
+<%- include('../shared/includes/head'), { pageTitle: 'Carehomes' } %>
+<link rel="stylesheet" href="/styles/slide.css">
 </head>
 <body>
-    <%- include('shared/includes/header') %>
-    <% for( let index = 0; index < array.length; index++ ) { %>
-        <%- include('') %>
-    <% } %>
+    <%- include('../shared/includes/header') %>
+    <section class="nonprofit-section">
+        <h2>Featured Nonprofits</h2>
+        <p>Please select the NGO Nonprofits you wish to raise funds for</p>
+
+        <div class="nonprofit-container">
+            <% nonprofits.forEach(nonprofit => { %>
+                <div class="nonprofit-card">
+                    <img src="/images/<%= nonprofit.image %>" alt="<%= nonprofit.name %>">
+                    <h3><%= nonprofit.name %></h3>
+                    <p><%= nonprofit.categories.join(" #") %></p>
+                    <div class="info">
+                        <div>
+                            <h4>₹<%= nonprofit.amountRaised.toLocaleString() %></h4>
+                            <p>Amount Raised</p>
+                        </div>
+                        <div>
+                            <h4><%= nonprofit.supporters.toLocaleString() %></h4>
+                            <p>Supporters</p>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <button class="details-btn">View details</button>
+                        <!-- <button class="select-btn">Donate</button> -->
+                        <!-- <button class="select-btn" onclick="window.location.href='/donate_money'">Donate</button> -->
+                        <a href="/donate/<%=(nonprofit.name) %>">
+                            <button class="select-btn">Donate</button>
+                        </a>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </section>
+    <%- include('../shared/includes/footer') %>
 </body>
 </html>

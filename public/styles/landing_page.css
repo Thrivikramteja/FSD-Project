@@ -1,16 +1,27 @@
 body {
-  font-family: sans-serif
+  font-family: sans-serif;
+  overflow: auto;
+  margin: 0;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+main {
+  min-height: 50vh;
 }
 
 #main-header {
-  height: 4rem;
+  height: 6rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
-  background-color: #f8f9fa;
+  padding: 15px 120px;
+  background-color: white ;
   border-bottom: 2px solid #ddd;
 }
+
 #logo a {
   font-size: 24px;
   font-weight: bold;
@@ -20,7 +31,7 @@ body {
 .nav-items {
   list-style: none;
   display: flex;
-  gap: 150px;
+  gap: 90px;
   margin: 0;
   padding: 0;
 }
@@ -74,3 +85,15 @@ li a:hover {
   transition: transform 0.1 s ease;
   border-radius: 4px;
 }
+
+/* .popup {
+  margin-left: 0;
+  background: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: none;
+  top: 0;
+  opacity: 1;
+  transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1);
+} */

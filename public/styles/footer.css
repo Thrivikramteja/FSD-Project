@@ -1,0 +1,169 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+/* Main Footer Styles */
+.footer {
+  background-color: black;
+  color: #ffffff;
+  padding: 40px 20px;
+  margin-top: 50px;
+}
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1300px;
+  margin: 0 auto;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+/* Footer Section Styles */
+.footer-section {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-section h3 {
+  color: #ffffff;
+  font-size: 18px;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-section h3:after {
+  background-color: #c9f7d6;
+  content: "";
+  display: block;
+  height: 2px;
+  width: 50px;
+  margin-top: 8px;
+}
+
+.footer-section p {
+  color: #e1f5d6;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+/* Links in Footer */
+.footer-links li {
+  margin-bottom: 12px;
+  list-style: none;
+}
+
+.footer-links {
+  padding-left: 0;
+}
+
+.footer-links a {
+  color: #e1f5d6;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Social Media Icons */
+.social-icons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.social-icon {
+  background-color: #388e5a;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.social-icon:hover {
+  background-color: #c9f7d6;
+  color: #4e9f76;
+}
+
+/* Contact Form Styles */
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: none;
+  background-color: #e1f5d6;
+}
+
+.contact-form button {
+  background-color: #e1f5d6;
+  color: #4e9f76;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.contact-form button:hover {
+  background-color: #ffffff;
+}
+
+/* Copyright Section */
+.footer-bottom {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #66ed4c;
+  color: #e1f5d6;
+}
+
+/* Newsletter Signup */
+.newsletter-signup {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.newsletter-signup input {
+  flex-grow: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px 0 0 5px;
+  background-color: #e1f5d6;
+}
+
+.newsletter-signup button {
+  background-color: #66ed4c;
+  color: #333;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.newsletter-signup button:hover {
+  background-color: #c9f7d6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer-section {
+    flex-basis: 100%;
+  }
+}

@@ -1,8 +1,9 @@
 const path = require("path");
+const db = require("./data/sqlite3");
 
 const express = require("express");
 
-const baseRoutes = require("./routes/base.routes");
+const baseRoutes = require("./routes/base.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
 
 const app = express();

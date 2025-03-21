@@ -1,0 +1,62 @@
+<%- include('../shared/includes/head', { pageTitle: 'Sign-Up' }) %>
+    <link rel="stylesheet" href="/styles/signup.css" />
+    <script src="scripts/signup.js" defer></script>
+</head>
+<body>
+    <main>
+        <form name="myForm" action="/signup" method="POST">
+            <h1>SIGN UP</h1>
+    
+            <label for="name">Name</label><br />
+            <input
+              type="text"
+              id="name"
+              name="name"
+            />
+            <span id="name-error" style="color: red"></span>
+            <br /><br />
+    
+            <label for="mail">Email</label><br />
+            <input
+              type="email"
+              id="mail"
+              name="mail"
+            />
+            <span id="mail-error" style="color: red"></span>
+            <br /><br />
+    
+            <label for="pass">Password</label><br />
+            <input
+              type="password"
+              id="pass"
+              name="password"
+            />
+            <span id="pass-error" style="color: red"></span>
+            <br /><br />
+    
+            <label for="repass">Confirm Password</label><br>
+            <input
+              type="password"
+              id="repass"
+              name="repass"
+            />
+            <span id="repass-error" style="color: red"></span>
+            <br /><br />
+    
+            <label for="contact">Contact Number</label><br />
+            <input
+              type="text"
+              id="contact"
+              name="contact"
+            />
+            <br /><br />
+    
+            <input type="checkbox" id="notification" />
+            <label for="notification">I agree to receive notifications</label>
+            <br /><br />
+    
+            <button type="submit">Sign-Up</button>
+          </form>
+    </main>
+</body>
+</html>
