@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success Stories</title>
+    <link rel="stylesheet" href="/1.css">
+    <script src="/1_a.js"></script>
+
+</head>
+<body>
+    <header id="main-header">
+        <div id="logo"><a href="/">CareConnect</a></div>
+        <nav>
+          <ul class="nav-items">
+            <li class="dropdown">
+              <a class="dropdown-toggle">Donate</a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Items</a></li>
+                <li><a href="/views/carehomes.ejs">Money</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle">Discover</a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Events</a></li>
+                <li><a href="/views/carehomes.ejs">Carehomes</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle">Register</a>
+              <ul class="dropdown-menu">
+                <li><a href="#">As an NGO</a></li>
+                <li><a href="/views/carehomes.ejs">As a Carehome</a></li>
+              </ul>
+            </li>
+            <li id="login-button"><a href="/login">Login</a></li>
+          </ul>
+        </nav>
+      </header>
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Real Stories, Real Impact</h1>
+        <p>Your donations have changed lives. Read how.</p>
+    </div>
+
+    <!-- Success Stories Section -->
+    <div class="stories-container">
+        <% stories.forEach(function(story) { %>
+            <div class="story-card">
+                <a href="/stories/<%= story.title %>" class="tile_story">
+                    <img src="<%= story.image %>" alt="<%= story.title %>">
+                    <div class="story-text">
+                        <h3><%= story.title %></h3>
+                        <p><%= story.description %></p>
+                    </div>
+                </a>
+            </div>
+        <% }); %>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="cta">
+        <h2>Be a Part of the Change</h2>
+        <p>Join us in making the world a better place.</p>
+        <a href="/donate">Donate Now</a>
+    </div>
+
+</body>

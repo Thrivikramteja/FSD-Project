@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/1_a.css">
+    <script src="/1_a.js"></script>
+
+</head>
+<body>
+
+    <h1><%= title %></h1>
+    
+    <div class="description">
+        <% descriptions.forEach(function(desc) { %>
+            <p><%= desc %></p>
+        <% }); %>
+    </div>
+
+    <div class="container">
+        <div class="text-content">
+            
+            <div class="report">
+                <h2>Fundraiser Report Statistics</h2>
+                <p>Total amount raised: ₹<%= totalRaised %></p>
+                <p>Number of donors: <%= numberOfDonors %></p>
+                <p>Average donation size: ₹<%= avgDonationSize %></p>
+                <p>Largest single donation: ₹<%= largestDonation %></p>
+                <p>Smallest donation: ₹<%= smallestDonation %></p>
+            </div>
+
+            <div class="funds">
+                <h2>Fund Allocation</h2>
+                <p><%= total_description_allocation %></p>
+               
+            </div>
+
+            <div class="impact">
+                <h2>Impact Metrics</h2>
+                <p><%= total_description_impact %></p>
+             
+            </div>
+        </div>
+
+        <div class="image-container">
+            <img src="<%= image %>" alt="Helping Kids Get Shelter">
+        </div>
+    </div>
+</body>
+</html>
