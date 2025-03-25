@@ -1,69 +1,77 @@
-<%- include('../shared/includes/head', { pageTitle: 'Sign-Up' }) %>
-    <link rel="stylesheet" href="/styles/signup.css" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="/signupproject.css">
+    <link rel="stylesheet" href="styles/signup.css">
     <script src="scripts/signup.js" defer></script>
-</head>
-<body>
-    <main>
-        <form name="myForm" action="/signup" method="POST">
-            <h1>SIGN UP</h1>
+    <style>
+      .error-message {
+    margin: 20px auto; /* Center horizontally with auto margins */
+    border-radius: 8px;
+    background-color: rgb(181, 242, 203);
+    color: rgb(161, 37, 9);
+    text-align: center;
+    display: flex; /* Use flexbox to center text */
+    align-items: center; /* Vertically center the text */
+    justify-content: center; /* Horizontally center the text */
+    height: auto; /* Allow height to adjust dynamically */
+    width: 300px; /* Set a fixed width or adjust as needed */
+    padding: 10px; /* Add padding for spacing */
+    font-size: 14px; /* Adjust font size */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a slight shadow for better aesthetics */
+}
 
-            <p><%= errorMessage %></p>
+    </style>
+</head>
+
+<body>
     
-            <label for="name">Name</label><br />
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-            />
-            <span id="name-error" style="color: red"></span>
-            <br /><br />
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
     
-            <label for="mail">Email</label><br />
-            <input
-              type="email"
-              id="mail"
-              name="mail"
-              required
-            />
-            <span id="mail-error" style="color: red"></span>
-            <br /><br />
-    
-            <label for="pass">Password</label><br />
-            <input
-              type="password"
-              id="pass"
-              name="password"
-              required
-            />
-            <span id="pass-error" style="color: red"></span>
-            <br /><br />
-    
-            <label for="repass">Confirm Password</label><br>
-            <input
-              type="password"
-              id="repass"
-              name="repass"
-              required
-            />
-            <span id="repass-error" style="color: red"></span>
-            <br /><br />
-    
-            <label for="contact">Contact Number</label><br />
-            <input
-              type="text"
-              id="contact"
-              name="contact"
-              required
-            />
-            <br /><br />
-    
-            <input type="checkbox" id="notification" name="checkbox" />
-            <label for="notification">I agree to receive notifications</label>
-            <br /><br />
-    
-            <button type="submit">Sign-Up</button>
-          </form>
-    </main>
+<div class="container">
+    <form name="myForm" action="/signup" method="post">
+        <h1 style="font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; color: rgb(119, 183, 23);">SIGN UP</h1>
+
+        <label for="fullname">Name:</label><br>
+        <input type="text" id="fullname" placeholder="Enter your fullname" name="fullname" required>
+        <span id="fullname-error" style="color:red;"></span>
+        <br><br>
+
+        <label for="mail">Email:</label><br>
+        <input type="email" id="mail" placeholder="Enter your email" name="mail">
+        <span id="mail-error" style="color:red;"></span>
+        <br><br>
+
+        <label for="phone">Phone:</label><br>
+        <input type="text" id="phone" placeholder="Enter your phone number" name="phone">
+        <span id="mail-error" style="color:red;"></span>
+        <br><br>
+
+        <label for="pass">Password</label><br>
+        <input type="password" id="pass" placeholder="Enter your password" name="password">
+        <span id="pass-error" style="color:red;"></span>
+        <br><br>
+
+        <label for="repass">Confirm Password</label>
+        <input type="password" id="repass" placeholder="Confirm your password">
+        <span id="repass-error" style="color:red;"></span>
+        <br><br>
+
+        <input type="checkbox" id="notification">
+        <label for="notification">I agree to receive notifications</label>
+        <br><br>
+
+        <button type="submit">Sign-Up</button>
+    </form>
+
+    <img src="images/careconnectLogo.jpg" class="logophoto">
+</div>
+
+<script src="/signupproject.js"></script>
 </body>
 </html>

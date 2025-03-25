@@ -14,19 +14,8 @@
     <div class="choose_someone" style="margin-top: 2rem;">
         <label for="some_home">Choose a care home:</label><br>
         <select name="carehomes" id="some_home">
-            <% const careHomes = [
-                { value: "helpage", label: "HelpAge India" },
-                { value: "agewell", label: "Agewell Foundation" },
-                { value: "shasksham", label: "Shasksham Foundation" },
-                { value: "jagat", label: "Jagat Bandu" },
-                { value: "ram_lal", label: "Ram Lal Old Age Home" },
-                { value: "neptune", label: "Neptune Foundation" },
-                { value: "jagorani", label: "Jagorani" },
-                { value: "manav", label: "Manav Kartavya" },
-                { value: "badthe", label: "Badthe Kadam" }
-            ]; %>
-            <% careHomes.forEach(home => { %>
-                <option value="<%= home.value %>"><%= home.label %></option>
+            <% carehomes.forEach(home => { %>
+                <option value="<%= home.name_carehome %>"><%= home.name_carehome %></option>
             <% }); %>   
         </select>
         <button type="button" id="submit">Choose it</button>

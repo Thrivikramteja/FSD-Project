@@ -1,5 +1,5 @@
 const db = require("../data/sqlite3");
-const bcrypt = require("bcryptjs");
+
 class NGO {
   constructor(
     name,
@@ -25,66 +25,57 @@ class NGO {
     this.ifsc = ifsc;
   }
 
-  async register() {
-    const hashedPassword = await bcrypt.hash(this.password, 12);
+  static toISO(dateText) {
+    if (!dateText) {
+      console.warn("Invalid or missing date:", dateText);
+      return null;
+    }
 
-    const sqlQuery =
-      "INSERT INTO NGOs (name_NGO, email, password, darpan_id, bank_acc_holder_name, IFSC_code, bank_acc_number, funds_raised, YOE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
-    db.run(
-      sqlQuery,
-      [
-        this.name,
-        this.email,
-        hashedPassword,
-        this.darpan_id,
-        this.account_holder_name,
-        this.ifsc,
-        this.account_number,
-        this.funds_raised,
-        this.year_established,
-      ],
-      (err) => {
-        if (err) {
-          console.error("Error inserting NGO:", err);
-        } else {
-          console.log("NGO successfully inserted.");
-        }
+    try {
+      const [day, month, year] = dateText.split("-");
+      if (!day || !month || !year) {
+        console.warn("Invalid date format:", dateText);
+        return null;
       }
-    );
+      return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    } catch (error) {
+      console.error("Error parsing date:", dateText, error);
+      return null;
+    }
   }
 
-  static getNGO(email, callback) {
-    const sqlQuery = "SELECT * FROM NGOs WHERE email = ?";
-
-    db.get(sqlQuery, [email], (err, row) => {
-      if (err) return callback(err, null);
-      callback(null, row ? row.id_NGO : null);
-    });
-  }
-
-  static getFundraisers(callback) { 
-    const sqlQuery = "SELECT * FROM created_fundraisers;";
-
-    db.all(sqlQuery, (err, rows) => {
+  static ongoing_fund(callback) {
+    const query = "SELECT * FROM created_fundraisers";
+    db.all(query, [], (err, rows) => {
       if (err) {
-        console.error("Error fetching fundraisers:", err);
+        console.error("Error while getting fundraisers", err);
         callback(err, null);
       } else {
-        callback(null, rows);
+        const isoCurrentDate = new Date().toISOString().split("T")[0]; 
+        const ongoing_fund = rows.filter((row) => {
+          const isoDate = NGO.toISO(row.deadline); 
+          return isoDate && isoDate >= isoCurrentDate;
+        });
+
+        callback(null, ongoing_fund);
       }
     });
   }
 
-  static getEvents(callback) {
-    const sqlQuery = "SELECT * FROM created_events;";
-
-    db.all(sqlQuery, (err, rows) => {
+  static upcoming_eve(callback) {
+    const query = "SELECT * FROM created_events";
+    db.all(query, [], (err, rows) => {
       if (err) {
-        console.error("Error fetching Events:", err);
+        console.error("Error fetching upcoming events:", err);
         callback(err, null);
       } else {
-        callback(null, rows);
+        const isoCurrentDate = new Date().toISOString().split("T")[0]; // ✅ Define current ISO date
+        const upcoming_eve = rows.filter((row) => {
+          const isoDate = NGO.toISO(row.event_date); // ✅ Use NGO.toISO instead of toISO
+          return isoDate && isoDate >= isoCurrentDate;
+        });
+
+        callback(null, upcoming_eve);
       }
     });
   }

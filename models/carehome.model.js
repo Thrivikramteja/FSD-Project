@@ -34,13 +34,19 @@ class Carehome {
     this.ifsc = ifsc;
   }
 
-  getCarehome(email, callback) {
-    const sqlQuery = "SELECT * FROM carehomes WHERE email = ?";
-
-    db.get(sqlQuery, [email], (err, row) => {
-      if (err) return callback(err, null);
-      callback(null, row ? row.id_carehome : null);
-    });
+  static getCareHomes(callback) {
+    return new Promise((resolve, reject) => {
+      const query = 'SELECT id_carehome, name_carehome FROM carehomes';
+      
+      db.all(query, [], (err, rows) => {
+          if (err) {
+              console.error('Error fetching care homes:', err);
+              reject(err);  // Reject the Promise on error
+          } else {
+              resolve(rows); // Resolve the Promise with the rows
+          }
+      })
+    })
   }
 
   getCarehomeId(email, callback) {

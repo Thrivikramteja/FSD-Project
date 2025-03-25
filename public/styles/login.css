@@ -1,99 +1,86 @@
+/* General Styles */
 body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   margin: 0;
 }
 
-#login {
-  background: #fff;
-  padding: 50px;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 320px;
+/* Centering the login form */
+main {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 400px;
   text-align: center;
-  margin: 7rem auto;
 }
 
-h1 {
-  margin-top: 0;
-  font-size: 20px;
-}
-
-p {
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-label {
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 5px;
-  display: block;
-}
-
-#sl {
-  display: flex;
-  width: 60%;
-  flex-direction: row;
-  justify-content: space-between;
-  border: 1px solid #d1d0d0;
-  border-radius: 8px;
-  margin: 16px auto;
-  margin-top: 0;
-}
-
+/* Login Title */
 #sl h1 {
-  margin-bottom: 0;
-  font-weight: 400;
-  font-size: 18px;
-  color: rgb(100, 99, 99);
-  padding: 8px 16px;
-  cursor: pointer;
+  color: #4CAF50;
+  font-size: 28px;
+  margin-bottom: 10px;
 }
 
-#sl h1:hover {
-  color: black;
-  background-color: rgb(234, 233, 233);
-}
-
-
-input {
-  width: 95%;
-  padding: 10px;
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  font-size: 15px;
-  outline: none;
-  transition: 0.3s;
-}
-
-input:focus {
-  border-color: #55d477;
-}
-
-.btn {
-  padding: 10px;
-  border: 2px solid #55d477;
-  background: none;
-  color: #15f852;
-  font-size: 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: border-width 0.3s ease, padding 0.3s ease;
-}
-
-.btn:hover {
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+/* Login as dropdown */
+#loginas {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
 }
 
 #role {
-  font-size: 16px;
-  padding: 8px;
-  border-radius: 4px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 5px;
 }
 
-#role option {
+/* Labels */
+label {
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin: 10px 0 5px;
+}
+
+/* Input Fields */
+input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   font-size: 14px;
+  margin-bottom: 15px;
 }
 
-#role:focus {
-  border: 2px solid #55d477;
+/* Login Button */
+#loginSubmitBtn {
+  width: 100%;
+  padding: 12px;
+  background-color: #3b59eb;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#loginSubmitBtn:hover {
+  background-color: #1d3ecb;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  main {
+      width: 90%;
+  }
 }

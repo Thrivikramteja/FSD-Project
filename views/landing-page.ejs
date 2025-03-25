@@ -12,23 +12,18 @@
     <main>
       <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</p>
       <div class="nonprofit-container">
-        <% fundraisers.forEach(fundraiser => { %>
+        <% ongoing_fund.forEach(ongoing_fun => { %>
             <div class="nonprofit-card" >
-                <img src="/images/<%= fundraiser.imageUrl %>" alt="<%= fundraiser.name %>">
-                <h3><%= fundraiser.name %></h3>
+                <h3><%= ongoing_fun.fundraiser_name %></h3>
                 <div class="info">
                     <div>
-                        <h4>₹<%= fundraiser.amountRaised.toLocaleString() %></h4>
+                        <h4>₹<%= ongoing_fun.amount_raised_so_far.toLocaleString() %></h4>
                         <p>Amount Raised</p>
-                    </div>
-                    <div>
-                        <h4><%= fundraiser.supporters.toLocaleString() %></h4>
-                        <p>Supporters</p>
                     </div>
                 </div>
                 <div class="buttons">
                     <button class="details-btn">View details</button>
-                    <a href="/donate/<%=(fundraiser.name) %>">
+                    <a href="/donate/<%=(ongoing_fun.fundraiser_name) %>">
                         <button class="select-btn">Donate</button>
                     </a>
                 </div>
@@ -38,31 +33,25 @@
 
       <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">NGO Events</p>
       <div class="nonprofit-section">
-        <% events.forEach(event => { %>
+        <% upcoming_eve.forEach(event => { %>
             <div class="nonprofit-card" >
-                <img src="/images/<%= event.imageUrl %>" alt="<%= event.name %>">
-                <h3><%= event.name %></h3>
-                <p><%= event.categories.join("#") %></p>
+                <h3><%= event.event_name %></h3>
                 <div class="info">
                     <div>
-                        <h4>₹<%= event.amountRaised.toLocaleString() %></h4>
-                        <p>Amount Raised</p>
-                    </div>
-                    <div>
-                        <h4><%= event.supporters.toLocaleString() %></h4>
+                        <h4><%= event.number_of_registrations.toLocaleString() %></h4>
                         <p>Supporters</p>
                     </div>
                 </div>
                 <div class="buttons">
                     <button class="details-btn">View details</button>
-                    <a href="/donate/<%=(event.name) %>">
-                        <button class="select-btn">Donate</button>
+                    <a href="/donate/<%=(event.event_name) %>">
+                        <button class="select-btn">Register</button>
                     </a>
                 </div>
             </div>
         <% }) %>
     </div>
-      <section class="nonprofit-section" style="margin-bottom: 35px;">
+      <!-- <section class="nonprofit-section" style="margin-bottom: 35px;">
  
         <div class="container">
             <div class="drives">
@@ -102,7 +91,7 @@
                 </div>
               </div>    
         </div>
-    </section>
+    </section> -->
     </main>
     <section>
       <%- include('./shared/includes/faq_section') %>

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Care Home Registration</title>
-    <link rel="stylesheet" href="/care_reg.css">
-    <script defer src="/carehome_regi.js"></script>
+    <link rel="stylesheet" href="styles/care_reg.css">
+    <script defer src="scripts/carehome_regi.js"></script>
 </head>
 <body>
     <div class="container">
@@ -15,58 +15,32 @@
             <label for="care_home_name">Care Home Name</label>
             <input type="text" id="care_home_name" name="care_home_name" required>
             
-            <label for="reg_number">Registration Number</label>
+            <label for="reg_number">Govt. ID</label>
             <input type="text" id="reg_number" name="reg_number" required placeholder="e.g. 123/2024">
             
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
             
             <label for="contact">Contact Number</label>
             <input type="tel" id="contact" name="contact" required>
 
-            <!-- Address -->
-            <label for="state">State</label>
-            <select id="state" name="state" required>
-                <option value="">-- Select State --</option>
-                <% states.forEach(state => { %>
-                    <option value="<%= state %>"><%= state %></option>
-                <% }); %>
-            </select>
-            
-            <label for="city">City</label>
-            <select id="city" name="city" required>
-                <option value="">-- Select City --</option>
-                <% cities.forEach(city => { %>
-                    <option value="<%= city %>"><%= city %></option>
-                <% }); %>
-            </select>
-<<<<<<< HEAD
-=======
-
-            
             <label for="num_residents">Number of Residents</label>
             <input type="number" id="num_residents" name="num_residents" required placeholder="Must be greater than 10">
             
             <label for="avg_expense">Average Monthly Expense</label>
             <input type="number" id="avg_expense" name="avg_expense" required placeholder="Enter in INR">
->>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a
 
             <label for="wishlist">Wishlist (Optional)</label>
-            <textarea id="wishlist" name="wishlist" placeholder="Can be filled after signup">
+            <textarea id="wishlist" name="wishlist" placeholder="Can be filled after signup"></textarea>
 
             <label for="description">Description (Optional)</label>
             <textarea id="description" name="description" placeholder="Describe your care home..."></textarea>
-
-            
-            <label for="admin_name">Administrator Name</label>
-            <input type="text" id="admin_name" name="admin_name" required>
-<<<<<<< HEAD
-=======
-
             
             <label for="account_holder">Account Holder Name</label>
             <input type="text" id="account_holder" name="account_holder" required>
->>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a
 
             <label for="account_number">Account Number</label>
             <input type="text" id="account_number" name="account_number" required>
@@ -74,14 +48,11 @@
             <label for="ifsc">IFSC Code</label>
             <input type="text" id="ifsc" name="ifsc" required>
 
-            
-
-            
             <div class="terms">
                 <label><input type="checkbox" name="terms" required> I agree to the Terms & Conditions</label>
             </div>
             
-            <button type="submit">Register Care Home</button>
+            <button type="submit">Register</button>
         </form>
     </div>
 </body>
