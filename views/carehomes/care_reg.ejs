@@ -5,20 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Care Home Registration</title>
     <link rel="stylesheet" href="/care_reg.css">
-    <script src="/care_reg.js"></script>
-
- <!-- Ensure correct path -->
+    <script defer src="/carehome_regi.js"></script>
 </head>
 <body>
     <div class="container">
         <h2>Care Home Registration</h2>
-        <form id="registrationForm" action="/register" method="POST"> 
-            <!-- Basic Information -->
+        <form id="registrationForm"  method="POST"> 
+            
             <label for="care_home_name">Care Home Name</label>
             <input type="text" id="care_home_name" name="care_home_name" required>
             
             <label for="reg_number">Registration Number</label>
-            <input type="text" id="reg_number" name="reg_number" required>
+            <input type="text" id="reg_number" name="reg_number" required placeholder="e.g. 123/2024">
             
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
@@ -42,32 +40,43 @@
                     <option value="<%= city %>"><%= city %></option>
                 <% }); %>
             </select>
+<<<<<<< HEAD
+=======
 
-            <label>Services Needed</label>
-            <div class="checkbox-group">
-                <% services.forEach(service => { %>
-                    <label><input type="checkbox" name="services" value="<%= service %>"> <%= service %></label>
-                <% }); %>
-            </div>
+            
+            <label for="num_residents">Number of Residents</label>
+            <input type="number" id="num_residents" name="num_residents" required placeholder="Must be greater than 10">
+            
+            <label for="avg_expense">Average Monthly Expense</label>
+            <input type="number" id="avg_expense" name="avg_expense" required placeholder="Enter in INR">
+>>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a
 
-            <!-- Administrator Details -->
+            <label for="wishlist">Wishlist (Optional)</label>
+            <textarea id="wishlist" name="wishlist" placeholder="Can be filled after signup">
+
+            <label for="description">Description (Optional)</label>
+            <textarea id="description" name="description" placeholder="Describe your care home..."></textarea>
+
+            
             <label for="admin_name">Administrator Name</label>
             <input type="text" id="admin_name" name="admin_name" required>
+<<<<<<< HEAD
+=======
 
-            <label for="bank_name">Bank Name:</label>
-<input type="text" id="bank_name" name="bank_name" value="<%= typeof bankName !== 'undefined' ? bankName : '' %>" required>
+            
+            <label for="account_holder">Account Holder Name</label>
+            <input type="text" id="account_holder" name="account_holder" required>
+>>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a
 
-<label for="account_number">Account Number:</label>
-<input type="text" id="account_number" name="account_number" value="<%= typeof accountNumber !== 'undefined' ? accountNumber : '' %>" required>
+            <label for="account_number">Account Number</label>
+            <input type="text" id="account_number" name="account_number" required>
 
-<label for="ifsc">IFSC Code:</label>
-<input type="text" id="ifsc" name="ifsc" value="<%= typeof ifsc !== 'undefined' ? ifsc : '' %>" required>
+            <label for="ifsc">IFSC Code</label>
+            <input type="text" id="ifsc" name="ifsc" required>
 
-<label for="upi">UPI ID:</label>
-<input type="text" id="upi" name="upi" value="<%= typeof upi !== 'undefined' ? upi : '' %>">
+            
 
-
-            <!-- Terms and Submit -->
+            
             <div class="terms">
                 <label><input type="checkbox" name="terms" required> I agree to the Terms & Conditions</label>
             </div>
@@ -75,6 +84,5 @@
             <button type="submit">Register Care Home</button>
         </form>
     </div>
-
 </body>
 </html>

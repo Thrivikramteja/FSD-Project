@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title || "NGO Registration" %></title>
-    <link rel="stylesheet" href="/ngo_reg.css">
+    <link rel="stylesheet" href="/ngo_registration.css">
     <script defer src="/ngo_reg.js"></script>
 </head>
 <body>
@@ -18,7 +18,11 @@
             <label for="darpan_id">DARPAN ID</label>
             <input type="text" id="darpan_id" name="darpan_id" value="<%= darpanId || '' %>" required>
 
+<<<<<<< HEAD:views/NGOs/ngo_reg.ejs
             <label for="year_established">Year of Establishment</label>
+=======
+            <label for="year_established">Year of Establishment:</label>
+>>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a:views/NGOs/ngo_registration.ejs
             <input type="number" id="year_established" name="year_established" value="<%= yearEstablished || '' %>" required min="1800" max="2100">
 
             <h2>Contact Information</h2>
@@ -38,8 +42,13 @@
             <textarea id="address" name="address" required><%= address || '' %></textarea>
 
             <h2>Bank & Payment Details</h2>
+<<<<<<< HEAD:views/NGOs/ngo_reg.ejs
             <label for="bank_name">Bank Account Holder Name</label>
             <input type="text" id="bank_name" name="bank_name" value="<%= bankName || '' %>" required>
+=======
+            <label for="account_holder">Account Holder Name:</label>
+            <input type="text" id="account_holder" name="account_holder" value="<%= accountHolder || '' %>" required>
+>>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a:views/NGOs/ngo_registration.ejs
 
             <label for="account_number">Account Number</label>
             <input type="text" id="account_number" name="account_number" value="<%= accountNumber || '' %>" required>
@@ -47,7 +56,21 @@
             <label for="ifsc">IFSC Code</label>
             <input type="text" id="ifsc" name="ifsc" value="<%= ifsc || '' %>" required>
 
+<<<<<<< HEAD:views/NGOs/ngo_reg.ejs
             <button type="submit">Register</button>
+=======
+           
+            <h2>Login Credentials</h2>
+            
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+
+            <button type="submit">Submit for Verification</button>
+>>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a:views/NGOs/ngo_registration.ejs
         </form>
     </div>
 </body>
