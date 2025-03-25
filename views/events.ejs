@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+    <link rel="stylesheet" href="/events.css">
+</head>
+<body>
+    <section class="nonprofit-section">
+        <h2>Events</h2>
+        <p>Select the events you wish to participate in.</p>
+        
+        <div class="container">
+            <% events.forEach(event => { %>
+                <div class="drives">
+                    <img src="<%= event.image %>" alt="<%= event.title %>">
+                    <h3><%= event.title %></h3>
+                    <div class="info">
+                        <p><%= event.description %></p>
+                    </div>
+                    <div class="buttons">
+                        <a href="/donor_reg?event=<%= encodeURIComponent(event.title) %>" class="select-btn">Register</a>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+</body>
+</html>

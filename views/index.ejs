@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Featured Nonprofits</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <section class="nonprofit-section">
+        <h2>List of Fundraisers</h2>
+        <p>Please select the Fundraisers you wish to raise funds for</p>
+
+        <div class="nonprofit-container">
+            <% nonprofits.forEach(function(nonprofit, index) { %>
+                <div class="nonprofit-card">
+                    <img src="/images/<%= nonprofit.image %>" alt="<%= nonprofit.name %>">
+                    <h3><%= nonprofit.name %></h3>
+                    <p><%= nonprofit.tags && Array.isArray(nonprofit.tags) ? nonprofit.tags.join(', ') : "No tags available" %></p>
+
+
+                    <div class="info">
+                        <div>
+                            <h4><%= nonprofit.amountRaised.toLocaleString() %></h4>
+                            <p>Amount Raised</p>
+                        </div>
+                        <div>
+                            <h4><%= nonprofit.supporters.toLocaleString() %></h4>
+                            <p>Supporters</p>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <button class="details-btn" onclick="openModal('modal<%= index %>')">View details</button>
+                        <!-- <a href="/donate/<%= nonprofit.name %>" class="btn btn-primary">Donate</a> -->
+                        <!-- <button class="select-btn">Donate</button> -->
+                        <!-- <a href="/donate/<%=(nonprofit.name) %>">
+                            <button class="select-btn">Donate</button>
+                        </a> -->
+                        <a href="/donate/<%=(nonprofit.name) %>">
+                            <button class="select-btn">Donate</button>
+                        </a>
+
+
+
+
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+
+    <% nonprofits.forEach(function(nonprofit, index) { %>
+        <div id="modal<%= index %>" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('modal<%= index %>')">&times;</span>
+                <h2><%= nonprofit.name %></h2>
+                <img src="/images/<%= nonprofit.image %>" alt="<%= nonprofit.name %>">
+                <p><strong>Description</strong></p>
+                <p><%= nonprofit.description %></p>
+            </div>
+        </div>
+    <% }); %>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Basic styles for modal */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%; 
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+
+   
+</body>
+</html>

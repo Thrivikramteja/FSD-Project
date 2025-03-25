@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Registration</title>
+    <link rel="stylesheet" href="/donor_reg.css">
+    <script defer src="/donor_reg.js"></script> <!-- Ensure script loads after DOM -->
+    
+</head>
+<body>
+    <div class="container">
+        <h2>Donor Registration - <%= event || "General Event" %></h2>
+
+
+        <form id="donorForm" action="/register" method="POST">
+            <input type="hidden" name="event" value="<%= event %>">
+
+            <label for="name">Full Name:</label>
+            <input type="text" name="name" id="name" placeholder="Full Name" value="<%= name %>" required>
+
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" placeholder="Email" value="<%= email %>" required>
+
+            <label for="number">Phone Number:</label>
+            <input type="text" name="number" id="number" placeholder="Phone Number" value="<%= number %>" required>
+
+            <label for="age">Age:</label>
+            <input type="number" name="age" id="age" placeholder="Age" value="<%= age %>" required>
+
+            <label for="address">Address:</label>
+            <input type="text" name="address" id="address" placeholder="Address" required>
+
+            <label for="state">State:</label>
+            <select name="state" id="state" required>
+                <option value="">Select State</option>
+                <% states.forEach(function(stateItem) { %>
+                    <option value="<%= stateItem %>" <%= state === stateItem ? 'selected' : '' %>><%= stateItem %></option>
+                <% }); %>
+            </select>
+
+            <label>
+                <input type="checkbox" name="terms" id="terms" required> I agree to the Terms and Conditions
+            </label>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+    
+</body>
+</html>

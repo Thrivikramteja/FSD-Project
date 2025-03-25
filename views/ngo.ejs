@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizations List</title>
+    <link rel="stylesheet" href="/ngo.css">
+</head>
+<body>
+    <h1>NGOs awarded Trusted Organization Certification by CareConnect</h1>
+
+    <% ngos.forEach(ngo => { %>
+        <div class="organization">
+            <img src="<%= ngo.image %>" alt="<%= ngo.name %> Logo">
+            <div class="org-details">
+                <h2><%= ngo.name %></h2>
+                <p><span class="icon">📍</span> <%= ngo.location %></p>
+                <p><%= ngo.description %></p>
+
+                <div class="badges">
+                    <span class="green-badge">Trusted organization</span>
+                    <% ngo.badges.forEach(badge => { %>
+                        <span class="badge"><%= badge %></span>
+                    <% }) %>
+                </div>
+            </div>
+            <div class="revenue">
+                <p>FY <%= ngo.fy %></p>
+                <p><strong>Total Revenue</strong><br>Rs. <%= ngo.revenue %></p>
+                <p><strong>Total Expenses</strong><br>Rs. <%= ngo.expenses %></p>
+            </div>
+        </div>
+    <% }) %>
+
+</body>
+</html>
