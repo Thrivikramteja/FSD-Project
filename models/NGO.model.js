@@ -81,4 +81,90 @@ class NGO {
   }
 }
 
+
+static create_event(eventDetails, callback) {
+    const { id_NGO, event_location, event_name, event_date, event_time, number_of_registrations, description } = eventDetails;
+
+    const query = `
+        INSERT INTO created_events (id_NGO, event_location, event_name, event_date, event_time, number_of_registrations, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        id_NGO,
+        event_location,
+        event_name,
+        event_date, 
+        event_time,
+        number_of_registrations || 0,
+        description,
+    ];
+
+    db.run(query, values, function (err) {
+        if (err) {
+            console.error('Error while inserting new event:', err);
+            callback(err, null);
+        } else {
+            callback(null, { id: this.lastID, ...eventDetails });
+        }
+    });
+}
+
+static get_carehome(callback) {
+    const query = `
+        SELECT id_carehome, name_carehome
+        FROM carehomes
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching care home details:", err);
+            callback(err, null);
+        } else {
+            callback(null, rows); // Return all care homes as an array of objects
+        }
+    });
+}
+
+
+static create_fundraiser(fundraiserDetails, callback) {
+    const { 
+        id_carehome, 
+        fundraiser_name, 
+        id_NGO, 
+        has_report, 
+        goal_amount, 
+        description, 
+        amount_raised_so_far, 
+        deadline 
+    } = fundraiserDetails;
+
+    const query = `
+        INSERT INTO created_fundraisers (id_carehome, fundraiser_name, id_NGO, has_report, goal_amount, description, amount_raised_so_far, deadline)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        id_carehome,
+        fundraiser_name,
+        id_NGO,
+        has_report || 0, // Default to 0 if not provided
+        goal_amount || 0, // Default to 0 if not provided
+        description,
+        amount_raised_so_far || 0, // Default to 0 if not provided
+        deadline
+    ];
+
+    db.run(query, values, function (err) {
+        if (err) {
+            console.error('Error while inserting new fundraiser:', err);
+            callback(err, null);
+        } else {
+            callback(null, { id: this.lastID, ...fundraiserDetails });
+        }
+    });
+}
+
+
+
 module.exports = NGO;
