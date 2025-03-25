@@ -1,0 +1,102 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0;
+    padding: 20px; /* Adds space around the content */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;  /* Stacks items vertically */
+    align-items: center;
+    width: 100%;
+}
+
+.card {
+    display: flex;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    max-width: 900px;
+    width: 90%;
+    border: 1px solid #ccc;
+    align-items: center;
+    margin-bottom: 20px;  /* Ensures space between cards */
+}
+
+.logo {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo img {
+    width: 100px;
+}
+
+.content {
+    flex-grow: 1;
+    margin-left: 20px;
+}
+
+h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+}
+
+ul li {
+    margin: 5px 0;
+}
+
+a {
+    text-decoration: none;
+    color: green;
+    font-size: 16px;
+}
+
+p {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.location {
+    margin-top: 10px;
+}
+
+.location a {
+    color: blue;
+    font-size: 16px;
+}
+
+
+/* Tablet (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        width: 90%;
+        margin: auto;
+    }
+}
+
+/* Mobile (up to 767px) */
+@media screen and (max-width: 767px) {
+    body {
+        font-size: 12px;
+    }
+}
