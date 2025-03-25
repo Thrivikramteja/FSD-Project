@@ -42,15 +42,6 @@
                     <option value="<%= city %>"><%= city %></option>
                 <% }); %>
             </select>
-            
-            <!-- Care Home Details -->
-            <label for="type">Type of Care Home</label>
-            <select id="type" name="type" required>
-                <option value="">-- Select Type --</option>
-                <% careHomeTypes.forEach(type => { %>
-                    <option value="<%= type %>"><%= type %></option>
-                <% }); %>
-            </select>
 
             <label>Services Needed</label>
             <div class="checkbox-group">
@@ -62,9 +53,6 @@
             <!-- Administrator Details -->
             <label for="admin_name">Administrator Name</label>
             <input type="text" id="admin_name" name="admin_name" required>
-            
-            <label for="designation">Designation</label>
-            <input type="text" id="designation" name="designation" required>
 
             <label for="bank_name">Bank Name:</label>
 <input type="text" id="bank_name" name="bank_name" value="<%= typeof bankName !== 'undefined' ? bankName : '' %>" required>

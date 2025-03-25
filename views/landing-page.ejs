@@ -6,42 +6,62 @@
     <link rel="stylesheet" href="/styles/events.css">
     <link rel="stylesheet" href="/styles/donate_mon.css">
     <link rel="stylesheet" href="/styles/landing_page.css" />
-    <!-- <script src="/scripts/overlay.js" defer></script> -->
-    <!-- <script src="/scripts/toggleForms.js" defer></script> -->
-    
   </head>
-  <body>
+  <body> 
     <%- include('./shared/includes/header') %>
     <main>
       <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</p>
       <div class="nonprofit-container">
-        <% nonprofits.forEach(nonprofit => { %>
+        <% fundraisers.forEach(fundraiser => { %>
             <div class="nonprofit-card" >
-                <img src="/images/<%= nonprofit.image %>" alt="<%= nonprofit.name %>">
-                <h3><%= nonprofit.name %></h3>
-                <p><%= nonprofit.categories.join("#") %></p>
+                <img src="/images/<%= fundraiser.imageUrl %>" alt="<%= fundraiser.name %>">
+                <h3><%= fundraiser.name %></h3>
                 <div class="info">
                     <div>
-                        <h4>₹<%= nonprofit.amountRaised.toLocaleString() %></h4>
+                        <h4>₹<%= fundraiser.amountRaised.toLocaleString() %></h4>
                         <p>Amount Raised</p>
                     </div>
                     <div>
-                        <h4><%= nonprofit.supporters.toLocaleString() %></h4>
+                        <h4><%= fundraiser.supporters.toLocaleString() %></h4>
                         <p>Supporters</p>
                     </div>
                 </div>
                 <div class="buttons">
                     <button class="details-btn">View details</button>
-                    <!-- <button class="select-btn">Donate</button> -->
-                    <!-- <button class="select-btn" onclick="window.location.href='/donate_money'">Donate</button> -->
-                    <a href="/donate/<%=(nonprofit.name) %>">
+                    <a href="/donate/<%=(fundraiser.name) %>">
                         <button class="select-btn">Donate</button>
                     </a>
                 </div>
             </div>
         <% }) %>
     </div>
+
       <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">NGO Events</p>
+      <div class="nonprofit-section">
+        <% events.forEach(event => { %>
+            <div class="nonprofit-card" >
+                <img src="/images/<%= event.imageUrl %>" alt="<%= event.name %>">
+                <h3><%= event.name %></h3>
+                <p><%= event.categories.join("#") %></p>
+                <div class="info">
+                    <div>
+                        <h4>₹<%= event.amountRaised.toLocaleString() %></h4>
+                        <p>Amount Raised</p>
+                    </div>
+                    <div>
+                        <h4><%= event.supporters.toLocaleString() %></h4>
+                        <p>Supporters</p>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="details-btn">View details</button>
+                    <a href="/donate/<%=(event.name) %>">
+                        <button class="select-btn">Donate</button>
+                    </a>
+                </div>
+            </div>
+        <% }) %>
+    </div>
       <section class="nonprofit-section" style="margin-bottom: 35px;">
  
         <div class="container">
