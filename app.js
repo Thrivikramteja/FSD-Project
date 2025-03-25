@@ -1,12 +1,28 @@
 const path = require("path");
-const db = require("./data/sqlite3");
 
 const express = require("express");
+const session = require('express-session');
+
+require("./data/sqlite3");
+const SQLiteStore = require("connect-sqlite3")(session);
 
 const baseRoutes = require("./routes/base.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
 
 const app = express();
+
+app.use(
+    session({
+      store: new SQLiteStore({
+        db: "sessions.db",   
+        dir: "./data",   
+      }),
+      secret: "the-very-very-strongest-secret-key", 
+      resave: false,
+      saveUninitialized: false,
+      cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, 
+    })
+  );
 
 app.use(express.static("public"));
 

@@ -6,12 +6,15 @@
     <main>
         <form name="myForm" action="/signup" method="POST">
             <h1>SIGN UP</h1>
+
+            <p><%= errorMessage %></p>
     
             <label for="name">Name</label><br />
             <input
               type="text"
               id="name"
               name="name"
+              required
             />
             <span id="name-error" style="color: red"></span>
             <br /><br />
@@ -21,6 +24,7 @@
               type="email"
               id="mail"
               name="mail"
+              required
             />
             <span id="mail-error" style="color: red"></span>
             <br /><br />
@@ -30,6 +34,7 @@
               type="password"
               id="pass"
               name="password"
+              required
             />
             <span id="pass-error" style="color: red"></span>
             <br /><br />
@@ -39,6 +44,7 @@
               type="password"
               id="repass"
               name="repass"
+              required
             />
             <span id="repass-error" style="color: red"></span>
             <br /><br />
@@ -48,10 +54,11 @@
               type="text"
               id="contact"
               name="contact"
+              required
             />
             <br /><br />
     
-            <input type="checkbox" id="notification" />
+            <input type="checkbox" id="notification" name="checkbox" />
             <label for="notification">I agree to receive notifications</label>
             <br /><br />
     
