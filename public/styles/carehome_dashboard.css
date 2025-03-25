@@ -1,0 +1,321 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    color: #2980b9;
+    margin: 20px 0;
+}
+
+h2, h3 {
+    color: #2c3e50;
+}
+
+/* Header Styles */
+.header {
+    background-color: #2980b9;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+
+.wishlist 
+{
+    background-color: #ecf0f1;
+    padding: 15px;
+    width: 250px; /* Fixed width for the wishlist */
+    position: fixed; /* Fixed position on the left */
+    top: 60px; /* Below the header */
+    left: 20px; /* Margin from the left */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; 
+    max-height: calc(100vh - 80px); /* Responsive height */
+    margin-right: 150px;
+}
+
+.wishlist h2 {
+    margin-top: 0;
+}
+
+/* Main Dashboard Styles */
+.dashboard {
+    margin-left: 320px; /* Space for sidebar */
+    padding: 20px;
+}
+
+.toggle-button {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* Dashboard Stats Section Styles */
+.dashboard-stats {
+    padding: 20px; /* Padding around the section */
+    background-color: white; /* Background color for the section */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    margin-bottom: 20px; /* Space below the section */
+}
+
+.stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between cards */
+    justify-content: flex-start; /* Align items from the start */
+}
+
+
+.stat-card {
+    background-color: #ffffff; /* White background for cards */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Padding inside cards */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    
+    transition: transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+    position: relative; /* Position for icon */
+    flex: 1 1 calc(25% - 20px);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
+}
+
+.stat-icon {
+    position: absolute; /* Position icon */
+    top: 20px; /* Positioning */
+    right: 20px; /* Positioning */
+    width: 40px; /* Icon size */
+    height: 40px; /* Icon size */
+}
+
+.stat-icon img {
+    width: 100%; /* Responsive icon */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.stat-card h3 {
+    color: #2980b9; /* Title color */
+    margin: 0 0 10px; /* Margin below title */
+    font-size: 1.5em; /* Larger font size for title */
+}
+
+.stat-value {
+    font-size: 1em; /* Larger font size for value */
+    color: #27ae60; /* Green color for value */
+    font-weight: bold; /* Bold font for emphasis */
+}
+
+/* Donations Section Styles */
+.donations {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.donation-card {
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+/* View More & View Less Button Styling */
+.view-toggle-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007bff; /* Blue Button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.view-toggle-btn:hover {
+    background-color: #0056b3; /* Darker Blue on Hover */
+}
+
+.hidden {
+    display: none;
+}
+
+
+/* Fundraisers Section Styles */
+.fundraisers {
+    background-color: #eafaf1; /* Light green background */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Padding around the content */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    margin-bottom: 20px; /* Space below the section */
+}
+
+.fundraiser-list {
+    display: flex; /* Use flexbox for layout */
+    flex-wrap: wrap; /* Allow wrapping of cards */
+    gap: 20px; /* Space between cards */
+}
+
+.fundraiser-card {
+    background-color: #ffffff; /* White background for cards */
+    border: 1px solid #bdc3c7; /* Light border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Padding inside cards */
+    flex: 1 1 calc(25% - 20px); /* Responsive width for 4 cards in a row */
+    margin-bottom: 15px; /* Space below cards */
+    transition: transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+}
+
+.fundraiser-card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
+}
+
+.fundraiser-card h3 {
+    color: #2980b9; /* Title color */
+    margin: 0 0 10px; /* Margin below title */
+}
+
+.fundraiser-card p {
+    color: #2c3e50; /* Text color */
+    margin: 0; /* Reset margin */
+}
+
+.fundraiser-card p strong {
+    color: #e74c3c; /* Red color for end date */
+}
+
+.progress-bar {
+    background-color: #bdc3c7; /* Background for progress bar */
+    border-radius: 5px; /* Rounded corners */
+    height: 10px; /* Height of the progress bar */
+    overflow: hidden; /* Hide overflow */
+}
+
+.progress {
+    background-color: #27ae60; /* Green for progress */
+    height: 100%; /* Full height */
+    transition: width 0.3s; /* Smooth transition for progress */
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #2980b9;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.footer-section {
+    flex: 1;
+    margin: 10px;
+    min-width: 200px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin: 5px 0;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.newsletter-signup {
+    display: flex;
+    justify-content: space-between;
+}
+
+.newsletter-signup input {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.newsletter-signup button {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .wishlist {
+        width: 100%;
+        position: relative; /* Change to relative on small screens */
+        top: auto; /* Reset top */
+        left: auto; /* Reset left */
+        margin: 0; /* Reset margin */
+    }
+
+    .dashboard {
+        margin-left: 0; /* Reset margin for dashboard */
+    }
+
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-card {
+        flex: 1 1 calc(50% - 20px); /* Two cards in
+                /* Two cards in a row on smaller screens */
+    }
+
+    .fundraiser-card {
+        flex: 1 1 calc(50% - 20px); /* Two cards in a row on smaller screens */
+    }
+}
+
+/* Additional Styles for Better Visuals */
+.stat-card {
+    text-align: center; /* Center text in stat cards */
+}
+
+.stat-card h3 {
+    margin-bottom: 5px; /* Space below title */
+}
+
+.stat-card .stat-value {
+    margin-top: 10px; /* Space above value */
+}
+
+.fundraiser-card h3 {
+    margin-bottom: 10px; /* Space below title */
+}
+
+.fundraiser-card p {
+    margin-bottom: 5px; /* Space below paragraph */
+}

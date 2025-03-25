@@ -1,0 +1,115 @@
+body{
+    font-family: Arial, sans-serif;
+    background-color: #e6f4ea; /* Light Green Background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #2e7d32; /* Dark Green */
+}
+
+h3 {
+    margin-top: 15px;
+    color: #388e3c; /* Medium Green */
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.terms {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terms label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.terms input[type="checkbox"] {
+    margin: 0;
+    position: relative;
+}
+
+button {
+    background: #2e7d32; /* Green Button */
+    color: white;
+    padding: 10px;
+    border: none;
+    width: 100%;
+    margin-top: 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #1b5e20; /* Darker Green */
+}
+
+.error-message {
+    font-size: 12px;
+    color: red;
+    margin-top: 5px;
+}
+
+.invalid {
+    border-color: red;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
+        width: 100%;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
