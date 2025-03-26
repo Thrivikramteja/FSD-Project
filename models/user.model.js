@@ -8,21 +8,15 @@ class User {
     this.checkbox = checkbox;
   }
 
-  existsAlready(email) {
-    return new Promise((resolve, reject) => {
-      console.log("Checking existence for email:", email);
-      const sqlQuery = "SELECT * FROM donors WHERE email = ?";
+  static getUser(email, callback) {
+    const sql = "SELECT * FROM donors WHERE email = ?"; // Adjust table name if needed
 
-      db.get(sqlQuery, [email], (err, row) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log("Query result:", row);
-          resolve(!!row);
-        }
-      });
+    db.get(sql, [email], (err, row) => {
+      if (err) return callback(err, null);
+      return callback(null, row); // Returns a single User or null if not found
     });
   }
+
 
   async signup() {
     const hashedPassword = await bcrypt.hash(this.password, 12);
@@ -87,7 +81,7 @@ class User {
     }
   }
 
-  getname(userId, callback) {
+  static getname(userId, callback) {
     db.get(
       "SELECT name FROM donors WHERE id_donor = ?",
       [userId],
@@ -102,7 +96,7 @@ class User {
     );
   }
 
-  participatedEvents(userId, callback) {
+  static participatedEvents(userId, callback) {
     const query = "SELECT * FROM user_registered_events WHERE id_donor = ?";
     db.all(query, [userId], (err, rows) => {
       if (err) {
@@ -119,7 +113,7 @@ class User {
     });
   }
 
-  contributedFundraisers(userId, callback) {
+  static contributedFundraisers(userId, callback) {
     const query =
       "SELECT * FROM user_contributed_fundraisers WHERE id_donor = ?";
     db.all(query, [userId], (err, rows) => {
@@ -136,7 +130,7 @@ class User {
     });
   }
 
-  ongoingfund(userId, callback) {
+  static ongoingfund(userId, callback) {
     const query =
       "SELECT * FROM user_contributed_fundraisers WHERE id_donor = ?";
     db.all(query, [userId], (err, rows) => {
@@ -153,7 +147,7 @@ class User {
     });
   }
 
-  upcomingEvents(userId, callback) {
+  static upcomingEvents(userId, callback) {
     const query = "SELECT * FROM user_registered_events WHERE id_donor = ?";
     db.all(query, [userId], (err, rows) => {
       if (err) {

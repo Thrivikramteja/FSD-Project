@@ -12,7 +12,8 @@ const db = new sqlite3.Database(":memory:", (err) => {
         name TEXT,
         email TEXT UNIQUE,
         password TEXT,
-        mobile_number TEXT
+        mobile_number TEXT,
+        receive_notifications BLOB
       );
 
       CREATE TABLE carehomes (
@@ -40,6 +41,7 @@ const db = new sqlite3.Database(":memory:", (err) => {
         password TEXT,
         darpan_id TEXT,
         bank_acc_holder_name TEXT,
+        phone TEXT,
         IFSC_code TEXT,
         bank_acc_number TEXT,
         funds_raised INTEGER,

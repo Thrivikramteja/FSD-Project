@@ -49,6 +49,15 @@ class Carehome {
     })
   }
 
+  static getCarehome(email, callback) {
+    const sql = "SELECT * FROM carehomes WHERE email = ?"; // Adjust table name if needed
+
+    db.get(sql, [email], (err, row) => {
+      if (err) return callback(err, null);
+      return callback(null, row); // Returns a single Carehome or null if not found
+    });
+  }
+
   getCarehomeId(email, callback) {
     const sqlQuery = "SELECT id_carehome FROM carehomes WHERE email = ?";
 

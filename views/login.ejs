@@ -10,6 +10,10 @@
         <h1 id="loginBtn">Login</h1> 
       </div>
 
+      <% if (error) { %>
+        <p><%= error  %></p>
+      <% } %>
+
       <p id="loginas">Login As:<br>
         <select name="UserRole" id="role">
           <option value="NGO">NGO</option>

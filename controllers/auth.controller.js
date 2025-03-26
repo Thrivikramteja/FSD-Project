@@ -2,6 +2,8 @@ const User = require("../models/user.model");
 const NGO = require("../models/NGO.model");
 const Carehome = require("../models/carehome.model");
 
+const bcrypt = require('bcryptjs');
+
 const isAuth = (req, res, next) => {
   if (req.session.isAuth) {
     next();
@@ -16,19 +18,24 @@ function getSignup(req, res) {
 }
 
 function getLogin(req, res) {
-  res.render("login");
+  const error = " "
+  res.render("login", {error});
 }
 
 async function signup(req, res) {
-  const { name, mail, password, repass, contact, checkbox } = req.body;
-
-  const user = new User(name, mail, password, contact, checkbox);
+  const { fullname, mail, password, repass, phone, checkbox } = req.body;
+  const user = new User(fullname, mail, password, phone, checkbox);
 
   try {
-    const exists = await user.existsAlready(mail);
+    const exists = await new Promise((resolve, reject) => {
+      User.getUser(mail, (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    });
     if (exists) {
       console.log("User already exists.");
-      return res.render("signup", {error: "User already exists"});
+      return res.render("users/signup", {error: "User already exists"});
     }
     await user.signup();
     console.log("User registered successfully.");
@@ -43,81 +50,169 @@ async function signup(req, res) {
 async function login(req, res) {
   const { UserRole, email, password } = req.body;
 
-  if (UserRole == "NGO") {
-    const ngo = NGO.getNGO(email, (err, row) => {
-      if (err) {
-        console.log("Error: ", err);
-        return;
-      }
-      if (!row) {
+  console.log("in login " + UserRole);
+
+  try {
+    let user = null;
+
+    if (UserRole === "NGO") {
+      user = await new Promise((resolve, reject) => {
+        NGO.getNGO(email, (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      });
+
+      if (!user) {
         console.log("NGO does not exist.");
-        return;
+        return res.render("login", {error: "NGO does not exist."});
       }
-    });
 
-    if (!ngo) {
-      return res.redirect("/login");
-    }
-    const isMatch = await bcrypt.compare(password, ngo.password);
-
-    if (!isMatch) {
-      return res.redirect("/login");
-    }
-
-    const ngoId = ngo.id_NGO;
-    req.session.isAuth = true;
-    res.redirect("/NGO-dashboard/:ngoId");
-  } else if (UserRole == "donor") {
-    const donor = User.getUser(email, (err, row) => {
-      if (err) {
-        console.log("Error: ", err);
-        return;
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        console.log("Incorrect password.");
+        return res.render("login", {error:"Incorrect password."});
       }
-      if (!row) {
-        console.log("donor does not exist.");
-        return;
+
+      req.session.isAuth = true;
+      return res.redirect(`/NGO-dashboard/${user.id_NGO}`);
+
+    } else if (UserRole === "Donor") {
+      user = await new Promise((resolve, reject) => {
+        User.getUser(email, (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      });
+
+      if (!user) {
+        console.log("Donor does not exist.");
+        return res.render("login", {error:"Donor does not exist."});
       }
-    });
 
-    if (!donor) {
-      return res.redirect("/login");
-    }
-    const isMatch = await bcrypt.compare(password, donor.password);
-
-    if (!isMatch) {
-      return res.redirect("/login"); 
-    }
-
-    req.session.isAuth = true;
-    const donorId = donor.id_donor;
-
-    res.redirect("/user-dashboard/:donorId");
-  } else if (UserRole == "carehome") {
-    const carehome = Carehome.getCarehome(email, (err, row) => {
-      if (err) {
-        console.log("Error: ", err);
-        return;
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        console.log("Incorrect password.");
+        return res.render("login", {error:"Incorrect password."});
       }
-      if (!row) {
+
+      req.session.isAuth = true;
+      return res.redirect(`/user-dashboard/${user.id_donor}`);
+
+    } else if (UserRole === "Carehome") {
+      user = await new Promise((resolve, reject) => {
+        NGO.getCarehome(email, (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      });
+
+      if (!user) {
         console.log("Carehome does not exist.");
-        return;
+        return res.render("login", {error:"Carehome does not exist."});
       }
-    });
 
-    if (!carehome) {
-      return res.redirect("/login");
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        console.log("Incorrect password.");
+        return res.render("login", {error:"Incorrect password."});
+      }
+
+      req.session.isAuth = true;
+      return res.redirect(`/carehome-dashboard/${user.id_carehome}`);
     }
-    const isMatch = await bcrypt.compare(password, carehome.password);
 
-    if (!isMatch) {
-      return res.redirect("/login");
-    }
+    console.log("Invalid user role.");
+    res.render("login", {error:"Invalid user role."});
 
-    const carehomeId = carehome.id_carehome;
-    req.session.isAuth = true;
-    res.redirect("/carehome-dashboard/:carehomeId");
+  } catch (error) {
+    console.error("Login error:", error);
+    res.redirect("/login");
   }
 }
+async function login(req, res) {
+  const { UserRole, email, password } = req.body;
+
+  console.log("in login " + UserRole);
+
+  try {
+    let user = null;
+
+    if (UserRole === "NGO") {
+      user = await new Promise((resolve, reject) => {
+        NGO.getNGO(email, (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      });
+
+      if (!user) {
+        console.log("NGO does not exist.");
+        return res.render("login", {error: "NGO does not exist."});
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        console.log("Incorrect password.");
+        return res.render("login", {error:"Incorrect password."});
+      }
+
+      req.session.isAuth = true;
+      return res.redirect(`/NGO-dashboard/${user.id_NGO}`);
+
+    } else if (UserRole === "Donor") {
+      user = await new Promise((resolve, reject) => {
+        User.getUser(email, (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      });
+
+      if (!user) {
+        console.log("Donor does not exist.");
+        return res.render("login", {error:"Donor does not exist."});
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        console.log("Incorrect password.");
+        return res.render("login", {error:"Incorrect password."});
+      }
+
+      req.session.isAuth = true;
+      return res.redirect(`/user-dashboard/${user.id_donor}`);
+
+    } else if (UserRole === "Carehome") {
+      user = await new Promise((resolve, reject) => {
+        Carehome.getCarehome(email, (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      });
+
+      if (!user) {
+        console.log("Carehome does not exist.");
+        return res.render("login", {error:"Carehome does not exist."});
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        console.log("Incorrect password.");
+        return res.render("login", {error:"Incorrect password."});
+      }
+
+      req.session.isAuth = true;
+      return res.redirect(`/carehome-dashboard/${user.id_carehome}`);
+    }
+
+    console.log("Invalid user role.");
+    res.render("login", {error:"Invalid user role."});
+
+  } catch (error) {
+    console.error("Login error:", error);
+    res.redirect("/login");
+  }
+} 
 
 module.exports = {
   getSignup: getSignup,

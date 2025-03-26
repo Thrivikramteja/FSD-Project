@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NGO Registration</title>
     <link rel="stylesheet" href="styles/ngo_registration.css">
-    <script defer src="scripts/ngo_reg.js"></script>
+    <script defer src="scripts/ngo_reg.js" defer></script>
 </head>
 <body>
     <div class="container">
         <h1 id="ngo_display_name">NGO Registration</h1>
-        <form id="ngo_form">
+        <form id="ngo_form" action="/registerNgo" method="post">
             <h2>NGO Details</h2>
             <label for="name">NGO Name</label>
-            <input type="text" id="name" name="name" required>
+            <input type="text" id="name" name="Ngoname" required>
 
             <label for="darpan_id">DARPAN ID</label>
             <input type="text" id="darpan_id" name="darpan_id" required>
@@ -39,7 +39,7 @@
 
             <h2>Bank & Payment Details</h2>
             <label for="bank_name">Bank Account Holder Name</label>
-            <input type="text" id="bank_name" name="bank_name" required>
+            <input type="text" id="bank_name" name="account_holder_name" required>
 
             <label for="account_number">Account Number</label>
             <input type="text" id="account_number" name="account_number" required>

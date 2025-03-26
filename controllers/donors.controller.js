@@ -28,7 +28,7 @@ async function getdonor(req, res) {
       user_ID
     );
     const contributedFundraisers = await promisifyModelMethod(
-      User.contributedFundraisers,
+      User.contributedFundraisers, 
       user_ID
     );
     const ongoingfund = await promisifyModelMethod(User.ongoingfund, user_ID);

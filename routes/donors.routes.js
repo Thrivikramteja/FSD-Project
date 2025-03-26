@@ -1,11 +1,11 @@
 const express = require("express");
 
-const donorsController = require("../controllers/donors.controller");
+const donorsController = require("../controllers/donors.controller"); 
 
 const {isAuth} = require('../controllers/auth.controller');
 
-const router = express.Router();
+const router = express.Router(); 
 
-router.get('/user-dashboard/:donorId',isAuth ,donorsController.getdonor);
+router.get('/user-dashboard/:userId',isAuth ,donorsController.getdonor);
 
 module.exports = router;

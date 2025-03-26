@@ -107,38 +107,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Form Submission and Success Popup
-    const form = document.getElementById("ngo_form");
-    if (form) {
-        form.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            let isValid = true;
-
-            // Check for existing error messages
-            document.querySelectorAll(".error-message").forEach(error => {
-                if (error.textContent !== "") {
-                    isValid = false;
-                }
-            });
-
-            // Final account number validation before submission
-            if (accountNumberInput) {
-                const accountNumber = accountNumberInput.value.trim();
-                const accountNumberPattern = /^\d{9,18}$/;
-                if (!accountNumberPattern.test(accountNumber)) {
-                    alert("Invalid Account Number. It should contain only digits and be between 9 to 18 characters long.");
-                    accountNumberInput.focus();
-                    isValid = false;
-                }
-            }
-
-            if (isValid) {
-                alert("🎉 Registration Successful! Your NGO has been registered.");
-                form.reset();
-            } else {
-                alert("⚠️ Please correct the errors before submitting.");
-            }
-        });
-    }
 });

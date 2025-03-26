@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
-    <link rel="stylesheet" href="/user_dashboard.css">
-    <link rel="stylesheet" href="/footer.css">
+    <link rel="stylesheet" href="/styles/user_dashboard.css">
+    <link rel="stylesheet" href="/styles/footer.css">
 </head>
 <body>
 
@@ -13,13 +13,13 @@
 
         <div class="name_right">
             
-            <h1>Welcome <br><%= user.name %></h1>
+            <h1>Welcome <br><%= name %></h1>
 
         </div>
 
         <div class="user_pro">
-            <img src="/user.png" alt="profile" class="pro_img">
-            <p class="greet">Hi <%= user.name %>.</p>
+            <img src="/images/user.jpg" alt="profile" class="pro_img">
+            <p class="greet">Hi <%= name %>.</p>
             <button id="toggle-stats-btn">Statistics</button>
             <div id="user-stats" class="user-stats">
                 <h2>Your Statistics</h2>
@@ -156,6 +156,6 @@
             
         </div>
     </footer>
-    <script src="/analytics_user.js"></script>  
+    <script src="/scripts/analytics_user.js"></script>  
 </body>
 </html>

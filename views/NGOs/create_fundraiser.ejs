@@ -4,41 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Fundraiser</title>
-    <link href="/ngo_dashboard.css" rel="stylesheet">
-
+    <link href="/styles/ngo_das.css" rel="stylesheet">
+    
 </head>
 <body>
 
     <div class="form-container">
         <h2 class="head_ing">Create New Fundraiser</h2>
-        <form id="fundraiserForm" action="/create-fundraiser"    method="post"> <!-- Ensure method is POST for form submission -->
-           
+
+        <form id="fundraiserForm" action="/NGO-dashboard/<%= ngoID %>/create-fundraiser" method="post"> <!-- Ensure method is POST for form submission -->
+            <input type="hidden" name="id_NGO" id="ngoId" value="<%= ngoID %>">
             <div class="form-group">
                 <label>PLease select one care home:</label>
-                <select id="val_drop" autofocus class="care_select">
+                <select id="val_drop" autofocus class="care_select" name="id_carehome">
                     <option value="None">None</option><br>
                     <% for(let i = 0; i < care.length; i++) { %>
-                        <option value="<%= care[i].name_carehome %>"><%= care[i].name_carehome %></option><br>
+                        <option value="<%= care[i].id_carehome %>"><%= care[i].name_carehome %></option><br>
                     <% } %>
                 </select>
                 <span id="val_error" style="color: red; display: none;">Must select one care home before proceeding</span>
             </div>
             <div class="form-group">
                 <label>Title:</label>
-                <input type="text" id="title" name="title" required>
+                <input type="text" id="title" name="fundraiser_name" required>
             </div>
             <div class="form-group">
                 <label>Description:</label>
-                <textarea id="description" required></textarea>
+                <textarea id="description" name="description" required></textarea>
             </div>
             <div class="form-group">
                 <label>Goal Amount:</label>
-                <input type="number" id="goal" name="goal"  required> <!-- Pre-fill with dynamic data -->
+                <input type="number" id="goal" name="goal_amount"  required> <!-- Pre-fill with dynamic data -->
                 <span id="goalerror" style="color: red; display: none;">Goal amount must be valid and minimum is 1,00,000</span>
             </div>
             <div class="form-group">
                 <label>Deadline:</label>
                 <input type="date" id="deadline" name="deadline"  required> <!-- Pre-fill with dynamic data -->
+                <span id="dateerror" style="color: red; display: none;">Deadline must be a valid future date.</span>
             </div>
             <div class="form-group">
                 <label>Image:</label>
@@ -92,6 +94,49 @@
             
         </div>
     </footer>
-    <script src="/app.js"></script>
+    <script>
+        
+document.getElementById("fundraiserForm").addEventListener("submit", function (e) {
+    const goalInput = document.getElementById("goal");
+    const goalError = document.getElementById("goalerror");
+    const selectedDropdown = document.getElementById("val_drop");
+    const dropdownError = document.getElementById("val_error");
+    const dateInput = document.getElementById("deadline");
+    const dateError = document.getElementById("dateerror");
+    // Ensure goalError, dropdownError, and dateError visibility is reset
+    goalError.style.display = "none";
+    dropdownError.style.display = "none";
+    dateError.style.display = "none";
+
+    // Validate goal amount
+    const goalValue = parseInt(goalInput.value, 10);
+    if (isNaN(goalValue) || goalValue < 100000) {
+        e.preventDefault();
+        goalError.style.display = "block";
+        goalInput.focus();
+        return;
+    }
+
+    // Validate dropdown selection
+    if (selectedDropdown.value === "None" || selectedDropdown.value === "") {
+        e.preventDefault();
+        dropdownError.style.display = "block";
+        selectedDropdown.focus();
+        return;
+    }
+
+    // Validate deadline
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
+    const inputDate = new Date(dateInput.value);
+    if (isNaN(inputDate) || inputDate < today) {
+        e.preventDefault();
+        // alert("Please choose a valid deadline that is in the future.");
+        dateError.style.display = "block";
+        dateInput.focus();
+        return;
+    }
+});
+    </script>
 </body>
 </html>
