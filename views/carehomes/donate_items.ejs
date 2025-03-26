@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Directly</title>
+    <link rel="stylesheet" href="/styles/donate_mon.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="stylesheet" href="/styles/landing_page.css">
+    <script src="/scripts/donate_moneyy.js" defer></script>
+</head>
+<body>
+    <%- include('../shared/includes/header') %>
+    <div class="choose_someone" style="margin-top: 2rem;">
+        <label for="some_home">Choose a care home:</label><br>
+        <select name="carehomes" id="some_home">
+            <% carehomes.forEach(home => { %>
+                <option value="<%= home.name_carehome %>"><%= home.name_carehome %></option>
+            <% }); %>   
+        </select>
+        <button type="button" id="submit">Choose it</button>
+    </div>
+
+    <div class="donation_main" style="display: none; margin-top: 5rem">
+        <div class="user_det">
+            <div class="fill_money">
+                <h2>Donation Amount</h2>
+                <div class="popular_options">
+                    <button type="button" class="options">1000</button>
+                    <button type="button" class="options">2000</button>
+                    <button type="button" class="options">3000</button>
+                </div>
+                <div class="amount-input">
+                    <span class="currency-symbol">₹</span>
+                    <input id="anyamount" type="number" placeholder="Enter custom amount" min="1" max="1000000">
+                    <div class="error-message" id="amountError">Please enter a valid amount up to 10 lakhs</div>
+                </div>
+                <div class="tip">
+                    <div class="tip-label">
+                        <span>Give Tip (8%):</span>
+                    </div>
+                    <div id="show_tip">₹0.00</div>
+                </div>
+                <p class="tip-note">Tips help us scale the platform</p>
+            </div>
+
+            <div class="user_details">
+                <h2>Your Details</h2>
+                <form id="donationForm">
+                    <div class="form-group">
+                        <label for="name">Full name</label>
+                        <input type="text" id="name" required>
+                        <div class="error-message">Please enter your full name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone number</label>
+                        <input type="tel" id="phone" pattern="[0-9]{10}" required>
+                        <div class="error-message">Please enter a valid 10-digit number</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                        <div class="error-message">Please enter a valid email</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pan">PAN Number</label>
+                        <input type="text" id="pan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" required>
+                        <div class="error-message">Please enter a valid PAN</div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span class="button-text">Proceed to pay: ₹0.00</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+                <p class="secured-payment">All payments are securely processed</p>
+            </div>
+        </div>
+
+        <div class="invoice_final">
+            <div class="invoice-content">
+                <h3 id="choosen_one"></h3>
+                <p id="org-description">Providing compassionate care for elderly residents since 2005</p>
+                <div class="invoice-details">
+                    <div class="invoice-row">
+                        <span>Donation Amount:</span>
+                        <span id="invoiceDonation">₹0.00</span>
+                    </div>
+                    <div class="invoice-row">
+                        <span>Platform Tip (8%):</span>
+                        <span id="invoiceTip">₹0.00</span>
+                    </div>
+                    <hr>
+                    <div class="invoice-row total">
+                        <span>Total Amount:</span>
+                        <span id="invoiceTotal">₹0.00</span>
+                    </div>
+                </div>
+                <button type="button" class="pay-now-btn" disabled>
+                    <span class="button-text">Confirm Payment</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <%- include('../shared/includes/footer') %>
+</body>
+</html>

@@ -52,6 +52,14 @@ class NGO {
     );
   }
 
+  static getNGOById(id, callback) {
+    const sql = "SELECT * FROM NGOs WHERE id_NGO = ?";
+    db.get(sql, [id], (err, row) => {
+      if (err) return callback(err, null);
+      return callback(null, row); // Returns a single NGO or null if not found
+    });
+  }
+
   static getNGO(email, callback) {
     const sql = "SELECT * FROM NGOs WHERE email = ?";
     db.get(sql, [email], (err, row) => {

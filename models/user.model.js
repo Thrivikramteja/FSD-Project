@@ -1,6 +1,9 @@
 const db = require("../data/sqlite3");
 const bcrypt = require("bcryptjs");
 
+const today = new Date();
+const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
 class User {
   constructor(name, email, password, contact, checkbox) {
     (this.email = email), (this.password = password), (this.name = name);
@@ -17,6 +20,17 @@ class User {
     });
   }
 
+  static get_user_data(userId, callback) {
+    const query = `select * from donors where id_donor = ?`;
+    db.get(query, [userId], (err, rows) => {
+      if (err) {
+        console.error("Error fetching user data:", err);
+        callback(err, null);
+      } else {
+        callback(null, rows);
+      }
+    });
+  }
 
   async signup() {
     const hashedPassword = await bcrypt.hash(this.password, 12);
@@ -59,7 +73,7 @@ class User {
     return bcrypt.compare(this.password, hashedPassword);
   }
 
-  toISO(dateText) {
+  static toISO(dateText) {
     if (!dateText) {
       console.warn("Invalid or missing date:", dateText);
       return null;
@@ -104,7 +118,7 @@ class User {
         callback(err, null);
       } else {
         const participatedEvents = rows.filter((row) => {
-          const isoDate = toISO(row.event_date);
+          const isoDate = User.toISO(row.event_date);
           return isoDate && isoDate < isoCurrentDate;
         });
 
@@ -122,7 +136,7 @@ class User {
         callback(err, null);
       } else {
         const contributedFundraisers = rows.filter((row) => {
-          const isoDate = toISO(row.deadline);
+          const isoDate = User.toISO(row.deadline);
           return isoDate && isoDate < isoCurrentDate;
         });
         callback(null, contributedFundraisers);
@@ -139,7 +153,7 @@ class User {
         callback(err, null);
       } else {
         const ongoingFund = rows.filter((row) => {
-          const isoDate = toISO(row.deadline);
+          const isoDate = User.toISO(row.deadline);
           return isoDate && isoDate >= isoCurrentDate;
         });
         callback(null, ongoingFund);
@@ -155,7 +169,7 @@ class User {
         callback(err, null);
       } else {
         const upcomingEvents = rows.filter((row) => {
-          const isoDate = toISO(row.event_date);
+          const isoDate = User.toISO(row.event_date);
           return isoDate && isoDate >= isoCurrentDate;
         });
         callback(null, upcomingEvents);

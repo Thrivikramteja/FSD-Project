@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit NGO Details</title>
+    <link rel="stylesheet" href="ngos.css" />
+  </head>
+  <body class="edits1">
+    <div class="toppart">
+      <h2 style="color: rgb(24, 6, 188)">EDIT YOUR DETAILS (NGO)</h2>
+    </div>
+
+    <div class="ngos">
+      <form class="ngo1" method="put" action="/NGO-dashboard/<%= ngoid %>/edit">
+        <label for="fullname">NGO name</label><br />
+        <input
+          type="text"
+          id="fullname"
+          name="fullname"
+          value="<%= user.fullname || '' %>"
+        /><br />
+        <span id="fullname-error" style="color: red"></span><br />
+
+        <label for="mail">Email</label><br />
+        <input
+          type="email"
+          id="mail"
+          name="mail"
+          value="<%= user.mail || '' %>"
+        /><br />
+        <span id="mail-error" style="color: red"></span><br />
+
+        <label for="bank">Bank Account Holder name</label><br />
+        <input
+          type="text"
+          id="bank"
+          name="bank"
+          value="<%= user.bankName %>"
+        /><br />
+        <span id="bank-error" style="color: red"></span>
+        <br />
+
+        <label for="accnum"> Bank Account number</label><br />
+        <input
+          type="number"
+          id="accnum"
+          name="accnum"
+          value="<%= user.accnum %>"
+        /><br />
+        <span id="accnum-error" style="color: red"></span>
+        <br />
+
+        <label for="ifsc">IFSC code</label><br />
+        <input
+          type="text"
+          id="ifsc"
+          name="ifsc"
+          value="<%= user.ifsc %>"
+        /><br />
+        <span id="ifsc-error" style="color: red"></span>
+        <br />
+
+        <label for="darpan">Darpan ID</label><br />
+        <input
+          type="text"
+          id="darpan"
+          name="darpan"
+          value="<%= user.darpan || '' %>"
+        /><br />
+        <span id="darpan-error" style="color: red"></span><br />
+
+        <button class="cancelbut">Cancel</button>
+        <input type="submit" id="Save" value="Save" />
+        <img src="/images/logo.png" class="logofit" />
+      </form>
+    </div>
+
+    <script src="/scripts/ngos.js"></script>
+  </body>
+</html>

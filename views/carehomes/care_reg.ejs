@@ -1,59 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Care Home Registration</title>
-    <link rel="stylesheet" href="styles/care_reg.css">
+    <link rel="stylesheet" href="styles/care_reg.css" />
     <script defer src="scripts/carehome_regi.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h2>Care Home Registration</h2>
-        <form id="registrationForm"  method="POST"> 
-            
-            <label for="care_home_name">Care Home Name</label>
-            <input type="text" id="care_home_name" name="care_home_name" required>
-            
-            <label for="reg_number">Govt. ID</label>
-            <input type="text" id="reg_number" name="reg_number" required placeholder="e.g. 123/2024">
-            
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
+      <h2>Care Home Registration</h2>
+      <form id="registrationForm" method="POST" action="/registerCarehome">
+        <label for="care_home_name">Care Home Name</label>
+        <input type="text" id="care_home_name" name="care_home_name" required />
 
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-            
-            <label for="contact">Contact Number</label>
-            <input type="tel" id="contact" name="contact" required>
+        <label for="reg_number">Govt. ID</label>
+        <input
+          type="text"
+          id="reg_number"
+          name="reg_number"
+          required
+          placeholder="e.g. 123/2024"
+        />
 
-            <label for="num_residents">Number of Residents</label>
-            <input type="number" id="num_residents" name="num_residents" required placeholder="Must be greater than 10">
-            
-            <label for="avg_expense">Average Monthly Expense</label>
-            <input type="number" id="avg_expense" name="avg_expense" required placeholder="Enter in INR">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
 
-            <label for="wishlist">Wishlist (Optional)</label>
-            <textarea id="wishlist" name="wishlist" placeholder="Can be filled after signup"></textarea>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
 
-            <label for="description">Description (Optional)</label>
-            <textarea id="description" name="description" placeholder="Describe your care home..."></textarea>
-            
-            <label for="account_holder">Account Holder Name</label>
-            <input type="text" id="account_holder" name="account_holder" required>
+        <label for="contact">Contact Number</label>
+        <input type="tel" id="contact" name="contact" required />
 
-            <label for="account_number">Account Number</label>
-            <input type="text" id="account_number" name="account_number" required>
+        <label for="state">State</label>
+        <input type="text" name="state" id="state" required>
+        
 
-            <label for="ifsc">IFSC Code</label>
-            <input type="text" id="ifsc" name="ifsc" required>
+        <label for="city">City</label>
+        <input type="text" name="city" id="city" required>
 
-            <div class="terms">
-                <label><input type="checkbox" name="terms" required> I agree to the Terms & Conditions</label>
-            </div>
-            
-            <button type="submit">Register</button>
-        </form>
+        <label for="num_residents">Number of Residents</label>
+        <input
+          type="number"
+          id="num_residents"
+          name="num_residents"
+          required
+          placeholder="Must be greater than 10"
+        />
+
+        <label for="avg_expense">Average Monthly Expense</label>
+        <input
+          type="number"
+          id="avg_expense"
+          name="avg_expense"
+          required
+          placeholder="Enter in INR"
+        />
+
+        <label for="wishlist">Wishlist (Optional)</label>
+        <textarea
+          id="wishlist"
+          name="wishlist"
+          placeholder="Can be filled after signup"
+        ></textarea>
+
+        <label for="description">Description (Optional)</label>
+        <textarea
+          id="description"
+          name="description"
+          placeholder="Describe your care home..."
+        ></textarea>
+
+        <label for="account_holder">Account Holder Name</label>
+        <input type="text" id="account_holder" name="account_holder" required />
+
+        <label for="account_number">Account Number</label>
+        <input type="text" id="account_number" name="account_number" required />
+
+        <label for="ifsc">IFSC Code</label>
+        <input type="text" id="ifsc" name="ifsc" required />
+
+        <div class="terms">
+          <label
+            ><input type="checkbox" name="terms" required /> I agree to the
+            Terms & Conditions</label
+          >
+        </div>
+
+        <button type="submit">Register</button>
+      </form>
     </div>
-</body>
+  </body>
 </html>
+

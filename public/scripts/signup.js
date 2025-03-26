@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("pass").addEventListener("input", function () {
     validateField(
       this,
-      /^(?=.[A-Za-z])(?=.\d)[A-Za-z\d]{8,}$/,
+      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
       "Password must be at least 8 characters long and contain both letters and numbers."
     );
 
@@ -116,11 +116,11 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("repass")
     );
 
-    const isPanValid = validateField(
-      document.getElementById("pannum"),
-      /^[A-Z0-9]{10}$/,
-      "Enter a valid 10-character PAN number (uppercase letters and numbers only)."
-    );
+    // const isPanValid = validateField(
+    //   document.getElementById("pannum"),
+    //   /^[A-Z0-9]{10}$/,
+    //   "Enter a valid 10-character PAN number (uppercase letters and numbers only)."
+    // );
 
     if (
       isNameValid &&

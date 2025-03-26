@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Personal Details</title>
+    <link rel="stylesheet" href="/styles/user_editpage.css">
+</head>
+<body class="edits1">
+    <div class="toppart">
+        <h2>Edit your Details(USER)</h2>
+
+    </div>
+
+    <div class="formedit">
+        <form class="personaldetails" method="POST" action="/user-dashboard/<%= user.userID %>/edit">
+            <label for="fullname">Full name</label><br>
+            <input type="text" id="fullname" name="fullname"  value="<%= user.name %>"><br>
+
+            <label for="phne">Mobile number</label><br>
+            <input type="tel" id="phne" name="phone" value="<%= user.mobile_number %>"><br>
+
+            <input type="checkbox" id="updates" name="updates" >
+            <label for="updates">Receive updates on Whatsapp/SMS</label><br>
+
+            <label for="mail">Email</label><br>
+            <input type="email" id="mail" name="mail" value="<%= user.email %>"><br>
+
+
+            
+            <input type="submit" id="Save" value="Save">
+            
+        </form>
+    </div>
+
+    <script src="/scripts/edit_user.js"></script>
+</body>
+</html>

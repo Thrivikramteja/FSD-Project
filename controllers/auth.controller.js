@@ -101,7 +101,7 @@ async function login(req, res) {
 
     } else if (UserRole === "Carehome") {
       user = await new Promise((resolve, reject) => {
-        NGO.getCarehome(email, (err, row) => {
+        Carehome.getCarehome(email, (err, row) => {
           if (err) return reject(err);
           resolve(row);
         });

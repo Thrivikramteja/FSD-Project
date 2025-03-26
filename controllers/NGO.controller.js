@@ -35,6 +35,33 @@ function register(req, res) {
   res.redirect('/login');
 }
 
+async function getEditNGOProfile(req, res) {
+    const ngoId = req.params.ngoID;
+
+    const result = await new Promise((resolve, reject) => {
+        NGO.getNGOById(ngoId, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+
+    const user = {
+        fullname: result.name_NGO,
+        mail: result.email,
+        bankName: result.bank_acc_holder_name,
+        accnum: result.bank_acc_number,
+        ifsc: result.IFSC_code,
+        darpan: result.darpan_id  
+    }
+    
+    res.render('NGOs/ngo_edit', { ngoId, user});
+}
+
+function editNGOProfile() {}
+
 function format_date(deadline) {
     const formattedDate = new Date(deadline);
     const day = String(formattedDate.getDate()).padStart(2, '0'); 
@@ -287,5 +314,7 @@ module.exports = {
   rendercreatefundraiser,
   createFundraiser,
   renderCreateEventForm,
-  createEvent
+  createEvent,
+  getEditNGOProfile,
+  editNGOProfile
 };

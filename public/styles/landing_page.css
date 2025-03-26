@@ -18,7 +18,9 @@ main {
   justify-content: space-between;
   align-items: center;
   padding: 15px 120px;
-  background-color: white ;
+  background-color: white;
+  /* background: linear-gradient(135deg, #2c6e49 0%, #4e9f76 51%, #66ed4c 100%);
+  opacity: 1; */
   border-bottom: 2px solid #ddd;
 }
 

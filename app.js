@@ -14,6 +14,8 @@ const NGORoutes = require("./routes/NGO.routes.js");
 
 const app = express();
 
+
+
 app.use(
   session({
     store: new SQLiteStore({
@@ -35,6 +37,14 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+const isAuth = (req, res, next) => {
+  if (req.session.isAuth) {
+    next();
+  } else {
+    res.redirect("/login");
+  }
+};
 
 app.use(baseRoutes);
 app.use(authRoutes);

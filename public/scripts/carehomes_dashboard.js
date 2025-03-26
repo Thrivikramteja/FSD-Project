@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
-    generateRandomDonations();
+    // Hide dashboard stats by default
     document.getElementById("dashboard-stats").style.display = "none";
 
-    const viewMoreBtn = document.getElementById("viewMoreBtn");
-    const viewLessBtn = document.getElementById("viewLessBtn");
+    // Toggle visibility for fundraisers
+    const viewMoreBtn = document.getElementById("viewMoreFundraisers");
+    const viewLessBtn = document.getElementById("viewLessFundraisers");
 
     if (viewMoreBtn && viewLessBtn) {
         viewMoreBtn.addEventListener("click", function () {
@@ -20,30 +21,19 @@ document.addEventListener("DOMContentLoaded", function () {
             viewMoreBtn.classList.remove("hidden");
         });
     }
+
+    // Toggle visibility for dashboard stats
+    const toggleButton = document.querySelector(".toggle-button");
+    if (toggleButton) {
+        toggleButton.addEventListener("click", function () {
+            const stats = document.getElementById("dashboard-stats");
+            if (stats.style.display === "none" || stats.style.display === "") {
+                stats.style.display = "flex";
+                toggleButton.textContent = "Hide Dashboard Stats";
+            } else {
+                stats.style.display = "none";
+                toggleButton.textContent = "Show Dashboard Stats";
+            }
+        });
+    }
 });
-
-function toggleStats() {
-    var stats = document.getElementById("dashboard-stats");
-    var button = document.querySelector(".toggle-button");
-    if (stats.style.display === "none" || stats.style.display === "") {
-        stats.style.display = "flex";
-        button.textContent = "Hide Dashboard Stats";
-    } else {
-        stats.style.display = "none";
-        button.textContent = "Show Dashboard Stats";
-    }
-}
-
-function generateRandomDonations() {
-    const users = ["John Doe", "Jane Smith", "Michael Brown", "Alice Green", "David Johnson"];
-    const donationList = document.querySelector(".donation-list");
-    donationList.innerHTML = "";
-
-    for (let i = 0; i < users.length; i++) {
-        let randomAmount = (Math.floor(Math.random() * 50) + 1) * 100;
-        let donationItem = document.createElement("div");
-        donationItem.classList.add("donation-card");
-        donationItem.innerHTML = `<p><strong>${users[i]}</strong> donated ₹${randomAmount}</p>`;
-        donationList.appendChild(donationItem);
-    }
-}

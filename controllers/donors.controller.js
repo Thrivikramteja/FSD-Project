@@ -55,6 +55,35 @@ async function getdonor(req, res) {
   }
 }
 
+async function getEditDonorProfile(req, res) {
+  const userID = req.params.userID;
+
+  try {
+      const user = await new Promise((resolve)=>{
+          model.get_user_data(userID,(err,data)=>{
+              if(err)
+              {
+                  console.log("error fetching data of user ",err);
+                  resolve([]);
+              }
+              else
+              {
+                  resolve(data);
+              }
+          })
+      });
+      console.log("fetched details ",user);
+      res.render('users/edit_profile', { user });
+  } catch (error) {
+      console.error("Error rendering the Create Event form:", error);
+      res.status(500).send('Failed to load the Create Event form');
+  }
+}
+
+function editDonorProfile() {}
+
 module.exports = {
   getdonor,
+  getEditDonorProfile,
+  editDonorProfile,
 };

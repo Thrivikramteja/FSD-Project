@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("express"); 
 
 const router = express.Router();
 
@@ -19,5 +19,10 @@ router.post('/NGO-dashboard/:ngoID/create-event',isAuth, NGOController.createEve
 router.get('/NGO-dashboard/:ngoID/create-fundraiser', isAuth, NGOController.rendercreatefundraiser);
 
 router.post('/NGO-dashboard/:ngoID/create-fundraiser',isAuth ,NGOController.createFundraiser);
+
+router.get('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.getEditNGOProfile);
+
+router.put('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.editNGOProfile);
+
 
 module.exports = router;
