@@ -1,4 +1,6 @@
+const { resolve } = require("path");
 const NGO = require("../models/NGO.model");
+const { log } = require("console");
 
 function getRegister(req, res) {
   res.render("NGOs/ngo_registration");
@@ -299,6 +301,53 @@ async function getNGO(req, res) {
 }
 
 
+
+
+async function get_allngo(req, res) {
+    try {
+        const ngos = await new Promise((resolve) => {
+            NGO.get_all_ngos((err, data) => {
+                if (err) {
+                    console.log("Error while fetching details of NGOs:", err);
+                    resolve([]);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+
+        // Fetch stats for each NGO and add them to the object
+        const ngosWithStats = await Promise.all(ngos.map(async (ngo) => {
+            const stats = await new Promise((resolve, reject) => {
+                NGO.get_stats(ngo.id_NGO, (err, data) => {
+                    if (err) {
+                        console.log(`Error fetching stats for NGO ${ngo.id_NGO}:`, err);
+                        resolve({ totalFundsRaised: 0, totalRegistrations: 0, fundraisersCreated: 0, careHomesBenefited: 0 });
+                    } else {
+                        resolve(data);
+                    }
+                });
+            });
+
+            return {
+                ...ngo,
+                totalFundsRaised: stats.totalFundsRaised || 0,
+                totalRegistrations: stats.totalRegistrations || 0,
+                fundraisersCreated: stats.fundraisersCreated || 0,
+                careHomesBenefited: stats.careHomesBenefited || 0,
+            };
+        }));
+
+        res.render('NGOS/allngos', { ngos: ngosWithStats });
+
+    } catch (error) {
+        console.log("Error in function get_allngo:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+
+
 // function renderCreateEventForm() { }
 
 // function createEvent() {}
@@ -316,5 +365,7 @@ module.exports = {
   renderCreateEventForm,
   createEvent,
   getEditNGOProfile,
-  editNGOProfile
+  editNGOProfile,
+  get_allngo,
+  
 };

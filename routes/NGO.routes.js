@@ -24,5 +24,7 @@ router.get('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.getEditNGOProfile
 
 router.put('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.editNGOProfile);
 
+router.get('/NGOs',NGOController.get_allngo);
+
 
 module.exports = router;

@@ -312,6 +312,37 @@ class Carehome {
     });
   }
 
+  static getallcarehoms(callback)
+  {
+    const query = `select * from carehomes`;
+    db.all(query,(err,row)=>{
+      if(err)
+      {
+        console.log("error while fetching care homes: ",err)
+        return callback(err,null);
+      }
+      console.log("fetchhed data : ", row);
+      callback(null,row);
+    })
+  }
+
+  static get_care_data(careid,callback)
+      {
+        const query  = `select * from carehomes where id_carehome = ?`;
+
+        db.all(query,[careid],(err,rows)=>{
+          if(err)
+          {
+            console.log("error occured while getting data from carehomes",err);
+            return callback(err,null);
+          }
+          console.log("data fetched ",rows);
+          callback(null,rows);
+        })
+      }
+
+
+      
   static getWishlist(careid, callback) {
     const query = `
         SELECT wishlist 

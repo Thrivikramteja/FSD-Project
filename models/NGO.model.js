@@ -299,6 +299,19 @@ class NGO {
     });
   }
 
+  static get_all_ngos(callback)
+  {
+    const query = 'select * from NGOs';
+    db.all(query,[],(err,rows)=>{
+      if(err)
+      {
+        console.log("error while fetching NGOs ",err);
+        return callback(err,null);
+      }
+      callback(null,rows);
+    })
+  }
+
   static get_carehome(callback) {
     const query = `
         SELECT id_carehome, name_carehome
@@ -352,6 +365,9 @@ class NGO {
       }
     });
   }
+
+  
 }
+
 
 module.exports = NGO;
