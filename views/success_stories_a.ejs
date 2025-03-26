@@ -4,23 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <link rel="stylesheet" href="/1_a.css">
-    <script src="/1_a.js"></script>
-
+    <link rel="stylesheet" href="/success_stories_a.css">
+    <script src="/success_stories_a.js"></script>
 </head>
 <body>
 
     <h1><%= title %></h1>
     
     <div class="description">
-        <% descriptions.forEach(function(desc) { %>
-            <p><%= desc %></p>
-        <% }); %>
+        <% if (Array.isArray(descriptions) && descriptions.length > 0) { %>
+            <% descriptions.forEach(function(desc) { %>
+                <p><%= desc %></p>
+            <% }); %>
+        <% } else { %>
+            <p>No description available.</p>
+        <% } %>
     </div>
 
     <div class="container">
         <div class="text-content">
-            
             <div class="report">
                 <h2>Fundraiser Report Statistics</h2>
                 <p>Total amount raised: ₹<%= totalRaised %></p>
@@ -33,18 +35,16 @@
             <div class="funds">
                 <h2>Fund Allocation</h2>
                 <p><%= total_description_allocation %></p>
-               
             </div>
 
             <div class="impact">
                 <h2>Impact Metrics</h2>
                 <p><%= total_description_impact %></p>
-             
             </div>
         </div>
 
         <div class="image-container">
-            <img src="<%= image %>" alt="Helping Kids Get Shelter">
+            <img src="<%= image %>" alt="<%= title %>">
         </div>
     </div>
 </body>
