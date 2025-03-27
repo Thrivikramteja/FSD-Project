@@ -17,7 +17,7 @@ async function register(req, res) {
 async function donateItems(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
-    res.render("carehomes/donate_money", { carehomes });
+    res.render("carehomes/donate_items", {carehomes});
   } catch (error) {
     console.error("Error fetching carehomes:", error);
     res.status(500).send("Server Error");

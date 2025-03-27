@@ -2,7 +2,9 @@ const db = require("../data/sqlite3");
 const bcrypt = require("bcryptjs");
 
 const today = new Date();
-const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+const isoCurrentDate = `${today.getFullYear()}-${String(
+  today.getMonth() + 1
+).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 class NGO {
   constructor(
     Ngoname,
@@ -68,6 +70,15 @@ class NGO {
     });
   }
 
+  static getId(email, callback) {
+    const sql = "SELECT id_NGO FROM NGOs WHERE email = ?";
+
+    db.get(sql, [email], (err, row) => {
+      if (err) return callback(err, null);
+      return callback(null, row);
+    });
+  }
+
   static toISO(dateText) {
     if (!dateText) {
       console.warn("Invalid or missing date:", dateText);
@@ -88,6 +99,18 @@ class NGO {
       console.error("Error parsing date:", dateText, error);
       return null;
     }
+  }
+
+  static get_ngo_data(ngoID, callback) {
+    const query = "select * from NGOs where id_NGO = ?";
+    db.get(query, [ngoID], (err, rows) => {
+      if (err) {
+        console.error("Error fetching user data:", err);
+        callback(err, null);
+      } else {
+        callback(null, rows);
+      }
+    });
   }
 
   static ongoing_fund(callback) {
@@ -311,6 +334,31 @@ class NGO {
         callback(err, null);
       } else {
         callback(null, rows); // Return all care homes as an array of objects
+      }
+    });
+  }
+
+  static update_profile(updationDetails, callback) {
+    const {
+      id_NGO,
+      fullname,
+      darpan,
+      phone,
+      bank,
+      accnum,
+      ifsc,
+    } = updationDetails;
+
+    const query = `UPDATE NGOs SET name_NGO = ?, darpan_id = ?, bank_acc_holder_name = ?, phone = ?, IFSC_code = ?, bank_acc_number = ? WHERE id_NGO = ?`;
+
+    const values  = [fullname, darpan, bank, phone, ifsc, accnum, id_NGO];
+
+    db.run(query, values, function (err) {
+      if (err) {
+        console.error("Error while inserting new fundraiser:", err);
+        callback(err, null);
+      } else {
+        callback(null, { id: this.lastID, ...updationDetails });
       }
     });
   }

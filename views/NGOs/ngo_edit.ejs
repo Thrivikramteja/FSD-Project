@@ -1,81 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit NGO Details</title>
-    <link rel="stylesheet" href="ngos.css" />
-  </head>
-  <body class="edits1">
+    <link rel="stylesheet" href="/styles/ngo_edit.css">
+</head>
+<body class="edits1">
     <div class="toppart">
-      <h2 style="color: rgb(24, 6, 188)">EDIT YOUR DETAILS (NGO)</h2>
+        <h2 style="color: rgb(24, 6, 188);">EDIT YOUR DETAILS (NGO)</h2>
     </div>
 
     <div class="ngos">
-      <form class="ngo1" method="put" action="/NGO-dashboard/<%= ngoid %>/edit">
-        <label for="fullname">NGO name</label><br />
-        <input
-          type="text"
-          id="fullname"
-          name="fullname"
-          value="<%= user.fullname || '' %>"
-        /><br />
-        <span id="fullname-error" style="color: red"></span><br />
+        <form class="ngo1" method="post" action="/NGO-dashboard/<%= ngoID %>/edit">
+            <label for="fullname">NGO name</label><br>
+            <input type="text" id="fullname" name="fullname" value="<%= ngo.name_NGO || '' %>"><br>
+            <span id="fullname-error" style="color:red;"></span><br>
 
-        <label for="mail">Email</label><br />
-        <input
-          type="email"
-          id="mail"
-          name="mail"
-          value="<%= user.mail || '' %>"
-        /><br />
-        <span id="mail-error" style="color: red"></span><br />
+            <!-- <label for="mail">Email</label><br>
+            <input type="email" id="mail" name="mail" value=""><br>
+            <span id="mail-error" style="color:red;"></span><br> -->
 
-        <label for="bank">Bank Account Holder name</label><br />
-        <input
-          type="text"
-          id="bank"
-          name="bank"
-          value="<%= user.bankName %>"
-        /><br />
-        <span id="bank-error" style="color: red"></span>
-        <br />
+            <label for="phone">Contact number:</label><br>
+            <input type="text" id="phone" name="phone" value="<%= ngo.phone || '' %>"><br>
+            <span id="phone-error" style="color:red;"></span><br>
 
-        <label for="accnum"> Bank Account number</label><br />
-        <input
-          type="number"
-          id="accnum"
-          name="accnum"
-          value="<%= user.accnum %>"
-        /><br />
-        <span id="accnum-error" style="color: red"></span>
-        <br />
+            <label for="bank">Bank Account Holder name</label><br>
+            <input type="text" id="bank" name="bank" value="<%= ngo.bank_acc_holder_name %>"><br>
+            <span id="bank-error" style="color:red;"></span><br>
 
-        <label for="ifsc">IFSC code</label><br />
-        <input
-          type="text"
-          id="ifsc"
-          name="ifsc"
-          value="<%= user.ifsc %>"
-        /><br />
-        <span id="ifsc-error" style="color: red"></span>
-        <br />
+            <label for="accnum">Bank Account number</label><br>
+            <input type="number" id="accnum" name="accnum" value="<%= ngo.bank_acc_number %>"><br>
+            <span id="accnum-error" style="color:red;"></span><br>
 
-        <label for="darpan">Darpan ID</label><br />
-        <input
-          type="text"
-          id="darpan"
-          name="darpan"
-          value="<%= user.darpan || '' %>"
-        /><br />
-        <span id="darpan-error" style="color: red"></span><br />
+            <label for="ifsc">IFSC code</label><br>
+            <input type="text" id="ifsc" name="ifsc" value="<%= ngo.IFSC_code %>"><br>
+            <span id="ifsc-error" style="color:red;"></span><br>
 
-        <button class="cancelbut">Cancel</button>
-        <input type="submit" id="Save" value="Save" />
-        <img src="/images/logo.png" class="logofit" />
-      </form>
+            <label for="darpan">Darpan ID</label><br>
+            <input type="text" id="darpan" name="darpan" value="<%= ngo.darpan_id || '' %>"><br>
+            <span id="darpan-error" style="color:red;"></span><br>
+
+            <button type="submit">Update</button>
+        </form>
     </div>
 
-    <script src="/scripts/ngos.js"></script>
-  </body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function validateField(input, pattern, errorMsg) {
+                const errorElement = document.getElementById(input.id + "-error");
+                if (!pattern.test(input.value.trim())) {
+                    errorElement.textContent = errorMsg;
+                    return false; 
+                } else {
+                    errorElement.textContent = "";
+                    return true; 
+                }
+            }
+
+            const fields = [
+                { id: "fullname", pattern: /.+/, errorMsg: "Full Name is required." },
+                { id: "phone", pattern: /^[0-9]{10}$/, errorMsg: "Enter a valid 10-digit mobile number." },
+                { id: "mail", pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, errorMsg: "Enter a valid email address." },
+                { id: "darpan", pattern: /^[A-Za-z0-9]{10,15}$/, errorMsg: "Darpan ID must be 10-15 alphanumeric characters." },
+            ];
+
+            fields.forEach(({ id, pattern, errorMsg }) => {
+                const input = document.getElementById(id);
+                input.addEventListener("input", function () {
+                    validateField(input, pattern, errorMsg);
+                });
+            });
+
+            document.querySelector("form").addEventListener("submit", function (event) {
+                let isValid = true;
+
+                fields.forEach(({ id, pattern, errorMsg }) => {
+                    const input = document.getElementById(id);
+                    if (!validateField(input, pattern, errorMsg)) {
+                        if (isValid) {
+                            input.focus(); 
+                        }
+                        isValid = false; 
+                    }
+                });
+
+                if (!isValid) {
+                    event.preventDefault(); 
+                }
+            });
+        });
+    </script>
+</body>
 </html>
