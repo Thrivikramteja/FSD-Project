@@ -11,7 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
         { id: "upi", regex: /^[a-zA-Z0-9.-]+@[a-zA-Z]+$/, message: "Enter a valid UPI ID.", optional: true },
         { id: "reg_number", regex: /^\d{3}\/\d{4}$/, message: "Registration number must be in format 123/2024." },
         { id: "num_residents", regex: /^[1-9]\d*$/, message: "Number of residents must be greater than 10.", min: 11 },
-        { id: "account_number", regex: /^\d{10,14}$/, message: "Account number must be between 10 to 14 digits." }
+        { id: "account_number", regex: /^\d{10,14}$/, message: "Account number must be between 10 to 14 digits." },
+        { id: "password", regex: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, message: "Password must be at least 8 characters, with 1 uppercase, 1 lowercase, and 1 number." }
     ];
 
     function validateField(input, field) {
@@ -36,6 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return true;
         }
     }
+
+    
 
     // Apply validation
     validationRules.forEach(field => {

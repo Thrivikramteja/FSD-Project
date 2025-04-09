@@ -28,4 +28,10 @@ router.get('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.getEditNGOProfile
 
 router.post('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.editNGOProfile);
 
+router.get('/NGOs',NGOController.get_allngo);
+
+router.get('/NGO-dashboard/:ngoID/edit-event',NGOController.renderEditEvent);
+
+router.post('/NGO-dashboard/:ngoID/edit-event',NGOController.editEvent);
+
 module.exports = router;

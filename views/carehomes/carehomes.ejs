@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Care Homes</title>
+    
+    <link rel="stylesheet" href="/styles/carehome.css">
+    <link rel="stylesheet" href="/styles/landing_page.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+</head>
+<body>
+    <%- include('../shared/includes/header') %>
+    <h1>List of Care Homes Associated with CareConnect</h1>
+    <div class="container">
+        <% carehomes.forEach(carehome => { %>
+            <div class="card">
+                <div class="content">
+                    <h2><%= carehome.name_carehome %></h2>
+                    <div class="location">
+                        <a href="#city"><%= carehome.city %></a> |
+                        <a href="#state"><%= carehome.state %></a>
+                    </div>
+                    <p><%= carehome.description %></p>
+                    <div class="buttons">
+                        <a href="/carehomes/viewcare/<%= carehome.id_carehome %>" class="details-btn">View Details</a>
+                        <a href="/donate?carehome_id=<%= carehome.id_carehome %>" class="donate-btn">Donate</a>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+    <%- include('../shared/includes/footer') %>
+</body>
+</html>

@@ -8,7 +8,7 @@ const isoCurrentDate = `${today.getFullYear()}-${String(
 
 class Carehome {
   constructor(
-    name,
+    care_home_name,
     reg_number,
     email,
     password,
@@ -19,12 +19,11 @@ class Carehome {
     avg_expense,
     wishlist,
     description,
-    admin_name,
     account_holder,
     account_number,
     ifsc
   ) {
-    this.name = name;
+    this.care_home_name = care_home_name;
     this.reg_number = reg_number;
     this.email = email;
     this.password = password;
@@ -35,7 +34,6 @@ class Carehome {
     this.avg_expense = avg_expense;
     this.wishlist = wishlist;
     this.description = description;
-    this.admin_name = admin_name;
     this.account_holder = account_holder;
     this.account_number = account_number;
     this.ifsc = ifsc;
@@ -44,41 +42,41 @@ class Carehome {
   async storeCarehome() {
     const hashedPassword = await bcrypt.hash(this.password, 12);
     const sql = `
-  INSERT INTO carehomes (
-    name_carehome,
-    email,
-    password,
-    mobile,
-    govt_id,
-    bank_acc_holder_name,
-    IFSC_code,
-    bank_acc_number,
-    wishlist,
-    state,
-    city,
-    description,
-    number_of_residents,
-    avg_monthly_expenses
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`;
+      INSERT INTO carehomes (
+        name_carehome,
+        govt_id,
+        email,
+        password,
+        mobile,
+        state,
+        city,
+        number_of_residents,
+        avg_monthly_expenses,
+        wishlist,
+        description,
+        bank_acc_holder_name,
+        bank_acc_number,
+        IFSC_code
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     db.run(
       sql,
       [
-        this.name_carehome,
+        this.care_home_name,
+        this.reg_number,
         this.email,
         hashedPassword,
-        this.mobile,
-        this.govt_id,
-        this.bank_acc_holder_name,
-        this.IFSC_code,
-        this.bank_acc_number,
-        this.wishlist,
+        this.contact,
         this.state,
         this.city,
+        this.num_residents,
+        this.avg_expense,
+        this.wishlist,
         this.description,
-        this.number_of_residents,
-        this.avg_monthly_expenses
+        this.account_holder,
+        this.account_number,
+        this.ifsc
       ],
       (err) => {
         if (err) {
@@ -137,7 +135,7 @@ class Carehome {
         callback(err, null);
       } else {
         const ongoing_fund = rows.filter((row) => {
-          const isoDate = toISO(row.deadline);
+          const isoDate = Carehome.toISO(row.deadline);
           return isoDate && isoDate >= isoCurrentDate;
         });
 
@@ -155,7 +153,7 @@ class Carehome {
         callback(err, null);
       } else {
         const completed_fund = rows.filter((row) => {
-          const isoDate = toISO(row.deadline);
+          const isoDate = Carehome.toISO(row.deadline);
           return isoDate && isoDate < isoCurrentDate;
         });
         callback(null, completed_fund);
@@ -312,6 +310,37 @@ class Carehome {
     });
   }
 
+  static getallcarehoms(callback)
+  {
+    const query = `select * from carehomes`;
+    db.all(query,(err,row)=>{
+      if(err)
+      {
+        console.log("error while fetching care homes: ",err)
+        return callback(err,null);
+      }
+      console.log("fetchhed data : ", row);
+      callback(null,row);
+    })
+  }
+
+  static get_care_data(careid,callback)
+      {
+        const query  = `select * from carehomes where id_carehome = ?`;
+
+        db.all(query,[careid],(err,rows)=>{
+          if(err)
+          {
+            console.log("error occured while getting data from carehomes",err);
+            return callback(err,null);
+          }
+          console.log("data fetched ",rows);
+          callback(null,rows);
+        })
+      }
+
+
+      
   static getWishlist(careid, callback) {
     const query = `
         SELECT wishlist 

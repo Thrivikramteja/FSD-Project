@@ -30,7 +30,7 @@ h3 {
   background-color: #ecf0f1;
   padding: 15px;
   width: 250px; /* Fixed width for the wishlist */
-  position: fixed; /* Fixed position on the left */
+  position: relative; /* Fixed position on the left */
   top: 60px; /* Below the header */
   left: 20px; /* Margin from the left */
   border-radius: 5px;

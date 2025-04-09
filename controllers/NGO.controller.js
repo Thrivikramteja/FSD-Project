@@ -1,4 +1,6 @@
+const { resolve } = require("path");
 const NGO = require("../models/NGO.model");
+const { log } = require("console");
 
 function getRegister(req, res) {
   res.render("NGOs/ngo_registration");
@@ -246,6 +248,101 @@ async function rendercreatefundraiser(req, res) {
   }
 }
 
+async function editEvent(req, res) 
+{
+    const ngoID = req.params.ngoID; // Retrieve ngoID from route params
+    const { 
+        original_event_name, // Name of the event to identify it
+        new_event_name, 
+        event_location, 
+        event_date, 
+        event_time, 
+        description 
+    } = req.body;
+
+    try {
+        
+        if (!ngoID || !original_event_name || !event_location || !event_date || !event_time) {
+            return res.status(400).send('Missing required fields');
+        }
+
+        // Format the event date
+        const formatted_event_date = format_date(event_date);
+
+        // Prepare updated event details
+        const eventDetails = {
+            id_NGO: ngoID,
+            original_event_name,
+            new_event_name,
+            event_location,
+            event_date: formatted_event_date,
+            event_time,
+            description,
+        };
+
+       
+        const result = await new Promise((resolve, reject) => {
+            NGO.edit_event(eventDetails, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+
+        console.log('Event Updated:', result);
+        res.redirect(`/NGO-dashboard/${ngoID}`);
+
+    } catch (error) {
+        console.error('Error in editEvent controller:', error);
+        res.status(500).send('Failed to update event');
+    }
+}
+
+
+async function renderEditEvent(req, res) {
+    const ngoID = req.params.ngoID;
+    try {
+        const events = await new Promise((resolve, reject) => {
+            NGO.specific_events(ngoID, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+            });
+        });
+
+        const eventDetails = {}; // Object to store event data keyed by event_name
+        for (const event of events) {
+            const details = await new Promise((resolve, reject) => {
+                NGO.event_load(ngoID, event.event_name, (err, data) => {
+                    if (err) reject(err);
+                    else {
+                        // Ensure consistent property names
+                        const formattedDetails = {
+                            event_name: data.event_name,
+                            description: data.description,
+                            event_location: data.event_location,
+                            event_time: data.event_time,
+                            deadline: data.event_date // Assuming event_date is the correct column
+                        };
+                        resolve(formattedDetails);
+                    }
+                });
+            });
+            eventDetails[event.event_name] = details;
+        }
+
+        res.render('NGOs/edit_events', {
+            ngoID,
+            events,
+            eventDetails: JSON.stringify(eventDetails), // Convert to JSON string for client-side use
+        });
+    } catch (error) {
+        console.error("Error in renderEditEvent controller:", error);
+        res.status(500).send('Failed to load the Edit Event form');
+    }
+}
+
 async function getNGO(req, res) {
   const ngoID = req.params.ngoID;
   try {
@@ -331,21 +428,69 @@ async function getNGO(req, res) {
     // console.log("NGO Name:", name);
     // console.log("Stats:", stats);
 
-    // Render the EJS template with all the fetched data
-    res.render("NGOs/ngo_dashboard", {
-      name,
-      ongoing_fund,
-      completed_fund,
-      completed_event,
-      upcoming_eve,
-      ngoID,
-      stats, // Pass stats to the template
-    });
-  } catch (error) {
-    console.error("Error in getNGO controller:", error);
-    res.status(500).send("An error occurred while loading the dashboard");
-  }
+        // Render the EJS template with all the fetched data
+        res.render('NGOs/ngo_dashboard', {
+            name,
+            ongoing_fund,
+            completed_fund,
+            completed_event,
+            upcoming_eve,
+            ngoID,
+            stats, // Pass stats to the template
+        });
+    } catch (error) {
+        console.error("Error in getNGO controller:", error);
+        res.status(500).send('An error occurred while loading the dashboard');
+    }
 }
+
+
+
+
+async function get_allngo(req, res) {
+    try {
+        const ngos = await new Promise((resolve) => {
+            NGO.get_all_ngos((err, data) => {
+                if (err) {
+                    console.log("Error while fetching details of NGOs:", err);
+                    resolve([]);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+
+        // Fetch stats for each NGO and add them to the object
+        const ngosWithStats = await Promise.all(ngos.map(async (ngo) => {
+            const stats = await new Promise((resolve, reject) => {
+                NGO.get_stats(ngo.id_NGO, (err, data) => {
+                    if (err) {
+                        console.log(`Error fetching stats for NGO ${ngo.id_NGO}:`, err);
+                        resolve({ totalFundsRaised: 0, totalRegistrations: 0, fundraisersCreated: 0, careHomesBenefited: 0 });
+                    } else {
+                        resolve(data);
+                    }
+                });
+            });
+
+            return {
+                ...ngo,
+                totalFundsRaised: stats.totalFundsRaised || 0,
+                totalRegistrations: stats.totalRegistrations || 0,
+                fundraisersCreated: stats.fundraisersCreated || 0,
+                careHomesBenefited: stats.careHomesBenefited || 0,
+            };
+        }));
+
+        res.render('NGOS/allngos', { ngos: ngosWithStats });
+
+    } catch (error) {
+        console.log("Error in function get_allngo:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+
 
 // function renderCreateEventForm() { }
 
@@ -365,6 +510,9 @@ module.exports = {
   createEvent,
   getEditNGOProfile,
   editNGOProfile,
+  get_allngo,
+  editEvent, 
+  renderEditEvent,
   getEvents,
-  getFundraisers,
+  getFundraisers
 };

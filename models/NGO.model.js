@@ -322,6 +322,97 @@ class NGO {
     });
   }
 
+  static get_all_ngos(callback) {
+    const query = "select * from NGOs";
+    db.all(query, [], (err, rows) => {
+      if (err) {
+        console.log("error while fetching NGOs ", err);
+        return callback(err, null);
+      }
+      callback(null, rows);
+    });
+  }
+
+  static specific_events(ngoID, callback) {
+    const query = `SELECT * FROM created_events WHERE id_NGO = ?`;
+
+    db.all(query, [ngoID], (err, rows) => {
+      if (err) {
+        console.error("Error fetching specific events:", err);
+        return callback(err, null);
+      }
+
+      try {
+        // Filter rows to include only events with a date >= today's date
+        const filteredEvents = rows.filter((row) => {
+          const isoDate = this.toISO(row.event_date); // Convert event_date to ISO format
+          return isoDate && isoDate >= isoCurrentDate; // Compare with today's ISO date
+        });
+
+        callback(null, filteredEvents);
+      } catch (filterError) {
+        console.error("Error filtering events:", filterError);
+        callback(filterError, null);
+      }
+    });
+  }
+
+  static event_load(ngoID, event_name, callback) {
+    const query = `select * from created_events where id_NGO = ? and event_name = ?`;
+
+    db.get(query, [ngoID, event_name], (err, rows) => {
+      if (err) {
+        console.log("error fetching event details");
+        return callback(err, null);
+      }
+
+      callback(null, rows);
+    });
+  }
+
+  static edit_event(eventDetails, callback) {
+    const {
+      id_NGO,
+      original_event_name, // Original event name to identify the event
+      new_event_name, // New event name (title)
+      event_location,
+      event_date,
+      event_time,
+      description,
+    } = eventDetails;
+
+    const query = `
+        UPDATE created_events
+        SET event_name = ?, 
+            event_location = ?, 
+            event_date = ?, 
+            event_time = ?, 
+            description = ?
+        WHERE id_NGO = ? AND event_name = ?
+    `;
+
+    const values = [
+      new_event_name || original_event_name, // Default to original name if new name not provided
+      event_location,
+      event_date,
+      event_time,
+      description,
+      id_NGO,
+      original_event_name,
+    ];
+
+    db.run(query, values, function (err) {
+      if (err) {
+        console.error("Error while updating event:", err);
+        callback(err, null);
+      } else if (this.changes === 0) {
+        callback(new Error("No event found to update."), null);
+      } else {
+        callback(null, { success: true, ...eventDetails });
+      }
+    });
+  }
+
   static get_carehome(callback) {
     const query = `
         SELECT id_carehome, name_carehome
@@ -339,19 +430,12 @@ class NGO {
   }
 
   static update_profile(updationDetails, callback) {
-    const {
-      id_NGO,
-      fullname,
-      darpan,
-      phone,
-      bank,
-      accnum,
-      ifsc,
-    } = updationDetails;
+    const { id_NGO, fullname, darpan, phone, bank, accnum, ifsc } =
+      updationDetails;
 
     const query = `UPDATE NGOs SET name_NGO = ?, darpan_id = ?, bank_acc_holder_name = ?, phone = ?, IFSC_code = ?, bank_acc_number = ? WHERE id_NGO = ?`;
 
-    const values  = [fullname, darpan, bank, phone, ifsc, accnum, id_NGO];
+    const values = [fullname, darpan, bank, phone, ifsc, accnum, id_NGO];
 
     db.run(query, values, function (err) {
       if (err) {

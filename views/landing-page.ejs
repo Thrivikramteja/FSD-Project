@@ -6,11 +6,11 @@
     <link rel="stylesheet" href="/styles/events.css">
     <link rel="stylesheet" href="/styles/donate_mon.css"> 
     <link rel="stylesheet" href="/styles/landing_page.css" />
-  </head>
+  </head> 
   <body> 
     <%- include('./shared/includes/header') %>
     <main>
-      <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</p>
+      <a href="/fundraisers" style="font-size: 20px; padding: 12px; text-decoration: none; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</a>
       <div class="nonprofit-container">
         <% ongoing_fund.forEach(ongoing_fun => { %>
             <div class="nonprofit-card" >
@@ -22,16 +22,16 @@
                     </div>
                 </div>
                 <div class="buttons">
-                    <button class="details-btn">View details</button>
-                    <a href="/donate/<%=(ongoing_fun.fundraiser_name) %>">
+                    <!-- <button class="details-btn">View details</button>
+                    <a href="/donate/">
                         <button class="select-btn">Donate</button>
-                    </a>
+                    </a> -->
                 </div>
             </div>
         <% }) %>
     </div>
 
-      <p style="font-size: 20px; padding: 12px; margin-top: 20px; text-align: center; color: black; font-weight: 600">NGO Events</p>
+      <a href="/events" style="font-size: 20px; padding: 12px; margin-top: 20px; text-decoration: none; text-align: center; color: black; font-weight: 600">NGO Events</a>
       <div class="nonprofit-section">
         <% upcoming_eve.forEach(event => { %>
             <div class="nonprofit-card" >
@@ -43,10 +43,10 @@
                     </div>
                 </div>
                 <div class="buttons">
-                    <button class="details-btn">View details</button>
-                    <a href="/donate/<%=(event.event_name) %>">
+                    <!-- <button class="details-btn">View details</button>
+                    <a href="/donate/>
                         <button class="select-btn">Register</button>
-                    </a>
+                    </a> -->
                 </div>
             </div>
         <% }) %>

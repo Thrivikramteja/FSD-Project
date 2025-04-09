@@ -160,6 +160,67 @@ async function getCarehome(req, res) {
   }
 }
 
+async function getallcarehomes(req,res)
+{
+
+  try
+  {
+    const carehomes =  await new Promise((resolve)=>{
+      Carehome.getallcarehoms((err,data)=>{
+        if(err)
+        {
+          console.log("error while fetching the data of care homes ",err);
+          resolve([]);
+        }
+        else
+        {
+          resolve(data);
+        }
+      })
+    })
+    console.log("fetched care homes : ", carehomes);
+    res.render('carehomes/carehomes',{carehomes});
+    
+  }
+  catch(error)
+  {
+    console.log("error while fetching the care homes ",error);
+  }
+
+}
+
+
+async function view_details_care(req, res) 
+{
+  const careid = req.params.careid;
+
+  try {
+    console.log("Fetching data for care home ID:", careid);
+
+    const details = await new Promise((resolve) => {
+      Carehome.get_care_data(careid, (err, data) => {
+        if (err) {
+          console.log("Error fetching data of care home:", err);
+          resolve(null); // Resolve with null instead of rejecting
+        } else {
+          resolve(data.length > 0 ? data[0] : null);
+        }
+      });
+    });
+
+    if (!details) {
+      return res.status(404).json({ error: "Care home not found." });
+    }
+
+    console.log("Fetched care home details:", details);
+    res.render("carehomes/view_care", { details });
+
+  } catch (error) {
+    console.log("Error while fetching care home details:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
 function getEditCarehomeProfile() {}
 
 function editCarehomeProfile() {}
@@ -171,5 +232,8 @@ module.exports = {
   registerCarehome,
   getCarehome,
   getEditCarehomeProfile,
-  editCarehomeProfile
+  editCarehomeProfile,
+  getallcarehomes,
+  view_details_care,
+
 };
