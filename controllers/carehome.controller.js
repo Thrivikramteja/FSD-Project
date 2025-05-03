@@ -17,7 +17,7 @@ async function register(req, res) {
 async function donateItems(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
-    res.render("carehomes/donate_items", {carehomes});
+    res.render("carehomes/donate_items", { carehomes });
   } catch (error) {
     console.error("Error fetching carehomes:", error);
     res.status(500).send("Server Error");
@@ -25,43 +25,26 @@ async function donateItems(req, res) {
 }
 
 async function registerCarehome(req, res) {
-  const {
-    care_home_name,
-    reg_number,
-    email,
-    password,
-    contact,
-    state,
-    city,
-    num_residents,
-    avg_expense,
-    wishlist,
-    description,
-    account_holder,
-    account_number,
-    ifsc,
-    terms,
-  } = req.body;
+  const carehome = new Carehome({
+    care_home_name: req.body.care_home_name,
+    reg_number: req.body.reg_number,
+    email: req.body.email,
+    password: req.body.password,
+    contact: req.body.contact,
+    state: req.body.state,
+    city: req.body.city,
+    num_residents: req.body.num_residents,
+    avg_expense: req.body.avg_expense,
+    wishlist: req.body.wishlist,
+    description: req.body.description,
+    account_holder: req.body.account_holder,
+    account_number: req.body.account_number,
+    ifsc: req.body.ifsc,
+    care_img: `/images/${req.file.filename}`,
+    terms: req.body.terms,
+  });
 
-  const carehome = new Carehome(
-    care_home_name,
-    reg_number,
-    email,
-    password,
-    contact,
-    state,
-    city,
-    num_residents,
-    avg_expense,
-    wishlist,
-    description,
-    account_holder,
-    account_number,
-    ifsc,
-    terms
-  );
-
-  await carehome.storeCarehome();
+  await carehome.save();
   res.redirect("/login");
 }
 
@@ -160,38 +143,26 @@ async function getCarehome(req, res) {
   }
 }
 
-async function getallcarehomes(req,res)
-{
-
-  try
-  {
-    const carehomes =  await new Promise((resolve)=>{
-      Carehome.getallcarehoms((err,data)=>{
-        if(err)
-        {
-          console.log("error while fetching the data of care homes ",err);
+async function getallcarehomes(req, res) {
+  try {
+    const carehomes = await new Promise((resolve) => {
+      Carehome.getallcarehoms((err, data) => {
+        if (err) {
+          console.log("error while fetching the data of care homes ", err);
           resolve([]);
-        }
-        else
-        {
+        } else {
           resolve(data);
         }
-      })
-    })
+      });
+    });
     console.log("fetched care homes : ", carehomes);
-    res.render('carehomes/carehomes',{carehomes});
-    
+    res.render("carehomes/carehomes", { carehomes });
+  } catch (error) {
+    console.log("error while fetching the care homes ", error);
   }
-  catch(error)
-  {
-    console.log("error while fetching the care homes ",error);
-  }
-
 }
 
-
-async function view_details_care(req, res) 
-{
+async function view_details_care(req, res) {
   const careid = req.params.careid;
 
   try {
@@ -214,7 +185,6 @@ async function view_details_care(req, res)
 
     console.log("Fetched care home details:", details);
     res.render("carehomes/view_care", { details });
-
   } catch (error) {
     console.log("Error while fetching care home details:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -235,5 +205,4 @@ module.exports = {
   editCarehomeProfile,
   getallcarehomes,
   view_details_care,
-
 };

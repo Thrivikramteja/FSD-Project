@@ -2,7 +2,35 @@ const db = require("../data/sqlite3");
 const bcrypt = require("bcryptjs");
 
 const today = new Date();
-const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+const isoCurrentDate = `${today.getFullYear()}-${String(
+  today.getMonth() + 1
+).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+const donorSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  mobile_number: {
+    type: String,
+    required: true,
+  },
+  receive_notifications: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const Donor = mongoose.model("Donor", donorSchema);
 
 class User {
   constructor(name, email, password, contact, checkbox) {

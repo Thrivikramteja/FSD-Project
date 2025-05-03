@@ -1,11 +1,32 @@
 const db = require("../data/sqlite3");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoosee");
 
 const today = new Date();
 const isoCurrentDate = `${today.getFullYear()}-${String(
   today.getMonth() + 1
 ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
+const carehomeSchema = new mongoose.Schema({
+  care_home_name: String,
+  reg_number: String,
+  email: String,
+  password: String,
+  contact: String, 
+  state: String,
+  city: String,
+  num_residents: Number,
+  avg_expense: Number,
+  wishlist: String,
+  description: String,
+  account_holder: String,
+  account_number: String,
+  ifsc: String,
+  care_img: String,
+  terms: String
+});
+
+module.exports = mongoose.model('Carehome', Carehome);
 class Carehome {
   constructor(
     care_home_name,

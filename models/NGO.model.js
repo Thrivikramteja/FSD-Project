@@ -1,85 +1,115 @@
-const db = require("../data/sqlite3");
+const db = require("../data/database");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 
 const today = new Date();
 const isoCurrentDate = `${today.getFullYear()}-${String(
   today.getMonth() + 1
 ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-class NGO {
-  constructor(
-    Ngoname,
-    darpan_id,
-    year_established,
-    email,
-    password,
-    phone,
-    address,
-    account_holder_name,
-    account_number,
-    ifsc
-  ) {
-    this.Ngoname = Ngoname;
-    this.darpan_id = darpan_id;
-    this.year_established = year_established;
-    this.email = email;
-    this.password = password;
-    this.phone = phone;
-    this.address = address;
-    this.account_holder_name = account_holder_name;
-    this.account_number = account_number;
-    this.ifsc = ifsc;
+
+const ngoSchema = new mongoose.Schema({
+  Ngoname: String,
+  darpan_id: String,
+  year_established: Number,
+  email: { type: String, required: true, unique: true },
+  password: String,
+  phone: String,
+  address: String,
+  account_holder_name: String,
+  account_number: String,
+  ifsc: String
+});
+
+const NGO = mongoose.model('NGO', ngoSchema);
+
+
+
+ngoSchema.methods.storeNGO = async function storeNGO() {
+  try {
+    this.password = await bcrypt.hash(this.password, 12);
+
+    return await this.save();
+  } catch (err) {
+    throw err;
+  }
+}
+
+  // async storeNGO() {
+    
+  //   const sql =
+  //     "INSERT INTO NGOs (name_NGO, email, password, darpan_id, bank_acc_holder_name, phone, IFSC_code, bank_acc_number, YOE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+  //   db.run(
+  //     sql,
+  //     [
+  //       this.Ngoname,
+  //       this.email,
+  //       hashedPassword,
+  //       this.darpan_id,
+  //       this.account_holder_name,
+  //       this.phone,
+  //       this.ifsc,
+  //       this.account_number,
+  //       this.year_established,
+  //     ],
+  //     (err) => {
+  //       console.log(err);
+  //     }
+  //   );
+  // }
+
+  ngoSchema.statics.getNGOById = async function getNGOById(id) {
+    try {
+      const ngo = this.findById(id);
+      return ngo;
+    } catch (err) {
+      throw new Error('NGO not found or invalid ID');
+    }
+  }
+  // static getNGOById(id, callback) {
+  //   const sql = "SELECT * FROM NGOs WHERE id_NGO = ?";
+  //   db.get(sql, [id], (err, row) => {
+  //     if (err) return callback(err, null);
+  //     return callback(null, row); // Returns a single NGO or null if not found
+  //   });
+  // }
+
+  ngoSchema.statics.getNGO = async function getNGO(email) {
+    try {
+      const ngo = this.find({email: email});
+      return ngo;
+    } catch (err) {
+      throw new Error('NGO not found or invalid ID');
+    }
   }
 
-  async storeNGO() {
-    const hashedPassword = await bcrypt.hash(this.password, 12);
-    const sql =
-      "INSERT INTO NGOs (name_NGO, email, password, darpan_id, bank_acc_holder_name, phone, IFSC_code, bank_acc_number, YOE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  // static getNGO(email, callback) {
+  //   const sql = "SELECT * FROM NGOs WHERE email = ?";
+  //   db.get(sql, [email], (err, row) => {
+  //     if (err) return callback(err, null);
+  //     return callback(null, row); // Returns a single NGO or null if not found
+  //   });
+  // }
 
-    db.run(
-      sql,
-      [
-        this.Ngoname,
-        this.email,
-        hashedPassword,
-        this.darpan_id,
-        this.account_holder_name,
-        this.phone,
-        this.ifsc,
-        this.account_number,
-        this.year_established,
-      ],
-      (err) => {
-        console.log(err);
-      }
-    );
+  ngoSchema.statics.getId = async function getId(email) {
+    try {
+      const ngo = this.find({email: email});
+      return ngo.id;
+    } catch (err) {
+      throw new Error('NGO not found or invalid email.');
+    }
   }
 
-  static getNGOById(id, callback) {
-    const sql = "SELECT * FROM NGOs WHERE id_NGO = ?";
-    db.get(sql, [id], (err, row) => {
-      if (err) return callback(err, null);
-      return callback(null, row); // Returns a single NGO or null if not found
-    });
-  }
+  // static getId(email, callback) {
+  //   const sql = "SELECT id_NGO FROM NGOs WHERE email = ?";
 
-  static getNGO(email, callback) {
-    const sql = "SELECT * FROM NGOs WHERE email = ?";
-    db.get(sql, [email], (err, row) => {
-      if (err) return callback(err, null);
-      return callback(null, row); // Returns a single NGO or null if not found
-    });
-  }
+  //   db.get(sql, [email], (err, row) => {
+  //     if (err) return callback(err, null);
+  //     return callback(null, row);
+  //   });
+  // }
 
-  static getId(email, callback) {
-    const sql = "SELECT id_NGO FROM NGOs WHERE email = ?";
-
-    db.get(sql, [email], (err, row) => {
-      if (err) return callback(err, null);
-      return callback(null, row);
-    });
-  }
-
-  static toISO(dateText) {
+  function toISO(dateText) {
     if (!dateText) {
       console.warn("Invalid or missing date:", dateText);
       return null;
@@ -101,17 +131,17 @@ class NGO {
     }
   }
 
-  static get_ngo_data(ngoID, callback) {
-    const query = "select * from NGOs where id_NGO = ?";
-    db.get(query, [ngoID], (err, rows) => {
-      if (err) {
-        console.error("Error fetching user data:", err);
-        callback(err, null);
-      } else {
-        callback(null, rows);
-      }
-    });
-  }
+  // static get_ngo_data(ngoID, callback) {
+  //   const query = "select * from NGOs where id_NGO = ?";
+  //   db.get(query, [ngoID], (err, rows) => {
+  //     if (err) {
+  //       console.error("Error fetching user data:", err);
+  //       callback(err, null);
+  //     } else {
+  //       callback(null, rows);
+  //     }
+  //   });
+  // }
 
   static ongoing_fund(callback) {
     const query = "SELECT * FROM created_fundraisers";
@@ -122,7 +152,7 @@ class NGO {
       } else {
         const isoCurrentDate = new Date().toISOString().split("T")[0];
         const ongoing_fund = rows.filter((row) => {
-          const isoDate = NGO.toISO(row.deadline);
+          const isoDate = toISO(row.deadline);
           return isoDate && isoDate >= isoCurrentDate;
         });
 
@@ -486,4 +516,6 @@ class NGO {
   }
 }
 
+
+const NGO = mongoose.model('NGO', ngoSchema);
 module.exports = NGO;

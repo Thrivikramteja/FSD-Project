@@ -2,6 +2,21 @@ const path = require("path");
 
 const express = require("express");
 const session = require("express-session");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/images/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ storage });
+
+require("./data/database.js");
 
 require("./data/sqlite3");
 const SQLiteStore = require("connect-sqlite3")(session);
@@ -50,4 +65,6 @@ app.use(carehomeRoutes);
 app.use(donorRoutes);
 app.use(NGORoutes);
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3001, () => console.log("Server running on port 3000"));
+
+module.exports = {upload};

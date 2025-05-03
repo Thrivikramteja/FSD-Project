@@ -15,6 +15,7 @@
     <div class="container">
         <% carehomes.forEach(carehome => { %>
             <div class="card">
+                <img src="<%= carehome.care_img %>" alt="Carehome Picture" width="200" />
                 <div class="content">
                     <h2><%= carehome.name_carehome %></h2>
                     <div class="location">

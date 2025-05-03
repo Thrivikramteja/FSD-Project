@@ -10,7 +10,7 @@
   <body>
     <div class="container">
       <h2>Care Home Registration</h2>
-      <form id="registrationForm" method="POST" action="/registerCarehome">
+      <form id="registrationForm" method="POST" action="/registerCarehome" enctype="multipart/form-data">
         <label for="care_home_name">Care Home Name</label>
         <input type="text" id="care_home_name" name="care_home_name" required />
 
@@ -79,6 +79,9 @@
 
         <label for="ifsc">IFSC Code</label>
         <input type="text" id="ifsc" name="ifsc" required />
+
+        <label for="image">Carehome image</label>
+        <input type="file" id="care_img" name="care_img" accept="image/*" required>
 
         <div class="terms">
           <label
