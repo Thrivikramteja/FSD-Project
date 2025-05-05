@@ -1,6 +1,7 @@
 // const db = require("../data/sqlite3");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 // const today = new Date();
 // const isoCurrentDate = `${today.getFullYear()}-${String(
@@ -8,6 +9,7 @@ const mongoose = require("mongoose");
 // ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
 const donorSchema = new mongoose.Schema({
+  userId: { type: Number, unique: true },
   name: {
     type: String,
     required: true,
@@ -31,13 +33,15 @@ const donorSchema = new mongoose.Schema({
   },
 });
 
-donorSchema.statics.getUser = async function (email) {
-  const user = await this.findOne({ email: email });
+donorSchema.plugin(AutoIncrement, { inc_field: "userId" });
+
+donorSchema.statics.getUserByEmail = async function (email) {
+  const user = await this.findOne({ email });
   return user;
 };
 
-donorSchema.statics.getUser = function (userId) {
-  return this.findOne({ _id: userId });
+donorSchema.statics.getUserByUserId = function (userId) {
+  return this.findOne({ userId });
 };
 
 donorSchema.methods.signup = async function () {
@@ -47,17 +51,18 @@ donorSchema.methods.signup = async function () {
   await this.save();
 };
 
-donorSchema.statics.getname = function (userId) {
-  const user = this.findOne({ _id: userId });
+donorSchema.statics.getname = async function (userId) {
+  const user = await this.findOne({ userId });
+  console.log(user.name);
   return user.name;
 };
 
 const userRegisteredEventsSchema = new mongoose.Schema({
-  id_donor: {
+  userId: {
     type: Number,
     required: true,
   },
-  id_NGO: {
+  ngoId: {
     type: Number,
     required: true,
   },
@@ -79,12 +84,10 @@ const userRegisteredEventsSchema = new mongoose.Schema({
   },
 });
 
-
-
 donorSchema.statics.participatedEvents = async function (userId) {
   const currentDate = new Date();
   const events = await UserRegisteredEvent.find({
-    id_donor: userId,
+    userId: userId,
     event_date: { $lt: currentDate },
   });
   return events;
@@ -99,11 +102,11 @@ donorSchema.statics.upcomingEvents = async function (userId) {
 };
 
 const userContributedFundraisersSchema = new mongoose.Schema({
-  id_donor: {
+  userId: {
     type: Number,
     required: true,
   },
-  id_NGO: {
+  ngoId: {
     type: Number,
     required: true,
   },
@@ -125,17 +128,15 @@ const userContributedFundraisersSchema = new mongoose.Schema({
   },
 });
 
-
-
 donorSchema.statics.contributedFundraisers = async function (userId) {
-  const fundraisers = await UserContributedFundraiser.fine({
-    id_donor: userId,
+  const fundraisers = await UserContributedFundraiser.find({
+    userId: userId,
   });
   return fundraisers;
 };
 
 const createdFundraisersSchema = new mongoose.Schema({
-  id_carehome: {
+  carehomeId: {
     type: Number,
     required: true,
   },
@@ -143,7 +144,7 @@ const createdFundraisersSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  id_NGO: {
+  ngoId: {
     type: Number,
     required: true,
   },

@@ -90,7 +90,7 @@ ngoSchema.statics.ongoing_fund = async function () {
 
 ngoSchema.statics.getNGO = async function (email) {
   try {
-    const ngo = await this.findOne({ email: email });
+    const ngo = await this.findOne({ email });
     return ngo;
   } catch (err) {
     throw new Error("NGO not found or invalid email");

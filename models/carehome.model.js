@@ -3,6 +3,7 @@
 const mongoose = require("mongoose");
 const {CreatedFundraiser, Donor} = require("./user.model"); 
 const AutoIncrement = require("mongoose-sequence")(mongoose);
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 // const today = new Date();
 // const isoCurrentDate = `${today.getFullYear()}-${String(
@@ -10,6 +11,7 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 // ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
 const carehomeSchema = new mongoose.Schema({
+  carehomeId: { type: Number, unique: true },
   carehomeId: { type: Number, unique: true },
   care_home_name: String,
   reg_number: String,
@@ -33,7 +35,7 @@ carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
 const Carehome = mongoose.model('Carehome',  carehomeSchema);
 
 carehomeSchema.statics.getCareHomes = async function () {
-  const carehomes = await Carehome.find({}, {_id: 1, care_home_name: 1});
+  const carehomes = await Carehome.find({}, {carehomeId: 1, care_home_name: 1});
   return carehomes;
 }
 
@@ -43,14 +45,14 @@ carehomeSchema.statics.getCarehome = async function (email) {
 }
 
 carehomeSchema.statics.getname = async function (careId) {
-  const carehome = await Carehome.findOne({_id: careId});
+  const carehome = await Carehome.findOne({carehomeId: careId});
   return carehome;
 }
 
 carehomeSchema.statics.ongoing_fund = async function (careId) {
   const currentDate = new Date();
   const fundraisers = await CreatedFundraiser.find({
-    _id: careId,
+    carehomeId: careId,
     deadline: { $gt: currentDate },
   });
   return fundraisers;
@@ -59,7 +61,7 @@ carehomeSchema.statics.ongoing_fund = async function (careId) {
 carehomeSchema.statics.completed_fund = async function (careId) {
   const currentDate = new Date();
   const fundraisers = await CreatedFundraiser.find({
-    _id: careId,
+    carehomeId: careId,
     deadline: { $lt: currentDate },
   });
   return fundraisers;
@@ -71,18 +73,18 @@ carehomeSchema.statics.getallcarehoms = async function () {
 }
 
 carehomeSchema.statics.get_care_data = async function (careId) {
-  const carehome = await Carehome.findOne({_id: careId});
+  const carehome = await Carehome.findOne({carehomeId: careId});
   return carehome;
 }
 
 carehomeSchema.statics.getWishlist = async function (careId) {
-  const carehome = await Carehome.findOne({_id: careId});
+  const carehome = await Carehome.findOne({carehomeId: careId});
   return carehome.wishlist;
 }
 
 carehomeSchema.statics.getCarehomeId = async function (email) {
   const carehome = await Carehome.findOne({email});
-  return carehome._id;
+  return carehome.carehomeId;
 }
 
 carehomeSchema.statics.getCities = async function () {
@@ -202,7 +204,7 @@ carehomeSchema.statics.recentDonations = async function (careId) {
     throw err; // You can handle this error in your route/controller
   }
 };
-
+const Carehome = mongoose.model('Carehome',  carehomeSchema);
 
 module.exports = {Carehome, DonationMoney};
 

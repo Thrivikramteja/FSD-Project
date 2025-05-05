@@ -1,4 +1,4 @@
-const Carehome = require("../models/carehome.model");
+const {Carehome} = require("../models/carehome.model");
 
 async function donateMoney(req, res) {
   try {

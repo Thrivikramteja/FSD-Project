@@ -101,6 +101,7 @@ async function getFundraisers(req, res) {
     const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     
     const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
+    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
     const ongoing_fund = fundraisers.filter(fundraiser => {
       const deadline = fundraiser.deadline instanceof Date ? fundraiser.deadline.toISOString().split('T')[0] : fundraiser.deadline;
       return deadline >= isoCurrentDate;
@@ -222,8 +223,9 @@ async function createFundraiser(req, res) {
     }
 
     const newFundraiser = new CreatedFundraiser({
+    const newFundraiser = new CreatedFundraiser({
       ngoId: ngoID,
-      id_carehome,
+      carehomeId: id_carehome,
       fundraiser_name,
       goal_amount: Number(goal_amount),
       funds_raised: 0,
@@ -284,6 +286,7 @@ async function getNGO(req, res) {
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
+    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
     const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
     const ongoing_fund = fundraisers.filter(fundraiser => {
       const deadline = fundraiser.deadline instanceof Date ? fundraiser.deadline.toISOString().split('T')[0] : fundraiser.deadline;

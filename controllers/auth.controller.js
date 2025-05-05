@@ -1,4 +1,5 @@
 const { User } = require("../models/user.model");
+const {NGO} = require("../models/NGO.model");
 // const NGO = require("../models/NGO.model");
 const { NGO } = require("../models/NGO.model");
 const Carehome = require("../models/carehome.model");
@@ -30,11 +31,11 @@ async function signup(req, res) {
     email: mail,
     password: password,
     mobile_number: phone,
-    receive_notifications: checkbox,
+    receive_notifications: checkbox === "on",
   });
 
   try {
-    const exists = await User.getUser(mail);
+    const exists = await User.getUserByEmail(mail);
 
     if (exists) {
       console.log("User already exists.");
@@ -72,10 +73,11 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
+      return res.redirect(`/NGO-dashboard/${user.ngoId}`);
       console.log(user.ngoId);
       return res.redirect(`/NGO-dashboard/${user.ngoId}`);
     } else if (UserRole === "Donor") {
-      user = await User.getUser(email);
+      user = await User.getUserByEmail(email);
 
       if (!user) {
         console.log("Donor does not exist.");
@@ -89,7 +91,7 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
-      return res.redirect(`/user-dashboard/${user.id_donor}`);
+      return res.redirect(`/user-dashboard/${user.userId}`);
     } else if (UserRole === "Carehome") {
       user = await Carehome.getCarehome(email);
 
