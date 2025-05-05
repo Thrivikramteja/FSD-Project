@@ -73,7 +73,7 @@ ngoSchema.methods.storeNGO = async function storeNGO() {
 
 ngoSchema.statics.getNGOById = async function (id) {
   try {
-    const ngo = await this.findById(id);
+    const ngo = await this.find({ngoId: id});
     return ngo;
   } catch (err) {
     throw new Error("NGO not found or invalid ID");
@@ -268,23 +268,117 @@ ngoSchema.statics.get_all_ngos = async function (callback) {
 };
 
 // Inside eventSchema.statics
-ngoSchema.statics.upcoming_eve = async function () {
+// ngoSchema.statics.upcoming_eve = async function () {
+//   try {
+//     const currentDate = new Date();
+//     currentDate.setHours(0, 0, 0, 0); // Set to today's midnight
+
+//     // Find events with event_date today or in the future
+//     const upcomingEvents = await this.find({
+//       event_date: { $gte: currentDate }
+//     });
+// console.log(upcomingEvents);
+//     return upcomingEvents;
+//   } catch (err) {
+//     console.error("Error fetching upcoming events:", err);
+//     throw err; // rethrow to be caught where the function is called
+//   }
+// };
+
+// This should be on the eventSchema, not ngoSchema
+eventSchema.statics.upcoming_eve = async function () {
   try {
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0); // Set to today's midnight
-
     // Find events with event_date today or in the future
     const upcomingEvents = await this.find({
       event_date: { $gte: currentDate }
     });
-
+    console.log(upcomingEvents);
     return upcomingEvents;
   } catch (err) {
     console.error("Error fetching upcoming events:", err);
+    throw err;
+  }
+};
+
+eventSchema.statics.specific_events = async function(ngoID) {
+  try {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Set to today's midnight
+    
+    // Find events for the specific NGO with event_date today or in the future
+    const events = await this.find({
+      ngoId: ngoID,
+      event_date: { $gte: currentDate }
+    });
+    
+    return events;
+  } catch (err) {
+    console.error('Error fetching specific events:', err);
+    throw err; // rethrow to be caught where the function is called
+  }
+};
+eventSchema.statics.event_load = async function(ngoID, event_name) {
+  try {
+    // Find a single event that matches both the ngoId and event_name
+    const event = await this.findOne({
+      ngoId: ngoID,
+      event_name: event_name
+    });
+    
+    return event; // Will be null if no matching event is found
+  } catch (err) {
+    console.error("Error fetching event details:", err);
     throw err; // rethrow to be caught where the function is called
   }
 };
 
+
+eventSchema.statics.edit_event = async function(eventDetails) {
+  try {
+    const {
+      id_NGO,
+      original_event_name, // Original event name to identify the event
+      new_event_name,      // New event name (title)
+      event_location,
+      event_date,
+      event_time,
+      description,
+    } = eventDetails;
+
+    // Create update object with only the fields that are provided
+    const updateData = {};
+    if (new_event_name) updateData.event_name = new_event_name;
+    if (event_location) updateData.event_location = event_location;
+    if (event_date) updateData.event_date = new Date(event_date);
+    if (event_time) updateData.event_time = event_time;
+    if (description) updateData.description = description;
+
+    // Find and update the event
+    const result = await this.findOneAndUpdate(
+      { 
+        ngoId: id_NGO, 
+        event_name: original_event_name 
+      },
+      { $set: updateData },
+      { new: true } // Return the updated document
+    );
+
+    if (!result) {
+      throw new Error('No event found to update.');
+    }
+
+    return { 
+      success: true, 
+      ...eventDetails,
+      updatedEvent: result 
+    };
+  } catch (err) {
+    console.error('Error while updating event:', err);
+    throw err; // rethrow to be caught where the function is called
+  }
+};
 
 const NGO = mongoose.model("NGO", ngoSchema);
 const Event = mongoose.model("Event", eventSchema);

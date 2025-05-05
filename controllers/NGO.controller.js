@@ -1,6 +1,6 @@
 const { NGO, Event } = require("../models/NGO.model");
-const { Fundraiser } = require("../models/user.model"); // Assuming this is where Fundraiser is defined
-
+const { CreatedFundraiser} = require("../models/user.model"); // Assuming this is where Fundraiser is defined
+const {CareHome} = require("../models/user.model");
 /**
  * Render NGO registration page
  */
@@ -46,6 +46,7 @@ async function register(req, res) {
     });
 
     await ngo.storeNGO();
+    console.log("stored succesfully ");
     res.redirect("/login");
   } catch (error) {
     console.error("Error in register controller:", error);
@@ -99,7 +100,7 @@ async function getFundraisers(req, res) {
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     
-    const fundraisers = await Fundraiser.find({ ngoId: ngoID });
+    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
     const ongoing_fund = fundraisers.filter(fundraiser => {
       const deadline = fundraiser.deadline instanceof Date ? fundraiser.deadline.toISOString().split('T')[0] : fundraiser.deadline;
       return deadline >= isoCurrentDate;
@@ -116,12 +117,19 @@ async function getFundraisers(req, res) {
  * Update NGO profile
  */
 async function editNGOProfile(req, res) {
-  const ngoID = parseInt(req.params.ngoID,10); // Use ngoID parameter
+  const ngoID = parseInt(req.params.ngoID, 10); // Parse the ngoID parameter
+  
+  // Input validation
+  if (isNaN(ngoID)) {
+    return res.status(400).send("Invalid NGO ID");
+  }
+  
   const { fullname, phone, bank, accnum, ifsc, darpan } = req.body;
-
+  
   try {
-    const updatedNGO = await NGO.findByIdAndUpdate(
-      ngoID,
+    // Use findOneAndUpdate with ngoId field instead of findByIdAndUpdate
+    const updatedNGO = await NGO.findOneAndUpdate(
+      { ngoId: ngoID }, // Find by ngoId, not _id
       {
         Ngoname: fullname,
         darpan_id: darpan,
@@ -132,18 +140,18 @@ async function editNGOProfile(req, res) {
       },
       { new: true } // Return the updated document
     );
-
+    
     if (!updatedNGO) {
       return res.status(404).send("NGO not found");
     }
-
-    res.redirect(`/NGO-dashboard/${ngoID}`);
+    
+    // Handle successful update
+    res.redirect(`/NGO-dashboard/${ngoID}`); // Or however you handle successful updates
   } catch (error) {
     console.error("Error updating NGO profile:", error);
-    res.status(500).send("Failed to update NGO profile");
+    res.status(500).send("Server error");
   }
 }
-
 /**
  * Format date to DD-MM-YYYY
  */
@@ -213,7 +221,7 @@ async function createFundraiser(req, res) {
       return res.status(400).send("Missing required fields");
     }
 
-    const newFundraiser = new Fundraiser({
+    const newFundraiser = new CreatedFundraiser({
       ngoId: ngoID,
       id_carehome,
       fundraiser_name,
@@ -258,22 +266,25 @@ async function rendercreatefundraiser(req, res) {
  * Get NGO dashboard data
  */
 async function getNGO(req, res) {
-  const ngoID = parseInt(req.params.ngoID,10); // Use ngoID parameter
+  const ngoID = parseInt(req.params.ngoID,10); 
   
   try {
     console.log("Fetching data for NGO ID:", ngoID);
 
-    const ngo = await NGO.find({ngoId: ngoID});
+    const ngo = await NGO.findOne({ngoId: ngoID});
+    console.log(ngo);
     if (!ngo) {
       return res.status(404).send("NGO not found");
     }
-
+    
     const name = ngo.Ngoname;
+    console.log("for profile card : " + name);
+
 
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-    const fundraisers = await Fundraiser.find({ ngoId: ngoID });
+    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
     const ongoing_fund = fundraisers.filter(fundraiser => {
       const deadline = fundraiser.deadline instanceof Date ? fundraiser.deadline.toISOString().split('T')[0] : fundraiser.deadline;
       return deadline >= isoCurrentDate;
@@ -357,7 +368,7 @@ async function editEvent(req, res) {
 
       // Edit event using NGO.edit_event (assuming your logic is correct here)
       const result = await new Promise((resolve, reject) => {
-          NGO.edit_event(eventDetails, (err, data) => {
+          Event.edit_event(eventDetails, (err, data) => {
               if (err) {
                   reject(err);
               } else {
@@ -380,33 +391,19 @@ async function renderEditEvent(req, res) {
   const ngoID = parseInt(req.params.ngoID,10); // Retrieve ngoID from route params
   try {
       // Get the events for the given NGO ID
-      const events = await new Promise((resolve, reject) => {
-          NGO.specific_events(ngoID, (err, data) => {
-              if (err) reject(err);
-              else resolve(data);
-          });
-      });
-
+      const events = await Event.specific_events(ngoID);
       const eventDetails = {}; // Object to store event data keyed by event_name
 
       // Loop over the events and fetch their details
       for (const event of events) {
-          const details = await new Promise((resolve, reject) => {
-              NGO.event_load(ngoID, event.event_name, (err, data) => {
-                  if (err) reject(err);
-                  else {
-                      // Format event details for consistent property names
-                      const formattedDetails = {
-                          event_name: data.event_name,
-                          description: data.description,
-                          event_location: data.event_location,
-                          event_time: data.event_time,
-                          deadline: data.event_date, // Assuming event_date is the correct column
-                      };
-                      resolve(formattedDetails);
-                  }
-              });
-          });
+          const details = await Event.event_load(ngoID, event.event_name);
+        //   const formattedDetails = {
+        //     event_name: data.event_name,
+        //     description: data.description,
+        //     event_location: data.event_location,
+        //     event_time: data.event_time,
+        //     deadline: data.event_date, // Assuming event_date is the correct column
+        // };
 
           // Store event details using the event name as the key
           eventDetails[event.event_name] = details;

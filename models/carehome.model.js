@@ -2,6 +2,7 @@
 // const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const {CreatedFundraiser, Donor} = require("./user.model"); 
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 // const today = new Date();
 // const isoCurrentDate = `${today.getFullYear()}-${String(
@@ -9,6 +10,7 @@ const {CreatedFundraiser, Donor} = require("./user.model");
 // ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
 const carehomeSchema = new mongoose.Schema({
+  carehomeId: { type: Number, unique: true },
   care_home_name: String,
   reg_number: String,
   email: String,
@@ -27,6 +29,7 @@ const carehomeSchema = new mongoose.Schema({
   terms: String
 });
 
+carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
 const Carehome = mongoose.model('Carehome',  carehomeSchema);
 
 carehomeSchema.statics.getCareHomes = async function () {

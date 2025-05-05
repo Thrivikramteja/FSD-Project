@@ -1,5 +1,6 @@
 const { User } = require("../models/user.model");
-const NGO = require("../models/NGO.model");
+// const NGO = require("../models/NGO.model");
+const { NGO } = require("../models/NGO.model");
 const Carehome = require("../models/carehome.model");
 
 const bcrypt = require("bcryptjs");
@@ -57,6 +58,7 @@ async function login(req, res) {
 
     if (UserRole === "NGO") {
       user = await NGO.getNGO(email);
+      console.log(user);
 
       if (!user) {
         console.log("NGO does not exist.");
@@ -70,7 +72,8 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
-      return res.redirect(`/NGO-dashboard/${user.id_NGO}`);
+      console.log(user.ngoId);
+      return res.redirect(`/NGO-dashboard/${user.ngoId}`);
     } else if (UserRole === "Donor") {
       user = await User.getUser(email);
 

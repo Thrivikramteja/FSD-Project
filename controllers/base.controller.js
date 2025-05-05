@@ -1,4 +1,4 @@
-const {NGO} = require("../models/NGO.model");
+const {NGO , Event} = require("../models/NGO.model");
 // const User = require("../models/user.model");
 
 // const promisifyModelMethod = (modelMethod, ...args) =>
@@ -35,7 +35,7 @@ async function getLandingPage(req, res) {
   //   }
   //   console.log("Events:", events);
   // });
-  const upcoming_eve = await NGO.upcoming_eve();
+  const upcoming_eve = await Event.upcoming_eve();
 
   res.render("landing-page", { ongoing_fund, upcoming_eve });
 }

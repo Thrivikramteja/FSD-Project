@@ -29,6 +29,18 @@ const app = express();
 //   })
 // );
 
+
+
+// Make sure this middleware is added BEFORE your routes
+app.use(session({
+  secret: 'your_secret_key', // Replace with a real secret key
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 // 1 day in milliseconds
+  }
+}));
+
 app.use(express.static("public"));
 
 app.set("view engine", "ejs");
