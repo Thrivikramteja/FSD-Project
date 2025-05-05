@@ -10,8 +10,8 @@
   <body> 
     <%- include('./shared/includes/header') %>
     <main>
-      <a href="/fundraisers" style="font-size: 20px; padding: 12px; text-decoration: none; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</a>
-      <div class="nonprofit-container">
+        <a href="/fundraisers" style="font-size: 20px; padding: 12px; text-decoration: none; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</a>
+        <div class="nonprofit-container">
         <% ongoing_fund.forEach(ongoing_fun => { %>
             <div class="nonprofit-card" >
                 <h3><%= ongoing_fun.fundraiser_name %></h3>
@@ -21,15 +21,15 @@
                         <p>Amount Raised</p>
                     </div>
                 </div>
-                <div class="buttons">
-                    <!-- <button class="details-btn">View details</button>
+                <!-- <div class="buttons">
+                    <button class="details-btn">View details</button>
                     <a href="/donate/">
                         <button class="select-btn">Donate</button>
-                    </a> -->
-                </div>
+                    </a>
+                </div> -->
             </div>
         <% }) %>
-    </div>
+        </div>
 
       <a href="/events" style="font-size: 20px; padding: 12px; margin-top: 20px; text-decoration: none; text-align: center; color: black; font-weight: 600">NGO Events</a>
       <div class="nonprofit-section">

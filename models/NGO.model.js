@@ -1,15 +1,19 @@
-const db = require("../data/database");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose); // Added mongoose-sequence
 
+const { CreatedFundraiser } = require("./user.model");
+
+// Calculate current date in ISO format for comparisons
 const today = new Date();
 const isoCurrentDate = `${today.getFullYear()}-${String(
   today.getMonth() + 1
 ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
+// NGO Schema
 const ngoSchema = new mongoose.Schema({
   Ngoname: String,
-  darpan_id: String,
+  darpan_id: String, // Removed auto-increment from here as you don't need it.
   year_established: Number,
   email: { type: String, required: true, unique: true },
   password: String,
@@ -17,252 +21,196 @@ const ngoSchema = new mongoose.Schema({
   address: String,
   account_holder_name: String,
   account_number: String,
-  ifsc: String
+  ifsc: String,
+  ngoId: { type: Number, unique: true }, // This will be auto-incremented
 });
 
-const NGO = mongoose.model('NGO', ngoSchema);
+// Add auto-increment plugin only for ngoId
+ngoSchema.plugin(AutoIncrement, { inc_field: "ngoId" });
 
+// Event Schema
+const eventSchema = new mongoose.Schema({
+  ngoId: {
+    type: Number,
+  },
+  event_location: {
+    type: String,
+    required: true,
+  },
+  event_name: {
+    type: String,
+    required: true,
+  },
+  event_date: {
+    type: Date,
+    required: true,
+  },
+  event_time: {
+    type: String,
+    required: true,
+  },
+  number_of_registrations: {
+    type: Number,
+    default: 0,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+});
 
-
+// NGO Schema Methods
 ngoSchema.methods.storeNGO = async function storeNGO() {
   try {
     this.password = await bcrypt.hash(this.password, 12);
-
     return await this.save();
   } catch (err) {
     throw err;
   }
-}
+};
 
-  // async storeNGO() {
-    
-  //   const sql =
-  //     "INSERT INTO NGOs (name_NGO, email, password, darpan_id, bank_acc_holder_name, phone, IFSC_code, bank_acc_number, YOE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-  //   db.run(
-  //     sql,
-  //     [
-  //       this.Ngoname,
-  //       this.email,
-  //       hashedPassword,
-  //       this.darpan_id,
-  //       this.account_holder_name,
-  //       this.phone,
-  //       this.ifsc,
-  //       this.account_number,
-  //       this.year_established,
-  //     ],
-  //     (err) => {
-  //       console.log(err);
-  //     }
-  //   );
-  // }
 
-  ngoSchema.statics.getNGOById = async function getNGOById(id) {
-    try {
-      const ngo = this.findById(id);
-      return ngo;
-    } catch (err) {
-      throw new Error('NGO not found or invalid ID');
-    }
+ngoSchema.statics.getNGOById = async function (id) {
+  try {
+    const ngo = await this.findById(id);
+    return ngo;
+  } catch (err) {
+    throw new Error("NGO not found or invalid ID");
   }
-  // static getNGOById(id, callback) {
-  //   const sql = "SELECT * FROM NGOs WHERE id_NGO = ?";
-  //   db.get(sql, [id], (err, row) => {
-  //     if (err) return callback(err, null);
-  //     return callback(null, row); // Returns a single NGO or null if not found
-  //   });
-  // }
+};
 
-  ngoSchema.statics.getNGO = async function getNGO(email) {
-    try {
-      const ngo = this.find({email: email});
-      return ngo;
-    } catch (err) {
-      throw new Error('NGO not found or invalid ID');
-    }
+ngoSchema.statics.ongoing_fund = async function () {
+  const currentDate = new Date();
+  const fundraisers = await CreatedFundraiser.find({
+    deadline: { $gt: currentDate },
+  });
+  return fundraisers;
+};
+
+ngoSchema.statics.getNGO = async function (email) {
+  try {
+    const ngo = await this.findOne({ email: email });
+    return ngo;
+  } catch (err) {
+    throw new Error("NGO not found or invalid email");
   }
+};
 
-  // static getNGO(email, callback) {
-  //   const sql = "SELECT * FROM NGOs WHERE email = ?";
-  //   db.get(sql, [email], (err, row) => {
-  //     if (err) return callback(err, null);
-  //     return callback(null, row); // Returns a single NGO or null if not found
-  //   });
-  // }
-
-  ngoSchema.statics.getId = async function getId(email) {
-    try {
-      const ngo = this.find({email: email});
-      return ngo.id;
-    } catch (err) {
-      throw new Error('NGO not found or invalid email.');
-    }
+// Get NGO ID by email
+ngoSchema.statics.getId = async function (email) {
+  try {
+    const ngo = await this.findOne({ email: email });
+    return ngo ? ngo._id : null;
+  } catch (err) {
+    throw new Error("NGO not found or invalid email");
   }
+};
 
-  // static getId(email, callback) {
-  //   const sql = "SELECT id_NGO FROM NGOs WHERE email = ?";
+ngoSchema.statics.ongoing_funds = async function (ngoId, callback) {
+  try {
+    const fundraisers = await Fundraiser.find({ ngoId: ngoId });
 
-  //   db.get(sql, [email], (err, row) => {
-  //     if (err) return callback(err, null);
-  //     return callback(null, row);
-  //   });
-  // }
-
-  function toISO(dateText) {
-    if (!dateText) {
-      console.warn("Invalid or missing date:", dateText);
-      return null;
-    }
-
-    try {
-      const [day, month, year] = dateText.split("-");
-      if (!day || !month || !year) {
-        console.warn("Invalid date format:", dateText);
-        return null;
-      }
-      return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(
-        2,
-        "0"
-      )}`;
-    } catch (error) {
-      console.error("Error parsing date:", dateText, error);
-      return null;
-    }
-  }
-
-  // static get_ngo_data(ngoID, callback) {
-  //   const query = "select * from NGOs where id_NGO = ?";
-  //   db.get(query, [ngoID], (err, rows) => {
-  //     if (err) {
-  //       console.error("Error fetching user data:", err);
-  //       callback(err, null);
-  //     } else {
-  //       callback(null, rows);
-  //     }
-  //   });
-  // }
-
-  static ongoing_fund(callback) {
-    const query = "SELECT * FROM created_fundraisers";
-    db.all(query, [], (err, rows) => {
-      if (err) {
-        console.error("Error while getting fundraisers", err);
-        callback(err, null);
-      } else {
-        const isoCurrentDate = new Date().toISOString().split("T")[0];
-        const ongoing_fund = rows.filter((row) => {
-          const isoDate = toISO(row.deadline);
-          return isoDate && isoDate >= isoCurrentDate;
-        });
-
-        callback(null, ongoing_fund);
-      }
+    const ongoing_fund = fundraisers.filter((fundraiser) => {
+      const isoDate = toISO(fundraiser.deadline);
+      return isoDate && isoDate >= isoCurrentDate;
     });
+
+    callback(null, ongoing_fund);
+  } catch (err) {
+    console.error("Error while getting ongoing fundraisers", err);
+    callback(err, null);
   }
+};
 
-  static getname(ngoId, callback) {
-    db.get(
-      "SELECT name_NGO FROM NGOs WHERE id_NGO = ?",
-      [ngoId],
-      (err, row) => {
-        if (err) {
-          console.error("Error while getting name_NGO of the ngo:", err);
-          callback(err, null);
-        } else {
-          callback(null, row ? row.name_NGO : null);
-        }
-      }
-    );
-  }
+ngoSchema.statics.completed_fund = async function (ngoId, callback) {
+  try {
+    const fundraisers = await Fundraiser.find({ ngoId: ngoId });
 
-  static ongoing_funds(ngoId, callback) {
-    const query = "SELECT * FROM created_fundraisers WHERE id_NGO = ?";
-    db.all(query, [ngoId], (err, rows) => {
-      if (err) {
-        console.error("Error while getting fund raisers", err);
-        callback(err, null);
-      } else {
-        const ongoing_fund = rows.filter((row) => {
-          const isoDate = this.toISO(row.deadline);
-          return isoDate && isoDate >= isoCurrentDate;
-        });
-
-        callback(null, ongoing_fund);
-      }
+    const completed_fund = fundraisers.filter((fundraiser) => {
+      const isoDate = toISO(fundraiser.deadline);
+      return isoDate && isoDate < isoCurrentDate;
     });
-  }
 
-  static completed_fund(ngoId, callback) {
-    const query = "SELECT * FROM created_fundraisers WHERE id_NGO = ?";
-    db.all(query, [ngoId], (err, rows) => {
-      if (err) {
-        console.error("Error fetching completed fundraisers:", err);
-        callback(err, null);
-      } else {
-        const completed_fund = rows.filter((row) => {
-          const isoDate = this.toISO(row.deadline);
-          return isoDate && isoDate < isoCurrentDate;
-        });
-        callback(null, completed_fund);
-      }
+    callback(null, completed_fund);
+  } catch (err) {
+    console.error("Error fetching completed fundraisers:", err);
+    callback(err, null);
+  }
+};
+
+// Get ongoing events
+ngoSchema.statics.ongoing_events = async function (ngoId, callback) {
+  try {
+    const events = await Event.find({ ngoId: ngoId });
+
+    const ongoing_events = events.filter((event) => {
+      const eventDate =
+        event.event_date instanceof Date
+          ? event.event_date.toISOString().split("T")[0]
+          : toISO(event.event_date);
+
+      return eventDate && eventDate >= isoCurrentDate;
     });
-  }
 
-  static completed_event(ngoId, callback) {
-    const query = "SELECT * FROM created_events WHERE id_NGO = ?";
-    db.all(query, [ngoId], (err, rows) => {
-      if (err) {
-        console.error(
-          "Error fetching while fetching events for ngo dashboard:",
-          err
-        );
-        callback(err, null);
-      } else {
-        const completed_event = rows.filter((row) => {
-          const isoDate = this.toISO(row.event_date);
-          return isoDate && isoDate < isoCurrentDate;
-        });
-        callback(null, completed_event);
-      }
+    callback(null, ongoing_events);
+  } catch (err) {
+    console.error("Error fetching ongoing events:", err);
+    callback(err, null);
+  }
+};
+
+// Get completed events
+ngoSchema.statics.completed_event = async function (ngoId, callback) {
+  try {
+    const events = await Event.find({ ngoId: ngoId });
+
+    const completed_event = events.filter((event) => {
+      const eventDate =
+        event.event_date instanceof Date
+          ? event.event_date.toISOString().split("T")[0]
+          : toISO(event.event_date);
+
+      return eventDate && eventDate < isoCurrentDate;
     });
+
+    callback(null, completed_event);
+  } catch (err) {
+    console.error("Error fetching completed events:", err);
+    callback(err, null);
   }
+};
 
-  static upcoming_eves(ngoId, callback) {
-    const query = "SELECT * FROM created_events WHERE id_NGO = ?";
-    db.all(query, [ngoId], (err, rows) => {
-      if (err) {
-        console.error("Error fetching upcoming events for ngo dashboard:", err);
-        callback(err, null);
-      } else {
-        const upcoming_eve = rows.filter((row) => {
-          const isoDate = this.toISO(row.event_date);
-          return isoDate && isoDate >= isoCurrentDate;
-        });
-        callback(null, upcoming_eve);
-      }
-    });
+// Create new event
+ngoSchema.statics.create_event = async function (eventDetails, callback) {
+  try {
+    const event = new Event(eventDetails);
+    await event.save();
+    callback(null, event);
+  } catch (err) {
+    console.error("Error while creating new event:", err);
+    callback(err, null);
   }
+};
 
-  static upcoming_eve(callback) {
-    const query = "SELECT * FROM created_events";
-    db.all(query, [], (err, rows) => {
-      if (err) {
-        console.error("Error fetching upcoming events:", err);
-        callback(err, null);
-      } else {
-        const isoCurrentDate = new Date().toISOString().split("T")[0]; // ✅ Define current ISO date
-        const upcoming_eve = rows.filter((row) => {
-          const isoDate = NGO.toISO(row.event_date); // ✅ Use NGO.toISO instead of toISO
-          return isoDate && isoDate >= isoCurrentDate;
-        });
-
-        callback(null, upcoming_eve);
-      }
-    });
+// Create new fundraiser
+ngoSchema.statics.create_fundraiser = async function (
+  fundraiserDetails,
+  callback
+) {
+  try {
+    const fundraiser = new Fundraiser(fundraiserDetails);
+    await fundraiser.save();
+    callback(null, fundraiser);
+  } catch (err) {
+    console.error("Error while creating new fundraiser:", err);
+    callback(err, null);
   }
+};
 
-  static get_stats(ngoID, callback) {
+// Get statistics for a specific NGO
+ngoSchema.statics.get_stats = async function (ngoId, callback) {
+  try {
     const stats = {
       totalFundsRaised: 0,
       totalRegistrations: 0,
@@ -270,252 +218,75 @@ ngoSchema.methods.storeNGO = async function storeNGO() {
       careHomesBenefited: 0,
     };
 
-    const queryFundsRaised = `
-        SELECT funds_raised 
-        FROM NGOs 
-        WHERE id_NGO = ?;
-    `;
+    const fundsRaised = await Fundraiser.aggregate([
+      { $match: { ngoId: ngoId } },
+      { $group: { _id: null, total: { $sum: "$funds_raised" } } },
+    ]);
 
-    const queryTotalRegistrations = `
-        SELECT SUM(number_of_registrations) AS totalRegistrations 
-        FROM created_events 
-        WHERE id_NGO = ?;
-    `;
+    stats.totalFundsRaised = fundsRaised[0] ? fundsRaised[0].total : 0;
 
-    const queryFundraisersAndCareHomes = `
-        SELECT COUNT(*) AS fundraisersCreated, COUNT(DISTINCT id_carehome) AS careHomesBenefited 
-        FROM created_fundraisers 
-        WHERE id_NGO = ?;
-    `;
+    const registrations = await Event.aggregate([
+      { $match: { ngoId: ngoId } },
+      { $group: { _id: null, total: { $sum: "$number_of_registrations" } } },
+    ]);
 
-    db.get(queryFundsRaised, [ngoID], (err, row) => {
-      if (err) {
-        callback(err, null);
-        return;
-      }
-      stats.totalFundsRaised = row ? row.funds_raised : 0;
+    stats.totalRegistrations = registrations[0] ? registrations[0].total : 0;
 
-      db.get(queryTotalRegistrations, [ngoID], (err, row) => {
-        if (err) {
-          callback(err, null);
-          return;
-        }
-        stats.totalRegistrations = row ? row.totalRegistrations : 0;
+    const fundraisersAndCareHomes = await Fundraiser.aggregate([
+      { $match: { ngoId: ngoId } },
+      {
+        $group: {
+          _id: null,
+          fundraisersCreated: { $sum: 1 },
+          careHomesBenefited: { $addToSet: "$id_carehome" },
+        },
+      },
+    ]);
 
-        db.get(queryFundraisersAndCareHomes, [ngoID], (err, row) => {
-          if (err) {
-            callback(err, null);
-            return;
-          }
+    stats.fundraisersCreated = fundraisersAndCareHomes[0]
+      ? fundraisersAndCareHomes[0].fundraisersCreated
+      : 0;
+    stats.careHomesBenefited = fundraisersAndCareHomes[0]
+      ? fundraisersAndCareHomes[0].careHomesBenefited.length
+      : 0;
 
-          stats.careHomesBenefited = row ? row.careHomesBenefited : 0;
-
-          callback(null, stats);
-        });
-      });
-    });
+    callback(null, stats);
+  } catch (err) {
+    console.error("Error fetching stats:", err);
+    callback(err, null);
   }
+};
 
-  static create_event(eventDetails, callback) {
-    const {
-      id_NGO,
-      event_location,
-      event_name,
-      event_date,
-      event_time,
-      number_of_registrations,
-      description,
-    } = eventDetails;
-
-    const query = `
-        INSERT INTO created_events (id_NGO, event_location, event_name, event_date, event_time, number_of_registrations, description)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const values = [
-      id_NGO,
-      event_location,
-      event_name,
-      event_date,
-      event_time,
-      number_of_registrations || 0,
-      description,
-    ];
-
-    db.run(query, values, function (err) {
-      if (err) {
-        console.error("Error while inserting new event:", err);
-        callback(err, null);
-      } else {
-        callback(null, { id: this.lastID, ...eventDetails });
-      }
-    });
+ngoSchema.statics.get_all_ngos = async function (callback) {
+  try {
+    const ngos = await this.find();
+    callback(null, ngos);
+  } catch (err) {
+    console.error("Error while fetching NGOs", err);
+    callback(err, null);
   }
+};
 
-  static get_all_ngos(callback) {
-    const query = "select * from NGOs";
-    db.all(query, [], (err, rows) => {
-      if (err) {
-        console.log("error while fetching NGOs ", err);
-        return callback(err, null);
-      }
-      callback(null, rows);
+// Inside eventSchema.statics
+ngoSchema.statics.upcoming_eve = async function () {
+  try {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Set to today's midnight
+
+    // Find events with event_date today or in the future
+    const upcomingEvents = await this.find({
+      event_date: { $gte: currentDate }
     });
+
+    return upcomingEvents;
+  } catch (err) {
+    console.error("Error fetching upcoming events:", err);
+    throw err; // rethrow to be caught where the function is called
   }
-
-  static specific_events(ngoID, callback) {
-    const query = `SELECT * FROM created_events WHERE id_NGO = ?`;
-
-    db.all(query, [ngoID], (err, rows) => {
-      if (err) {
-        console.error("Error fetching specific events:", err);
-        return callback(err, null);
-      }
-
-      try {
-        // Filter rows to include only events with a date >= today's date
-        const filteredEvents = rows.filter((row) => {
-          const isoDate = this.toISO(row.event_date); // Convert event_date to ISO format
-          return isoDate && isoDate >= isoCurrentDate; // Compare with today's ISO date
-        });
-
-        callback(null, filteredEvents);
-      } catch (filterError) {
-        console.error("Error filtering events:", filterError);
-        callback(filterError, null);
-      }
-    });
-  }
-
-  static event_load(ngoID, event_name, callback) {
-    const query = `select * from created_events where id_NGO = ? and event_name = ?`;
-
-    db.get(query, [ngoID, event_name], (err, rows) => {
-      if (err) {
-        console.log("error fetching event details");
-        return callback(err, null);
-      }
-
-      callback(null, rows);
-    });
-  }
-
-  static edit_event(eventDetails, callback) {
-    const {
-      id_NGO,
-      original_event_name, // Original event name to identify the event
-      new_event_name, // New event name (title)
-      event_location,
-      event_date,
-      event_time,
-      description,
-    } = eventDetails;
-
-    const query = `
-        UPDATE created_events
-        SET event_name = ?, 
-            event_location = ?, 
-            event_date = ?, 
-            event_time = ?, 
-            description = ?
-        WHERE id_NGO = ? AND event_name = ?
-    `;
-
-    const values = [
-      new_event_name || original_event_name, // Default to original name if new name not provided
-      event_location,
-      event_date,
-      event_time,
-      description,
-      id_NGO,
-      original_event_name,
-    ];
-
-    db.run(query, values, function (err) {
-      if (err) {
-        console.error("Error while updating event:", err);
-        callback(err, null);
-      } else if (this.changes === 0) {
-        callback(new Error("No event found to update."), null);
-      } else {
-        callback(null, { success: true, ...eventDetails });
-      }
-    });
-  }
-
-  static get_carehome(callback) {
-    const query = `
-        SELECT id_carehome, name_carehome
-        FROM carehomes
-    `;
-
-    db.all(query, [], (err, rows) => {
-      if (err) {
-        console.error("Error fetching care home details:", err);
-        callback(err, null);
-      } else {
-        callback(null, rows); // Return all care homes as an array of objects
-      }
-    });
-  }
-
-  static update_profile(updationDetails, callback) {
-    const { id_NGO, fullname, darpan, phone, bank, accnum, ifsc } =
-      updationDetails;
-
-    const query = `UPDATE NGOs SET name_NGO = ?, darpan_id = ?, bank_acc_holder_name = ?, phone = ?, IFSC_code = ?, bank_acc_number = ? WHERE id_NGO = ?`;
-
-    const values = [fullname, darpan, bank, phone, ifsc, accnum, id_NGO];
-
-    db.run(query, values, function (err) {
-      if (err) {
-        console.error("Error while inserting new fundraiser:", err);
-        callback(err, null);
-      } else {
-        callback(null, { id: this.lastID, ...updationDetails });
-      }
-    });
-  }
-
-  static create_fundraiser(fundraiserDetails, callback) {
-    const {
-      id_carehome,
-      fundraiser_name,
-      id_NGO,
-      has_report,
-      goal_amount,
-      description,
-      amount_raised_so_far,
-      deadline,
-    } = fundraiserDetails;
-
-    const query = `
-        INSERT INTO created_fundraisers (id_carehome, fundraiser_name, id_NGO, has_report, goal_amount, description, amount_raised_so_far, deadline)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const values = [
-      id_carehome,
-      fundraiser_name,
-      id_NGO,
-      has_report || 0, // Default to 0 if not provided
-      goal_amount || 0, // Default to 0 if not provided
-      description,
-      amount_raised_so_far || 0, // Default to 0 if not provided
-      deadline,
-    ];
-
-    db.run(query, values, function (err) {
-      if (err) {
-        console.error("Error while inserting new fundraiser:", err);
-        callback(err, null);
-      } else {
-        callback(null, { id: this.lastID, ...fundraiserDetails });
-      }
-    });
-  }
-}
+};
 
 
-const NGO = mongoose.model('NGO', ngoSchema);
-module.exports = NGO;
+const NGO = mongoose.model("NGO", ngoSchema);
+const Event = mongoose.model("Event", eventSchema);
+
+module.exports = { NGO, Event };

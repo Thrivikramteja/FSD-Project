@@ -1,8 +1,8 @@
-const User = require("../models/user.model");
+const { User } = require("../models/user.model");
 const NGO = require("../models/NGO.model");
 const Carehome = require("../models/carehome.model");
 
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 
 const isAuth = (req, res, next) => {
   if (req.session.isAuth) {
@@ -18,24 +18,26 @@ function getSignup(req, res) {
 }
 
 function getLogin(req, res) {
-  const error = " "
-  res.render("login", {error});
+  const error = " ";
+  res.render("login", { error });
 }
 
 async function signup(req, res) {
   const { fullname, mail, password, repass, phone, checkbox } = req.body;
-  const user = new User(fullname, mail, password, phone, checkbox);
+  const user = new User({
+    name: fullname,
+    email: mail,
+    password: password,
+    mobile_number: phone,
+    receive_notifications: checkbox,
+  });
 
   try {
-    const exists = await new Promise((resolve, reject) => {
-      User.getUser(mail, (err, row) => {
-        if (err) return reject(err);
-        resolve(row);
-      });
-    });
+    const exists = await User.getUser(mail);
+
     if (exists) {
       console.log("User already exists.");
-      return res.render("users/signup", {error: "User already exists"});
+      return res.render("users/signup", { error: "User already exists" });
     }
     await user.signup();
     console.log("User registered successfully.");
@@ -50,72 +52,53 @@ async function signup(req, res) {
 async function login(req, res) {
   const { UserRole, email, password } = req.body;
 
-  console.log("in login " + UserRole);
-
   try {
     let user = null;
 
     if (UserRole === "NGO") {
-      user = await new Promise((resolve, reject) => {
-        NGO.getNGO(email, (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        });
-      });
+      user = await NGO.getNGO(email);
 
       if (!user) {
         console.log("NGO does not exist.");
-        return res.render("login", {error: "NGO does not exist."});
+        return res.render("login", { error: "NGO does not exist." });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         console.log("Incorrect password.");
-        return res.render("login", {error:"Incorrect password."});
+        return res.render("login", { error: "Incorrect password." });
       }
 
       req.session.isAuth = true;
       return res.redirect(`/NGO-dashboard/${user.id_NGO}`);
-
     } else if (UserRole === "Donor") {
-      user = await new Promise((resolve, reject) => {
-        User.getUser(email, (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        });
-      });
+      user = await User.getUser(email);
 
       if (!user) {
         console.log("Donor does not exist.");
-        return res.render("login", {error:"Donor does not exist."});
+        return res.render("login", { error: "Donor does not exist." });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         console.log("Incorrect password.");
-        return res.render("login", {error:"Incorrect password."});
+        return res.render("login", { error: "Incorrect password." });
       }
 
       req.session.isAuth = true;
       return res.redirect(`/user-dashboard/${user.id_donor}`);
-
     } else if (UserRole === "Carehome") {
-      user = await new Promise((resolve, reject) => {
-        Carehome.getCarehome(email, (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        });
-      });
+      user = await Carehome.getCarehome(email);
 
       if (!user) {
         console.log("Carehome does not exist.");
-        return res.render("login", {error:"Carehome does not exist."});
+        return res.render("login", { error: "Carehome does not exist." });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         console.log("Incorrect password.");
-        return res.render("login", {error:"Incorrect password."});
+        return res.render("login", { error: "Incorrect password." });
       }
 
       req.session.isAuth = true;
@@ -123,96 +106,90 @@ async function login(req, res) {
     }
 
     console.log("Invalid user role.");
-    res.render("login", {error:"Invalid user role."});
-
+    res.render("login", { error: "Invalid user role." });
   } catch (error) {
     console.error("Login error:", error);
     res.redirect("/login");
   }
 }
-async function login(req, res) {
-  const { UserRole, email, password } = req.body;
+// async function login(req, res) {
+//   const { UserRole, email, password } = req.body;
 
-  console.log("in login " + UserRole);
+//   console.log("in login " + UserRole);
 
-  try {
-    let user = null;
+//   try {
+//     let user = null;
 
-    if (UserRole === "NGO") {
-      user = await new Promise((resolve, reject) => {
-        NGO.getNGO(email, (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        });
-      });
+//     if (UserRole === "NGO") {
+//       user = await new Promise((resolve, reject) => {
+//         NGO.getNGO(email, (err, row) => {
+//           if (err) return reject(err);
+//           resolve(row);
+//         });
+//       });
 
-      if (!user) {
-        console.log("NGO does not exist.");
-        return res.render("login", {error: "NGO does not exist."});
-      }
+//       if (!user) {
+//         console.log("NGO does not exist.");
+//         return res.render("login", {error: "NGO does not exist."});
+//       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        console.log("Incorrect password.");
-        return res.render("login", {error:"Incorrect password."});
-      }
+//       const isMatch = await bcrypt.compare(password, user.password);
+//       if (!isMatch) {
+//         console.log("Incorrect password.");
+//         return res.render("login", {error:"Incorrect password."});
+//       }
 
-      req.session.isAuth = true;
-      return res.redirect(`/NGO-dashboard/${user.id_NGO}`);
+//       req.session.isAuth = true;
+//       return res.redirect(`/NGO-dashboard/${user.id_NGO}`);
 
-    } else if (UserRole === "Donor") {
-      user = await new Promise((resolve, reject) => {
-        User.getUser(email, (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        });
-      });
+//     } else if (UserRole === "Donor") {
+//       user = await User.getUser(email);
 
-      if (!user) {
-        console.log("Donor does not exist.");
-        return res.render("login", {error:"Donor does not exist."});
-      }
+//       if (!user) {
+//         console.log("Donor does not exist.");
+//         return res.render("login", {error:"Donor does not exist."});
+//       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        console.log("Incorrect password.");
-        return res.render("login", {error:"Incorrect password."});
-      }
+//       const isMatch = await bcrypt.compare(password, user.password);
+//       if (!isMatch) {
+//         console.log("Incorrect password.");
+//         return res.render("login", {error:"Incorrect password."});
+//       }
 
-      req.session.isAuth = true;
-      return res.redirect(`/user-dashboard/${user.id_donor}`);
+//       req.session.isAuth = true;
+//       return res.redirect(`/user-dashboard/${user.id_donor}`);
 
-    } else if (UserRole === "Carehome") {
-      user = await new Promise((resolve, reject) => {
-        Carehome.getCarehome(email, (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        });
-      });
+//     } else if (UserRole === "Carehome") {
+//       user = await new Promise((resolve, reject) => {
+//         Carehome.getCarehome(email, (err, row) => {
+//           if (err) return reject(err);
+//           resolve(row);
+//         });
+//       });
 
-      if (!user) {
-        console.log("Carehome does not exist.");
-        return res.render("login", {error:"Carehome does not exist."});
-      }
+//       if (!user) {
+//         console.log("Carehome does not exist.");
+//         return res.render("login", {error:"Carehome does not exist."});
+//       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        console.log("Incorrect password.");
-        return res.render("login", {error:"Incorrect password."});
-      }
+//       const isMatch = await bcrypt.compare(password, user.password);
+//       if (!isMatch) {
+//         console.log("Incorrect password.");
+//         return res.render("login", {error:"Incorrect password."});
+//       }
 
-      req.session.isAuth = true;
-      return res.redirect(`/carehome-dashboard/${user.id_carehome}`);
-    }
+//       req.session.isAuth = true;
+//       return res.redirect(`/carehome-dashboard/${user.id_carehome}`);
+//     }
 
-    console.log("Invalid user role.");
-    res.render("login", {error:"Invalid user role."});
+//     console.log("Invalid user role.");
+//     res.render("login", {error:"Invalid user role."});
 
-  } catch (error) {
-    console.error("Login error:", error);
-    res.redirect("/login");
-  }
-} 
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     res.redirect("/login");
+//   }
+// }
 
 module.exports = {
   getSignup: getSignup,

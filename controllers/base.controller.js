@@ -1,5 +1,5 @@
-const NGO = require("../models/NGO.model");
-const User = require("../models/user.model");
+const {NGO} = require("../models/NGO.model");
+// const User = require("../models/user.model");
 
 // const promisifyModelMethod = (modelMethod, ...args) =>
 //   new Promise((resolve, reject) => {
@@ -26,16 +26,7 @@ async function getLandingPage(req, res) {
   //   }
   //   console.log("Fundraisers:", fundraisers);
   // });
-  const ongoing_fund = await new Promise((resolve, reject) => {
-    NGO.ongoing_fund((err, data) => {
-      if (err) {
-        console.error("Error fetching ongoing_fund:", err);
-        resolve([]); // Default to empty array on error
-      } else {
-        resolve(data);
-      }
-    });
-  });
+  const ongoing_fund = await NGO.ongoing_fund();
 
   // const events = NGO.getEvents((err, events) => {
   //   if (err) {
@@ -44,16 +35,7 @@ async function getLandingPage(req, res) {
   //   }
   //   console.log("Events:", events);
   // });
-  const upcoming_eve = await new Promise((resolve, reject) => {
-    NGO.upcoming_eve((err, data) => {
-      if (err) {
-        console.error("Error fetching upcoming_eve:", err);
-        resolve([]);
-      } else {
-        resolve(data);
-      }
-    });
-  });
+  const upcoming_eve = await NGO.upcoming_eve();
 
   res.render("landing-page", { ongoing_fund, upcoming_eve });
 }
