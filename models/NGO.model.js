@@ -256,16 +256,16 @@ ngoSchema.statics.get_stats = async function (ngoId, callback) {
     callback(err, null);
   }
 };
-
-ngoSchema.statics.get_all_ngos = async function (callback) {
+ngoSchema.statics.get_all_ngos = async function () {
   try {
-    const ngos = await this.find();
-    callback(null, ngos);
+    const ngos = await this.find({});
+    return ngos; // Return the fetched NGOs
   } catch (err) {
     console.error("Error while fetching NGOs", err);
-    callback(err, null);
+    throw err; // Throw the error to let the caller handle it
   }
 };
+
 
 // Inside eventSchema.statics
 // ngoSchema.statics.upcoming_eve = async function () {

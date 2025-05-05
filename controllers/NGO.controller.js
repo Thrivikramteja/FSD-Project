@@ -8,10 +8,15 @@ function getRegister(req, res) {
   res.render("NGOs/ngo_registration");
 }
 
-function get_allngo() {
-  const NGOs = NGO.get_allngo;
-  res.render("NGOs", {ngos: NGOs});
-} 
+async function get_allngo(req, res) {
+  try {
+    const NGOs = await NGO.get_all_ngos(); // Await the asynchronous function
+    res.render("NGOs/allngos", { ngos: NGOs }); // Pass the data to the EJS view
+  } catch (err) {
+    console.error("Error while fetching NGOs:", err);
+    res.status(500).send("Failed to fetch NGOs"); // Handle errors appropriately
+  }
+}
 
 /**
  * Register a new NGO
@@ -77,16 +82,30 @@ async function getEditNGOProfile(req, res) {
 /**
  * Get all events
  */
-async function getEvents(req, res) {
-  const ngoID = parseInt(req.params.ngoID,10); // Use ngoID parameter
-
-  try {
-    const events = await Event.find({ ngoId: ngoID, event_date: { $gte: new Date() } });
+// async function getEvents(req, res) {
+//   const ngoID = parseInt(req.params.ngoID,10); // Use ngoID parameter
+//   console.log("hi : " + ngoID);
+//   try {
+//     const events = await Event.find({ ngoId: ngoID, event_date: { $gte: new Date() } });
     
-    res.render("NGOs/events", { upcoming_eve: events });
-  } catch (error) {
-    console.error("Error fetching events:", error);
-    res.status(500).send("Failed to load events");
+//     res.render("NGOs/events", { upcoming_eve: events });
+//   } catch (error) {
+//     console.error("Error fetching events:", error);
+//     res.status(500).send("Failed to load events");
+//   }
+// }
+
+async function getEvents(req,res)
+{
+  try
+  {
+    const events = await Event.find({event_date: {$gte: new Date()}});
+    res.render("NGOs/events", {upcoming_eve: events})
+  }
+  catch(error)
+  {
+    console.error("Error fetching upcoming events " , error);
+    res.staus(500).send("Failed to load events ");
   }
 }
 
@@ -353,7 +372,7 @@ async function editEvent(req, res) {
       }
 
       // Format the event date
-      const formatted_event_date = format_date(event_date);
+      // const formatted_event_date = format_date(event_date);
 
       // Prepare updated event details
       const eventDetails = {
@@ -361,21 +380,12 @@ async function editEvent(req, res) {
           original_event_name,
           new_event_name,
           event_location,
-          event_date: formatted_event_date,
+          event_date,
           event_time,
           description,
       };
 
-      // Edit event using NGO.edit_event (assuming your logic is correct here)
-      const result = await new Promise((resolve, reject) => {
-          Event.edit_event(eventDetails, (err, data) => {
-              if (err) {
-                  reject(err);
-              } else {
-                  resolve(data);
-              }
-          });
-      });
+      const result = await Event.edit_event(eventDetails);
 
       console.log('Event Updated:', result);
       res.redirect(`/NGO-dashboard/${ngoID}`);
