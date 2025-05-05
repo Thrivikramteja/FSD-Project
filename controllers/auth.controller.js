@@ -1,6 +1,4 @@
 const { User } = require("../models/user.model");
-const {NGO} = require("../models/NGO.model");
-// const NGO = require("../models/NGO.model");
 const { NGO } = require("../models/NGO.model");
 const Carehome = require("../models/carehome.model");
 
@@ -74,8 +72,6 @@ async function login(req, res) {
 
       req.session.isAuth = true;
       return res.redirect(`/NGO-dashboard/${user.ngoId}`);
-      console.log(user.ngoId);
-      return res.redirect(`/NGO-dashboard/${user.ngoId}`);
     } else if (UserRole === "Donor") {
       user = await User.getUserByEmail(email);
 
@@ -117,6 +113,15 @@ async function login(req, res) {
     res.redirect("/login");
   }
 }
+
+module.exports = {
+  getSignup: getSignup,
+  getLogin: getLogin,
+  signup: signup,
+  login: login,
+  isAuth,
+};
+
 // async function login(req, res) {
 //   const { UserRole, email, password } = req.body;
 
@@ -196,10 +201,3 @@ async function login(req, res) {
 //   }
 // }
 
-module.exports = {
-  getSignup: getSignup,
-  getLogin: getLogin,
-  signup: signup,
-  login: login,
-  isAuth,
-};

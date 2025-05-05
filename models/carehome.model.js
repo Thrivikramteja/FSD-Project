@@ -3,7 +3,6 @@
 const mongoose = require("mongoose");
 const {CreatedFundraiser, Donor} = require("./user.model"); 
 const AutoIncrement = require("mongoose-sequence")(mongoose);
-const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 // const today = new Date();
 // const isoCurrentDate = `${today.getFullYear()}-${String(
@@ -32,7 +31,6 @@ const carehomeSchema = new mongoose.Schema({
 });
 
 carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
-const Carehome = mongoose.model('Carehome',  carehomeSchema);
 
 carehomeSchema.statics.getCareHomes = async function () {
   const carehomes = await Carehome.find({}, {carehomeId: 1, care_home_name: 1});
@@ -116,7 +114,7 @@ const donationMoneySchema = new mongoose.Schema({
   }
 });
 
-const DonationMoney = mongoose.model('DonationMoney', donationMoneySchema);
+
 
 carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
   const stats = [];
@@ -205,6 +203,7 @@ carehomeSchema.statics.recentDonations = async function (careId) {
   }
 };
 const Carehome = mongoose.model('Carehome',  carehomeSchema);
+const DonationMoney = mongoose.model('DonationMoney', donationMoneySchema);
 
 module.exports = {Carehome, DonationMoney};
 
