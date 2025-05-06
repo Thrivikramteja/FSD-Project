@@ -74,10 +74,6 @@ const userRegisteredEventsSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  event_time: {
-    type: String,
-    required: true,
-  },
   event_location: {
     type: String,
     required: true,

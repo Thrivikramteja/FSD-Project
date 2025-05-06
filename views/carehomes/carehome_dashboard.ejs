@@ -5,19 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= name %></title>
     <link rel="stylesheet" href="/styles/carehome_dashboard.css">
+    <link href="/styles/ngo_das.css" rel="stylesheet" />
     <link rel="stylesheet" href="/styles/footer.css">
     <link rel="stylesheet" href="/styles/landing_page.css">
 </head>
 <body>
     
-    <header id="main-header" style="margin-bottom: 5rem;">
-        <div id="logo"><a href="/">CareConnect</a></div>
-        <nav>
-          <ul class="nav-items"></ul>
-          <a href="">Logout</a>
-          </ul>
+    <header id="header">
+        <a href="/" style="font-size: large;">CareConnect</a>
+        <nav >
+            <ul class="header_right">
+                <a href="/logout" style="margin-right: 3rem;">Logout</a>
+                <a href="/<%= careid %>/edit" style="margin-right: 3rem;">Edit Profile</a>
+            </ul>  
         </nav>
-      </header>
+    </header>
       
       <h1><%= name %></h1>
 

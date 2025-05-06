@@ -69,8 +69,6 @@ ngoSchema.methods.storeNGO = async function storeNGO() {
   }
 };
 
-
-
 ngoSchema.statics.getNGOById = async function (id) {
   try {
     const ngo = await this.find({ngoId: id});

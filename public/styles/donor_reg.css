@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+button {
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #218838;
+}
+label {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust spacing between checkbox and text */
+}
+
+label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0; /* Remove default margin */
+}
+.container {
+    width: 50%; /* Adjust form width */
+    max-width: 450px; /* Slightly increase width */
+    margin: auto;
+    padding: 30px; /* Increase padding for more height */
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Increase spacing between fields */
+}
+
+input, select, button {
+    width: 100%;
+    padding: 12px; /* Increase padding for height */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px; /* Slightly larger text */
+}
+
+/* Adjust checkbox alignment */
+label {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between checkbox and text */
+}
+
+button {
+    padding: 14px; /* Increase button height */
+    font-size: 18px;
+    font-weight: bold;
+}

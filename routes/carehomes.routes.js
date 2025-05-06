@@ -14,11 +14,13 @@ router.put('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.e
 
 router.get('/donate_money', carehomesController.donateMoney);
 
+router.post('/donate_money/:carehomeId',isAuth, carehomesController.insertMoney);
+
 router.get('/donate_items', carehomesController.donateItems);
 
 router.get('/registerCarehome', carehomesController.register);
 
-router.post('/registerCarehome',isAuth, carehomesController.registerCarehome);
+router.post('/registerCarehome', carehomesController.registerCarehome);
 
 router.get('/carehomes',carehomesController.getallcarehomes);
 

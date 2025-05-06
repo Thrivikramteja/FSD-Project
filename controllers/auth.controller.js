@@ -1,6 +1,7 @@
 const { User } = require("../models/user.model");
 const { NGO } = require("../models/NGO.model");
-const Carehome = require("../models/carehome.model");
+const { Carehome } = require("../models/carehome.model");
+const { Event } = require("../models/NGO.model");
 
 const bcrypt = require("bcryptjs");
 
@@ -71,6 +72,7 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
+      req.session.userRole = UserRole;
       return res.redirect(`/NGO-dashboard/${user.ngoId}`);
     } else if (UserRole === "Donor") {
       user = await User.getUserByEmail(email);
@@ -87,6 +89,8 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
+      req.session.user = user;
+      req.session.userRole = UserRole;
       return res.redirect(`/user-dashboard/${user.userId}`);
     } else if (UserRole === "Carehome") {
       user = await Carehome.getCarehome(email);
@@ -103,7 +107,8 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
-      return res.redirect(`/carehome-dashboard/${user.id_carehome}`);
+      req.session.userRole = UserRole;
+      return res.redirect(`/carehome-dashboard/${user.carehomeId}`);
     }
 
     console.log("Invalid user role.");
@@ -114,12 +119,20 @@ async function login(req, res) {
   }
 }
 
+function logout (req, res) {
+  req.session.destroy(err => {
+    if (err) return res.send('Error logging out');
+    res.redirect('/');
+  });
+}
+
 module.exports = {
   getSignup: getSignup,
   getLogin: getLogin,
   signup: signup,
   login: login,
   isAuth,
+  logout,
 };
 
 // async function login(req, res) {
@@ -200,4 +213,3 @@ module.exports = {
 //     res.redirect("/login");
 //   }
 // }
-

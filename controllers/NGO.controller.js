@@ -1,5 +1,9 @@
 const { NGO, Event } = require("../models/NGO.model");
-const { CreatedFundraiser } = require("../models/user.model"); // Assuming this is where Fundraiser is defined
+const {
+  CreatedFundraiser,
+  UserRegisteredEvent,
+  User,
+} = require("../models/user.model"); // Assuming this is where Fundraiser is defined
 const { CareHome } = require("../models/user.model");
 /**
  * Render NGO registration page
@@ -251,6 +255,29 @@ async function createFundraiser(req, res) {
   }
 }
 
+function getRegisterUser(req, res) {
+  const event = req.params.eventName;
+  const ngoId = req.params.ngoID;
+  res.render("users/donor_reg", { event, ngoId });
+}
+
+async function registerUser(req, res) {
+  const { event } = req.body;
+  const userId = await User.get;
+  const ngoId = req.params.ngoID;
+  const createdEvent = await Event.findOne({ event_name: event });
+  const userRegisteredEvent = new UserRegisteredEvent({
+    userId,
+    ngoId,
+    event,
+    event_date: createdEvent.event_date,
+    event_location: createdEvent.event_location,
+  });
+
+  await userRegisteredEvent.save();
+  res.json({ message: "Registration successful!" });
+}
+
 /**
  * Render create fundraiser form
  */
@@ -365,44 +392,49 @@ async function getNGO(req, res) {
 }
 
 async function editEvent(req, res) {
-  const ngoID = parseInt(req.params.ngoID,10); // Retrieve ngoID from route params
-  const { 
-      original_event_name, // Name of the event to identify it
-      new_event_name, 
-      event_location, 
-      event_date, 
-      event_time, 
-      description 
+  const ngoID = parseInt(req.params.ngoID, 10); // Retrieve ngoID from route params
+  const {
+    original_event_name, // Name of the event to identify it
+    new_event_name,
+    event_location,
+    event_date,
+    event_time,
+    description,
   } = req.body;
 
   try {
-      // Ensure required fields are provided
-      if (!ngoID || !original_event_name || !event_location || !event_date || !event_time) {
-          return res.status(400).send('Missing required fields');
-      }
+    // Ensure required fields are provided
+    if (
+      !ngoID ||
+      !original_event_name ||
+      !event_location ||
+      !event_date ||
+      !event_time
+    ) {
+      return res.status(400).send("Missing required fields");
+    }
 
-      // Format the event date
-      // const formatted_event_date = format_date(event_date);
+    // Format the event date
+    // const formatted_event_date = format_date(event_date);
 
-      // Prepare updated event details
-      const eventDetails = {
-          id_NGO: ngoID,
-          original_event_name,
-          new_event_name,
-          event_location,
-          event_date,
-          event_time,
-          description,
-      };
+    // Prepare updated event details
+    const eventDetails = {
+      id_NGO: ngoID,
+      original_event_name,
+      new_event_name,
+      event_location,
+      event_date,
+      event_time,
+      description,
+    };
 
-      const result = await Event.edit_event(eventDetails);
+    const result = await Event.edit_event(eventDetails);
 
-      console.log('Event Updated:', result);
-      res.redirect(`/NGO-dashboard/${ngoID}`);
-
+    console.log("Event Updated:", result);
+    res.redirect(`/NGO-dashboard/${ngoID}`);
   } catch (error) {
-      console.error('Error in editEvent controller:', error);
-      res.status(500).send('Failed to update event');
+    console.error("Error in editEvent controller:", error);
+    res.status(500).send("Failed to update event");
   }
 }
 
@@ -455,6 +487,8 @@ module.exports = {
   getEvents,
   getFundraisers,
   get_allngo,
+  getRegisterUser,
+  registerUser,
 };
 
 // const { resolve } = require("path");

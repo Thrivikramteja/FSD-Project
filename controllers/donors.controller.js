@@ -35,6 +35,7 @@ async function getdonor(req, res) {
       contributedFundraisers: contributedFundraisers || [],
       ongoingfund: ongoingfund || [],
       upcomingEvents: upcomingEvents || [],
+      user: req.session.user
     });
   } catch (error) {
     console.error("Error occurred while fetching user dashboard data:", error);

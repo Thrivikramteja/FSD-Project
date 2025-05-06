@@ -126,6 +126,7 @@ async function getNGO(req, res) {
 
 module.exports = {
   getNGO,
+  getLandingPage
 };
 
 // async function getdonor(req, res) {

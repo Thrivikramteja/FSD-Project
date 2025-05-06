@@ -10,22 +10,10 @@
     
 </head>
 <body>
-    <header id="main-header" style="margin-bottom: 5rem;">
-        <div id="logo"><a href="/">CareConnect</a></div>
-        <nav>
-          <ul class="nav-items"></ul>
-          <a href="/login">Logout</a>
-          
-          </ul>
-        </nav>
-      </header>
-
-    <div class="down_head">
+    <%- include('../shared/includes/header') %>
 
         <div class="name_right">
-            
             <h1>Welcome <br><%= name %></h1>
-
         </div>
 
         <div class="user_pro">
@@ -43,7 +31,7 @@
                 <p class="text-body">
                     <span id="donation-current">This month contribution: </span><br>
                     <span id="donation-all">All-time contribution: </span><br>
-                    <span id="this_mon_don">This month donations: </span><br>
+                    <span id="this_mon_don">This month donations:</span><br>
                     <span id="all_time_con">All-time donations: </span><br>
                 </p>
             </div>
