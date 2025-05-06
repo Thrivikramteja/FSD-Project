@@ -93,9 +93,9 @@
                 <% if (upcomingEvents && upcomingEvents.length > 0) { %>
                     <% upcomingEvents.forEach(event => { %>
                         <div class="regist_ev">
-                            <h3><%= event.name %></h3>
-                            <p><strong>Date:</strong> <%= event.event_name %></p>
-                            <p><strong>Time:</strong> <%= event.event_time %></p>
+                            <h3><%= event.event_name %></h3>
+                            <p><strong>Date:</strong> <%= event.event_date %></p>
+                            
                             <p><strong>Location:</strong> <%= event.event_location %></p>
                         </div>
                     <% }); %>

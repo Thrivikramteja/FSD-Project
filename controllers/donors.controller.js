@@ -15,7 +15,8 @@ const { User  , CreatedFundraiser , UserContributedFundraiser} = require("../mod
 //     });
 //   });
 
-async function getdonor(req, res) {
+async function getdonor(req, res) 
+{
   const user_ID = parseInt(req.params.userId, 10);
 
   try {
