@@ -18,10 +18,10 @@ router.get('/donate_items', carehomesController.donateItems);
 
 router.get('/registerCarehome', carehomesController.register);
 
-router.post('/registerCarehome',isAuth, carehomesController.registerCarehome);
+router.post('/registerCarehome', carehomesController.registerCarehome);
 
 router.get('/carehomes',carehomesController.getallcarehomes);
 
 router.get("/carehomes/viewcare/:careid",carehomesController.view_details_care);
 
-module.exports = router;        
+module.exports = router;

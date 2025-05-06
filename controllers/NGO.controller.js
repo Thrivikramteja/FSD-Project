@@ -1,6 +1,6 @@
 const { NGO, Event } = require("../models/NGO.model");
 const { CreatedFundraiser} = require("../models/user.model"); // Assuming this is where Fundraiser is defined
-const {CareHome} = require("../models/user.model");
+const { Carehome, DonationMoney } = require('../models/carehome.model');
 /**
  * Render NGO registration page
  */
@@ -119,6 +119,7 @@ async function getFundraisers(req, res) {
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     
+    
     const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
     const ongoing_fund = fundraisers.filter(fundraiser => {
       const deadline = fundraiser.deadline instanceof Date ? fundraiser.deadline.toISOString().split('T')[0] : fundraiser.deadline;
@@ -132,6 +133,28 @@ async function getFundraisers(req, res) {
   }
 }
 
+
+//for all fundraisers
+async function getallFundraisers(req, res) {
+  // const ngoID = parseInt(req.params.ngoID,10); // Use ngoID parameter
+
+  try {
+    const today = new Date();
+    const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    
+    
+    const fundraisers = await CreatedFundraiser.find({});
+    const ongoing_fund = fundraisers.filter(fundraiser => {
+      const deadline = fundraiser.deadline instanceof Date ? fundraiser.deadline.toISOString().split('T')[0] : fundraiser.deadline;
+      return deadline >= isoCurrentDate;
+    });
+    
+    res.render("NGOs/fundraisers", { ongoing_fund});
+  } catch (error) {
+    console.error("Error fetching fundraisers:", error);
+    res.status(500).send("Failed to load fundraisers");
+  }
+}
 /**
  * Update NGO profile
  */
@@ -240,9 +263,10 @@ async function createFundraiser(req, res) {
       return res.status(400).send("Missing required fields");
     }
 
+   
     const newFundraiser = new CreatedFundraiser({
       ngoId: ngoID,
-      id_carehome,
+      carehomeId: id_carehome,
       fundraiser_name,
       goal_amount: Number(goal_amount),
       funds_raised: 0,
@@ -268,8 +292,8 @@ async function rendercreatefundraiser(req, res) {
   const ngoID = parseInt(req.params.ngoID,10); // Use ngoID parameter
 
   try {
-    const CareHome = require('../models/carehome.model');
-    const carehomes = await CareHome.find();
+    // const CareHome = require('../models/carehome.model');
+    const carehomes = await Carehome.find({});
 
     res.render("NGOs/create_fundraiser", {
       ngoID,
@@ -278,6 +302,25 @@ async function rendercreatefundraiser(req, res) {
   } catch (error) {
     console.error("Error in rendercreatefundraiser controller:", error);
     res.status(500).send("Failed to load the Create Fundraiser form");
+  }
+}
+
+async function render_donate_fundraiser(req,res)
+{
+  console.log("from rendereing of fund doantion form");
+  const ngoId = parseInt(req.params.ngoId,10);
+  const name_fund = req.params.fundraiser_name;
+  try
+  {
+    res.render("NGOs/donate_fundraiser",{
+      ngoId,
+      name_fund
+    })
+  }
+  catch(error)
+  {
+    console.log("got error in loading contribution to fundraiser " + error);
+    res.status(500).send("error in fund contribution");
   }
 }
 
@@ -303,6 +346,7 @@ async function getNGO(req, res) {
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
+   
     const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
     const ongoing_fund = fundraisers.filter(fundraiser => {
       const deadline = fundraiser.deadline instanceof Date ? fundraiser.deadline.toISOString().split('T')[0] : fundraiser.deadline;
@@ -446,7 +490,9 @@ module.exports = {
   editEvent,
   getEvents,
   getFundraisers,
-  get_allngo
+  get_allngo,
+  getallFundraisers,
+  render_donate_fundraiser
 };
 
 // const { resolve } = require("path");

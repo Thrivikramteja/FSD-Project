@@ -19,7 +19,7 @@
                 <select id="val_drop" autofocus class="care_select" name="id_carehome">
                     <option value="None">None</option><br>
                     <% for(let i = 0; i < care.length; i++) { %>
-                        <option value="<%= care[i].id_carehome %>"><%= care[i].name_carehome %></option><br>
+                        <option value="<%= care[i].carehomeId %>"><%= care[i].care_home_name %></option><br>
                     <% } %>
                 </select>
                 <span id="val_error" style="color: red; display: none;">Must select one care home before proceeding</span>

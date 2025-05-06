@@ -1,7 +1,7 @@
 const { User } = require("../models/user.model");
-// const NGO = require("../models/NGO.model");
 const { NGO } = require("../models/NGO.model");
-const Carehome = require("../models/carehome.model");
+const { Carehome } = require("../models/carehome.model");
+const { Event } = require("../models/NGO.model");
 
 const bcrypt = require("bcryptjs");
 
@@ -30,11 +30,11 @@ async function signup(req, res) {
     email: mail,
     password: password,
     mobile_number: phone,
-    receive_notifications: checkbox,
+    receive_notifications: checkbox === "on",
   });
 
   try {
-    const exists = await User.getUser(mail);
+    const exists = await User.getUserByEmail(mail);
 
     if (exists) {
       console.log("User already exists.");
@@ -72,10 +72,9 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
-      console.log(user.ngoId);
       return res.redirect(`/NGO-dashboard/${user.ngoId}`);
     } else if (UserRole === "Donor") {
-      user = await User.getUser(email);
+      user = await User.getUserByEmail(email);
 
       if (!user) {
         console.log("Donor does not exist.");
@@ -89,7 +88,8 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
-      return res.redirect(`/user-dashboard/${user.id_donor}`);
+      req.session.user = user;
+      return res.redirect(`/user-dashboard/${user.userId}`);
     } else if (UserRole === "Carehome") {
       user = await Carehome.getCarehome(email);
 
@@ -105,7 +105,7 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
-      return res.redirect(`/carehome-dashboard/${user.id_carehome}`);
+      return res.redirect(`/carehome-dashboard/${user.carehomeId}`);
     }
 
     console.log("Invalid user role.");
@@ -115,6 +115,23 @@ async function login(req, res) {
     res.redirect("/login");
   }
 }
+
+function logout (req, res) {
+  req.session.destroy(err => {
+    if (err) return res.send('Error logging out');
+    res.redirect('/');
+  });
+}
+
+module.exports = {
+  getSignup: getSignup,
+  getLogin: getLogin,
+  signup: signup,
+  login: login,
+  isAuth,
+  logout,
+};
+
 // async function login(req, res) {
 //   const { UserRole, email, password } = req.body;
 
@@ -193,11 +210,3 @@ async function login(req, res) {
 //     res.redirect("/login");
 //   }
 // }
-
-module.exports = {
-  getSignup: getSignup,
-  getLogin: getLogin,
-  signup: signup,
-  login: login,
-  isAuth,
-};

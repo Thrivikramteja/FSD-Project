@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Directly</title>
+    <link rel="stylesheet" href="/styles/donate_mon.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="stylesheet" href="/styles/landing_page.css">
+    <script src="/scripts/fund_donation.js" defer></script>
+</head>
+<body>
+    <%- include('../shared/includes/header') %>
+    <h2>Donating to <%= name_fund %></h2>
+    <form id="donationForm" action="/donate_money/<%= ngoId %>/<%= name_fund %>" method="post">
+        <div class="donation_main">
+            <div class="user_det">
+                <div class="fill_money">
+                    <h2>Donation Amount</h2>
+                    <div class="popular_options">
+                        <button type="button" class="options">1000</button>
+                        <button type="button" class="options">2000</button>
+                        <button type="button" class="options">3000</button>
+                    </div>
+                    <div class="amount-input">
+                        <span class="currency-symbol">₹</span>
+                        <input id="anyamount" type="number" name="your_amount" placeholder="Enter custom amount" min="1" max="1000000" required>
+                        <div class="error-message" id="amountError">Please enter a valid amount up to 10 lakhs</div>
+                    </div>
+                    <div class="tip">
+                        <div class="tip-label">
+                            <span>Give Tip (8%):</span>
+                        </div>
+                        <div id="show_tip">₹0.00</div>
+                    </div>
+                    <p class="tip-note">Tips help us scale the platform</p>
+                </div>
+
+                <div class="user_details">
+                    <h2>Your Details</h2>
+                    <input type="hidden" name="id_NGO" id="ngoId" value="<%= ngoId %>">
+                    <div class="form-group">
+                        <label for="name">Full name</label>
+                        <input type="text" id="name" name="full_name" required>
+                        <div class="error-message" id="nameError">Please enter your full name</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone number</label>
+                        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+                        <div class="error-message" id="phoneError">Please enter a valid 10-digit number</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                        <div class="error-message" id="emailError">Please enter a valid email</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pan">PAN Number</label>
+                        <input type="text" id="pan" name="pan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" required>
+                        <div class="error-message" id="panError">Please enter a valid PAN</div>
+                    </div>
+                    <input type="hidden" name="donation_amount" id="donationAmount" value="0">
+                    <input type="hidden" name="tip_amount" id="tipAmount" value="0">
+                    <button type="submit">Donate Now</button>
+                    <p class="secured-payment">All payments are securely processed</p>
+                </div>
+            </div>
+            <div class="invoice_final">
+                <div class="invoice-content">
+                    <h3 id="choosen_one"></h3>
+                    <p id="org-description"><%= name_fund %></p>
+                    <div class="invoice-details">
+                        <div class="invoice-row">
+                            <span>Donation Amount:</span>
+                            <span id="invoiceDonation">₹0.00</span>
+                        </div>
+                        <div class="invoice-row">
+                            <span>Platform Tip (8%):</span>
+                            <span id="invoiceTip">₹0.00</span>
+                        </div>
+                        <hr>
+                        <div class="invoice-row total">
+                            <span>Total Amount:</span>
+                            <span id="invoiceTotal">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <%- include('../shared/includes/footer') %>
+</body>
+</html>

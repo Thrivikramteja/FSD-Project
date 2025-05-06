@@ -15,17 +15,17 @@
     <div class="container">
         <% carehomes.forEach(carehome => { %>
             <div class="card">
-                <img src="<%= carehome.care_img %>" alt="Carehome Picture" width="200" />
+                
                 <div class="content">
-                    <h2><%= carehome.name_carehome %></h2>
+                    <h2><%= carehome.care_home_name %></h2>
                     <div class="location">
                         <a href="#city"><%= carehome.city %></a> |
                         <a href="#state"><%= carehome.state %></a>
                     </div>
                     <p><%= carehome.description %></p>
                     <div class="buttons">
-                        <a href="/carehomes/viewcare/<%= carehome.id_carehome %>" class="details-btn">View Details</a>
-                        <a href="/donate?carehome_id=<%= carehome.id_carehome %>" class="donate-btn">Donate</a>
+                        <a href="/carehomes/viewcare/<%= carehome.carehomeId %>" class="details-btn">View Details</a>
+                        <a href="/donate?carehome_id=<%= carehome.carehomeId %>" class="donate-btn">Donate</a>
                     </div>
                 </div>
             </div>

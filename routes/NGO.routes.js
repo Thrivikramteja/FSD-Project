@@ -12,7 +12,7 @@ router.post('/registerNgo', NGOController.register);
 
 router.get('/events', NGOController.getEvents);
 
-router.get('/fundraisers', NGOController.getFundraisers);
+router.get('/fundraisers', NGOController.getallFundraisers);
 
 router.get('/NGO-dashboard/:ngoID', isAuth, NGOController.getNGO);
 
@@ -33,5 +33,7 @@ router.get('/NGOs',NGOController.get_allngo);
 router.get('/NGO-dashboard/:ngoID/edit-event',NGOController.renderEditEvent);
 
 router.post('/NGO-dashboard/:ngoID/edit-event',NGOController.editEvent);
+
+router.get('/donate_fundraiser/:ngoId/:fundraiser_name',NGOController.render_donate_fundraiser);
 
 module.exports = router;
