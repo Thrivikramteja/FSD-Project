@@ -256,6 +256,10 @@ ngoSchema.statics.get_stats = async function (ngoId, callback) {
     callback(err, null);
   }
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 695dd471949f1bdef6346afffc8cc6bb647e0c50
 ngoSchema.statics.get_all_ngos = async function () {
   try {
     const ngos = await this.find({});
