@@ -26,4 +26,4 @@ router.get('/carehomes',carehomesController.getallcarehomes);
 
 router.get("/carehomes/viewcare/:careid",carehomesController.view_details_care);
 
-module.exports = router;        
+module.exports = router;

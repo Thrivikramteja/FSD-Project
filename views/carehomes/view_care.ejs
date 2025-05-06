@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title><%= details.name_carehome %></title>
+        <title><%= details.care_home_name %></title>
         <link href="/styles/view_care.css" rel="stylesheet">
     </head>
     <body>
 
-        <h2 class="name_care"><%= details.name_carehome %></h2>
+        <h2 class="name_care"><%= details.care_home_name %></h2>
         <hr>
         <div class="description">
             <h3>Description:</h3>
@@ -14,27 +14,15 @@
         </div>
         <div class="stat_content">
 
-            <div class="wishlist">
-                <h3>Wishlist</h3>
-                <% if (!details.wishlist || details.wishlist.length === 0) { %>
-                    <p>No wishlist provided by care home</p>
-                <% } else { %>
-                    <ul>
-                        <% details.wishlist.forEach(item => { %>
-                            <li class="wish"><%= item %></li>
-                        <% }); %>
-                    </ul>
-                <% } %>
-            </div>
             
             <div class="care_stats">
                 <h3>Stats</h3>
                 <ul>
                     
 
-                    <li><span class="left">Residents: </span><span class="right"><%= details.number_of_residents %></span></li>
-                    <li><span class="left">Monthly Expense: </span><span class="right"><%= details.avg_monthly_expenses %></span></li>
-                    <li><span class="left">Avg resident Expense: </span><span class="right"><%= (details.avg_monthly_expenses/details.number_of_residents).toFixed(2) %></span></li>
+                    <li><span class="left">Residents: </span><span class="right"><%= details.num_residents %></span></li>
+                    <li><span class="left">Monthly Expense: </span><span class="right"><%= details.avg_expense %></span></li>
+                    <li><span class="left">Avg resident Expense: </span><span class="right"><%= (details.avg_expense/details.num_residents).toFixed(2) %></span></li>
                     
                     
                 </ul>

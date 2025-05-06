@@ -124,9 +124,12 @@ const userContributedFundraisersSchema = new mongoose.Schema({
   },
 });
 
-donorSchema.statics.contributedFundraisers = async function (userId) {
+donorSchema.statics.contributedFundraisers = async function (userId) 
+{
+  const currentDate = new Date();
   const fundraisers = await UserContributedFundraiser.find({
     userId: userId,
+    deadline: {$lt: currentDate},
   });
   return fundraisers;
 };
@@ -144,10 +147,7 @@ const createdFundraisersSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  has_report: {
-    type: Buffer,
-    required: false,
-  },
+
   goal_amount: {
     type: Number,
     required: true,
@@ -166,10 +166,15 @@ const createdFundraisersSchema = new mongoose.Schema({
   },
 });
 
-donorSchema.statics.ongoingfund = async function () {
+donorSchema.statics.ongoingfund = async function (userId) {
   const currentDate = new Date();
-  const fundraisers = await CreatedFundraiser.find({
-    deadline: { $gt: currentDate },
+  // const fundraisers = await CreatedFundraiser.find({
+  //   deadline: { $gt: currentDate },
+  // });
+  // return fundraisers;
+  const fundraisers = await UserContributedFundraiser.find({
+    userId: userId,
+    deadline: {$gte: currentDate},
   });
   return fundraisers;
 };

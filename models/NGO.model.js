@@ -254,7 +254,6 @@ ngoSchema.statics.get_stats = async function (ngoId, callback) {
     callback(err, null);
   }
 };
-
 ngoSchema.statics.get_all_ngos = async function () {
   try {
     const ngos = await this.find({});
@@ -264,6 +263,7 @@ ngoSchema.statics.get_all_ngos = async function () {
     throw err; // Throw the error to let the caller handle it
   }
 };
+
 
 // Inside eventSchema.statics
 // ngoSchema.statics.upcoming_eve = async function () {

@@ -97,6 +97,7 @@ async function registerCarehome(req, res) {
   }
 }
 
+
 async function getCarehome(req, res) {
   const careid = parseInt(req.params.carehomeId, 10);
 
@@ -141,16 +142,8 @@ async function getCarehome(req, res) {
 
 async function getallcarehomes(req, res) {
   try {
-    const carehomes = await new Promise((resolve) => {
-      Carehome.getallcarehoms((err, data) => {
-        if (err) {
-          console.log("error while fetching the data of care homes ", err);
-          resolve([]);
-        } else {
-          resolve(data);
-        }
-      });
-    });
+    const carehomes = await Carehome.getallcarehomes();
+      
     console.log("fetched care homes : ", carehomes);
     res.render("carehomes/carehomes", { carehomes });
   } catch (error) {
@@ -158,32 +151,47 @@ async function getallcarehomes(req, res) {
   }
 }
 
-async function view_details_care(req, res) {
-  const careid = req.params.careid;
+// async function view_details_care(req, res) {
+//   const careid = req.params.careid;
 
+//   try {
+//     console.log("Fetching data for care home ID:", careid);
+
+//     const details = await Carehome.get_care_data(careid);
+//     if (!details) {
+//       return res.status(404).json({ error: "Care home not found." });
+//     }
+
+//     console.log("Fetched care home details:", details);
+//     console.log("wishlist: "+ details.wishlist);
+//     res.render("carehomes/view_care", {details} );
+//   } catch (error) {
+//     console.log("Error while fetching care home details:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// }
+
+async function view_details_care(req, res) 
+{
   try {
-    console.log("Fetching data for care home ID:", careid);
+    const careId = parseInt(req.params.careid, 10);
+    console.log("care id: " + careId);
+    const carehome = await Carehome.get_care_data(careId);
+    
 
-    const details = await new Promise((resolve) => {
-      Carehome.get_care_data(careid, (err, data) => {
-        if (err) {
-          console.log("Error fetching data of care home:", err);
-          resolve(null); // Resolve with null instead of rejecting
-        } else {
-          resolve(data.length > 0 ? data[0] : null);
-        }
-      });
-    });
+    if (carehome) {
+      // Convert wishlist from string to array
+      carehome.wishlist = carehome.wishlist
+        ? carehome.wishlist.split(',').map(item => item.trim())
+        : [];
 
-    if (!details) {
-      return res.status(404).json({ error: "Care home not found." });
+      res.render('carehomes/view_care', { details: carehome });
+    } else {
+      res.status(404).send('Carehome not found');
     }
-
-    console.log("Fetched care home details:", details);
-    res.render("carehomes/view_care", { details });
   } catch (error) {
-    console.log("Error while fetching care home details:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error in viewDetailsCare:", error);
+    res.status(500).send("Failed to load carehome details");
   }
 }
 

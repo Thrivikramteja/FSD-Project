@@ -42,6 +42,11 @@ carehomeSchema.statics.getCarehome = async function (email) {
   const carehome = await Carehome.findOne({ email });
   return carehome;
 };
+carehomeSchema.statics.getallcarehomes =async function ()
+{
+  const carehomes = await Carehome.find({});
+  return carehomes;
+}
 
 carehomeSchema.statics.getname = async function (careId) {
   const carehome = await Carehome.findOne({ carehomeId: careId });
@@ -71,7 +76,8 @@ carehomeSchema.statics.getallcarehoms = async function () {
   return carehomes;
 };
 
-carehomeSchema.statics.get_care_data = async function (careId) {
+carehomeSchema.statics.get_care_data = async function (careId) 
+{
   const carehome = await Carehome.findOne({ carehomeId: careId });
   return carehome;
 };

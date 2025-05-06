@@ -12,4 +12,6 @@ router.get('/user-dashboard/:userId/edit', isAuth, donorsController.getEditDonor
 
 router.put('/user-dashboard/:userId/edit', isAuth, donorsController.editDonorProfile);
 
+router.post('/donate_money/:ngoId/:fundraiser_name', isAuth,donorsController.contributed_fund);
+
 module.exports = router;
