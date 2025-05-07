@@ -81,7 +81,7 @@ ngoSchema.statics.getNGOById = async function (id) {
 ngoSchema.statics.ongoing_fund = async function () {
   const currentDate = new Date();
   const fundraisers = await CreatedFundraiser.find({
-    deadline: { $gt: currentDate },
+    deadline: { $gte: currentDate },
   });
   return fundraisers;
 };

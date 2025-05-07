@@ -18,6 +18,8 @@ router.post('/donate_money/:carehomeId',isAuth, carehomesController.insertMoney)
 
 router.get('/donate_items', carehomesController.donateItems);
 
+router.post('/donate_items_user',carehomesController.get_don_items);
+
 router.get('/registerCarehome', carehomesController.register);
 
 router.post('/registerCarehome', carehomesController.registerCarehome);
@@ -27,5 +29,7 @@ router.get('/carehomes',carehomesController.getallcarehomes);
 router.get("/profile/Carehome/:carehomeId", isAuth, carehomesController.getCarehome);
 
 router.get("/carehomes/viewcare/:careid",carehomesController.view_details_care);
+
+router.post('/donate_item/action',carehomesController.accpet_item_doantions);
 
 module.exports = router;

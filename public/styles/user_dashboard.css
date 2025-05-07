@@ -297,6 +297,240 @@
             content: '₹';
             margin-right: 2px;
         }
+        /* Recent Messages Styles */
+.messages_container {
+  background-color: #e1f5d6;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  align-self: flex-start;
+  max-width: 750px;
+  margin-top: 30px;
+  margin-left: 400px;
+
+}
+
+.recent-messages .message {
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  border-left: 4px solid #4e9f76;
+}
+
+.recent-messages .message:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.message-from {
+  font-weight: 600;
+  color: #2c6e49;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.message-from::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+/* Category color indicators */
+.message-from[data-category="Event"] {
+  color: #2c6e49;
+}
+.message-from[data-category="Event"]::before {
+  background-color: #4e9f76;
+}
+
+.message-from[data-category="Donation"] {
+  color: #7d3c98;
+}
+.message-from[data-category="Donation"]::before {
+  background-color: #a569bd;
+}
+
+.message-from[data-category="Fundraiser"] {
+  color: #d35400;
+}
+.message-from[data-category="Fundraiser"]::before {
+  background-color: #e67e22;
+}
+
+.message-from[data-category="System"] {
+  color: #2980b9;
+}
+.message-from[data-category="System"]::before {
+  background-color: #3498db;
+}
+
+.message-date {
+  color: #777;
+  font-size: 14px;
+}
+
+.message-text {
+  color: #333;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  position: relative;
+  padding-left: 65px;
+}
+
+/* Status indicators */
+.message-text::before {
+  content: 'Status:';
+  position: absolute;
+  left: 0;
+  font-weight: 600;
+}
+
+.message-text[data-status="accept"],
+.message-text[data-status="approved"],
+.message-text[data-status="completed"] {
+  color: #1b7f3f;
+}
+
+.message-text[data-status="reject"],
+.message-text[data-status="declined"],
+.message-text[data-status="failed"] {
+  color: #c0392b;
+}
+
+.message-text[data-status="pending"],
+.message-text[data-status="processing"] {
+  color: #cd9a2b;
+}
+
+.message-text[data-status="info"] {
+  color: #2980b9;
+}
+
+/* Badge for status */
+.status-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.status-badge-accept,
+.status-badge-approved,
+.status-badge-completed {
+  background-color: #e1f5d6;
+  color: #1b7f3f;
+}
+
+.status-badge-reject,
+.status-badge-declined,
+.status-badge-failed {
+  background-color: #fdede9;
+  color: #c0392b;
+}
+
+.status-badge-pending,
+.status-badge-processing {
+  background-color: #fff9e1;
+  color: #cd9a2b;
+}
+
+.status-badge-info {
+  background-color: #e3f2fd;
+  color: #2980b9;
+}
+
+.view_all_messages {
+  background-color: #4e9f76;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  margin-top: 15px;
+}
+
+.view_all_messages:hover {
+  background-color: #388e5a;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Media Query Updates */
+@media (max-width: 1100px) {
+  .messages_container {
+      max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .messages_container {
+      width: 100%;
+      order: 1;
+      margin-top: 20px;
+  }
+  
+  .message-header {
+      flex-direction: column;
+  }
+  
+  .message-date {
+      font-size: 12px;
+      margin-top: 5px;
+  }
+  
+  .message-text {
+      padding-left: 0;
+      padding-top: 20px;
+  }
+  
+  .message-text::before {
+      top: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .messages_container {
+      padding: 15px;
+  }
+  
+  .recent-messages .message {
+      padding: 12px;
+      margin-bottom: 12px;
+  }
+  
+  .message-from {
+      font-size: 15px;
+  }
+  
+  .message-text {
+      font-size: 14px;
+  }
+}
 
        
         @media (max-width: 1100px) {

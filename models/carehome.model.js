@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { CreatedFundraiser, User } = require("./user.model");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
+const { donate_items_mes} = require('./user.model');
 
 const carehomeSchema = new mongoose.Schema({
   carehomeId: { type: Number, unique: true },
@@ -114,6 +115,46 @@ const donationMoneySchema = new mongoose.Schema({
   },
 });
 
+const donationitemschema = new mongoose.Schema({
+  userId: {
+    type: Number,
+    required: true
+  },
+  carehomeId: {
+    type: Number,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  delivery: {
+    type: Date,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true,
+  },
+  donated_at: {
+    type: Date,
+    required: true
+  }
+});
+
+donationitemschema.statics.get_item_donations = async function(carehomeId) {
+  const donations = await this.find({ carehomeId: carehomeId })
+    .sort({ donated_at: -1 }) // Sort by `donated_at` in descending order (newest first)
+    .limit(4); // Limit to the first 4 results
+  console.log("I am from model (sorted and limited): ", donations);
+  return donations;
+};
+
+
 donationMoneySchema.statics.saveDonation = async function({ userId, amount_donated, carehomeId }) {
   const donation = new this({
     userId,
@@ -213,10 +254,25 @@ carehomeSchema.statics.recentDonations = async function (careId) {
   }
 };
 
+carehomeSchema.statics.getMessages = async function (carehomeId)
+{
+try
+{
+  const messages = await donate_items_mes.find({carehomeId: carehomeId});
+  return messages;
+}
+catch(error)
+{
+  console.log("error while getting messages: " + error);
+  throw error;
+}
+};
+
+
 const Carehome = mongoose.model("Carehome", carehomeSchema);
 const DonationMoney = mongoose.model("DonationMoney", donationMoneySchema);
-
-module.exports = { Carehome, DonationMoney };
+const donate_items = mongoose.model("donate_items",donationitemschema);
+module.exports = { Carehome, DonationMoney , donate_items};
 
 // class Carehome {
 //   constructor(

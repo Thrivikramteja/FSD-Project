@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/styles/landing_page.css" />
     <link rel="stylesheet" href="/styles/user_dashboard.css" />
     <link rel="stylesheet" href="/styles/footer.css" />
-    <!-- <link rel="stylesheet" href="/styles/ngo_das.css" /> -->
     <script src="/scripts/analytics_user.js" defer></script>
   </head>
   <body>
@@ -157,7 +156,26 @@
       </div>
     </div>
 
-    <%- include('../shared/includes/footer') %>
+    <div class="messages_container">
+      <h2>Recent Messages</h2>
+      <div class="recent-messages">
+        <% if (recentMessages && recentMessages.length > 0) { %>
+          <% recentMessages.forEach(message => { %>
+            <div class="message">
+              <div class="message-header">
+                <span class="message-from">Category: <%= message.category %></span>
+                <span class="message-date">Delivery: <%= message.delivery %></span>
+              </div>
+              <p class="message-text"><%= message.message %></p>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <p class="no-data">No recent messages.</p>
+        <% } %>
+      </div>
+      
+    </div>
+    
     <script>
       const profile = document.getElementById("profile");
       if (profile) {

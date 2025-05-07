@@ -162,6 +162,68 @@ const createdFundraisersSchema = new mongoose.Schema({
   },
 });
 
+const donate_it_message = new mongoose.Schema({
+  carehomeId: {
+    type: Number,
+    required: true
+  },
+  userId: {
+    type: Number,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  delivery_date: {
+    type: Date,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  }
+});
+
+const accept_or_rejct = new mongoose.Schema({
+  carehomeId: {
+    type: Number,
+    require: true
+  },
+  userId: {
+    type: Number,
+    require: true
+  },
+  message: {
+    type: String,
+    reuiqre: true
+  },
+  category: {
+    type: String,
+    require: true
+  },
+  delivery:{
+    type: Date,
+    require: true
+  },
+  when_date: {
+    type: Date,
+    require: true
+  }
+});
+
+accept_or_rejct.statics.get_newmessages = async function(userId) {
+  const messages = await user_message
+    .find({ userId: userId })
+    .sort({ when_date: -1 }) // Sort by `when_date` in descending order
+    .limit(4); // Limit to the latest 4 messages
+  return messages;
+};
+
 donorSchema.statics.ongoingfund = async function (userId) {
   const currentDate = new Date();
   const fundraisers = await UserContributedFundraiser.find({
@@ -185,9 +247,21 @@ const UserContributedFundraiser = mongoose.model(
   userContributedFundraisersSchema
 );
 
+const donate_items_mes = mongoose.model(
+  "donate_items_mes",
+  donate_it_message
+);
+
+const user_message = mongoose.model(
+  "user_message",
+  accept_or_rejct
+);
+
 module.exports = {
   User,
   CreatedFundraiser,
   UserContributedFundraiser,
   UserRegisteredEvent,
+  donate_items_mes,
+  user_message
 };

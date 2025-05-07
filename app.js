@@ -13,6 +13,7 @@ const authRoutes = require("./routes/auth.routes.js");
 const carehomeRoutes = require("./routes/carehomes.routes.js");
 const donorRoutes = require("./routes/donors.routes.js");
 const NGORoutes = require("./routes/NGO.routes.js");
+const adminRoutes = require('./routes/admin.routes.js');
 
 const app = express();
 
@@ -68,5 +69,6 @@ app.use(authRoutes);
 app.use(carehomeRoutes);
 app.use(donorRoutes);
 app.use(NGORoutes);
+app.use(adminRoutes);
 
 app.listen(3000, () => console.log("Server running on port 3000"));

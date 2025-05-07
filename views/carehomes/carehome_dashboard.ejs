@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="/styles/footer.css">
     <link rel="stylesheet" href="/styles/landing_page.css">
 </head>
+<script>
+    function setAction(button, action) {
+        const form = button.closest('form');
+        form.querySelector('input[name="action"]').value = action;
+    }
+</script>
 <body>
     
     <header id="header">
@@ -106,6 +112,55 @@
         </div>
     </div>
 
+    <div class="message-section">
+        <h2>Decide these Items Donations</h2>
+        <div class="message-list">
+            <% if (messages && messages.length > 0) { %>
+                <% messages.forEach(message => { %>
+                    <div class="message-item">
+                        <form method="POST" action="/donate_item/action">
+                            <input type="hidden" name="userId" value="<%= message.userId %>">
+                            <input type="hidden" name="carehomeId" value="<%= message.carehomeId %>">
+                            <input type="hidden" name="category" value="<%= message.category %>">
+                            <input type="hidden" name="delivery_date" value="<%= message.delivery_date %>">
+                            <input type="hidden" name="location" value="<%= message.location %>">
+                            <input type="hidden" name="description" value="<%= message.description %>">
+                            <input type="hidden" name="action" value="">
+                            
+                            <p><strong>Category:</strong> <%= message.category %></p>
+                            <p><strong>Location:</strong> <%= message.location %></p>
+                            <p><strong>Delivery Date:</strong> <%= new Date(message.delivery_date).toLocaleDateString() %></p>
+                            <div class="button-group">
+                                <button type="submit" class="accept-button" onclick="setAction(this, 'accept')">Accept</button>
+                                <button type="submit" class="reject-button" onclick="setAction(this, 'reject')">Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No recent item messages available.</p>
+            <% } %>
+        </div>
+    </div>
+    
+
+    <div class="donation-items-container">
+        <h4 class="donation-header">Donation Items</h4>
+        <% if (items.length > 0) { %>
+          <% items.forEach(item => { %>
+            <div class="donation-item">
+              <h5 class="donation-category">Category: <%= item.category %></h5>
+              <p class="donation-detail"><strong>Location:</strong> <%= item.location %></p>
+              <p class="donation-detail"><strong>Delivery Date:</strong> <%= new Date(item.delivery).toLocaleDateString() %></p>
+              <p class="donation-detail"><strong>Donated At:</strong> <%= new Date(item.donated_at).toLocaleDateString() %></p>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <p class="no-items">No items available.</p>
+        <% } %>
+      </div>
+      
+      
     <%- include('../shared/includes/footer') %>
 
     <script src="/scripts/carehomes_dashboard.js"></script>
