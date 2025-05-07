@@ -21,7 +21,7 @@ const {
 
 async function getdonor(req, res) {
   const user_ID = parseInt(req.params.userId, 10);
-
+  const userRole = req.params.userRole;
   try {
     console.log(`Fetching data for userId: ${user_ID}`); // Debug the userId being passed
 
@@ -40,6 +40,7 @@ async function getdonor(req, res) {
       ongoingfund: ongoingfund || [],
       upcomingEvents: upcomingEvents || [],
       user: req.session.user,
+      userRole: userRole
     });
   } catch (error) {
     console.error("Error occurred while fetching user dashboard data:", error);
@@ -143,19 +144,11 @@ async function contributed_fund(req, res) {
 }
 
 async function getEditDonorProfile(req, res) {
-  const userID = parseInt(req.params.userID, 10);
+  const userID = parseInt(req.params.userId, 10);
 
   try {
-    const user = await new Promise((resolve) => {
-      model.get_user_data(userID, (err, data) => {
-        if (err) {
-          console.log("error fetching data of user ", err);
-          resolve([]);
-        } else {
-          resolve(data);
-        }
-      });
-    });
+    const user = await User.getUserByUserId(userID);
+
     console.log("fetched details ", user);
     res.render("users/edit_profile", { user });
   } catch (error) {
@@ -164,7 +157,18 @@ async function getEditDonorProfile(req, res) {
   }
 }
 
-function editDonorProfile() {}
+async function editDonorProfile(req, res) {
+  const {fullname, phone, mail} = req.body;
+  const userId = parseInt(req.params.userId, 10);
+
+  await User.findOneAndUpdate(
+    { userId: userId },                       
+    { name: fullname, mobile_number: phone, email: mail },                
+    { new: true }                             
+  );
+
+  res.redirect(`/user-dashboard/${userId}`);
+}
 
 module.exports = {
   getdonor,

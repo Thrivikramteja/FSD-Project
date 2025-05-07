@@ -10,7 +10,7 @@ router.get('/carehome-dashboard/:carehomeId',isAuth, carehomesController.getCare
 
 router.get('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.getEditCarehomeProfile);
 
-router.put('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.editCarehomeProfile);
+router.post('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.editCarehomeProfile);
 
 router.get('/donate_money',isAuth, carehomesController.donateMoney);
 
@@ -23,6 +23,8 @@ router.get('/registerCarehome', carehomesController.register);
 router.post('/registerCarehome', carehomesController.registerCarehome);
 
 router.get('/carehomes',carehomesController.getallcarehomes);
+
+router.get("/profile/Carehome/:carehomeId", isAuth, carehomesController.getCarehome);
 
 router.get("/carehomes/viewcare/:careid",carehomesController.view_details_care);
 

@@ -34,9 +34,15 @@
       <% } else { %>
         <li id="logout-button"><a href="/logout">Logout</a></li>
       <% } %>
-      <% if (user) { %>
-        <li><a id="profile" href="/profile/<%= user.userId %>">Profile</a></li>
+
+      <% if (user && userRole == "Donor") { %>
+        <li><a id="profile" href="/profile/<%= userRole %>/<%= user.userId %>">Profile</a></li>
+      <% } else if (user && userRole == "Carehome") { %>
+        <li><a id="profile" href="/profile/<%= userRole %>/<%= user.carehomeId %>">Profile</a></li>
+      <% } else if (user && userRole == "NGO") { %>
+        <li><a id="profile" href="/profile/<%= userRole %>/<%= user.ngoId %>">Profile</a></li>
       <% } %>
+
     </ul>
   </nav>
 </header>

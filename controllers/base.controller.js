@@ -4,20 +4,23 @@ async function getLandingPage(req, res) {
   const ongoing_fund = await NGO.ongoing_fund();
   const upcoming_eve = await Event.upcoming_eve();
 
-  res.render("landing-page", { ongoing_fund, upcoming_eve });
+  res.render("landing-page", {
+    ongoing_fund,
+    upcoming_eve,
+    user: req.session.user,
+    userRole: req.session.userRole,
+  });
 }
 
 async function getNGO(req, res) {
   const ngoID = req.params.ngoID;
 
   try {
-
-    // Fetch data one by one using async/await and new Promise directly
     const ongoing_fund = await new Promise((resolve, reject) => {
       model.ongoing_fund(ngoID, (err, data) => {
         if (err) {
           console.error("Error fetching ongoing_fund:", err);
-          resolve([]); // Default to empty array on error
+          resolve([]); 
         } else {
           resolve(data);
         }

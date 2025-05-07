@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/user-dashboard/:userId", isAuth, donorsController.getdonor);
 
-router.get("/profile/:userId", isAuth, donorsController.getdonor);
+router.get("/profile/Donor/:userId", isAuth, donorsController.getdonor);
 
 router.get(
   "/user-dashboard/:userId/edit",
@@ -16,7 +16,7 @@ router.get(
   donorsController.getEditDonorProfile
 );
 
-router.put(
+router.post(
   "/user-dashboard/:userId/edit",
   isAuth,
   donorsController.editDonorProfile

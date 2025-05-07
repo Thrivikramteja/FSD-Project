@@ -16,7 +16,7 @@
         <nav >
             <ul class="header_right">
                 <a href="/logout" style="margin-right: 3rem;">Logout</a>
-                <a href="/<%= careid %>/edit" style="margin-right: 3rem;">Edit Profile</a>
+                <a href="/carehome-dashboard/<%= careid %>/edit" style="margin-right: 3rem;">Edit Profile</a>
             </ul>  
         </nav>
     </header>
@@ -109,5 +109,11 @@
     <%- include('../shared/includes/footer') %>
 
     <script src="/scripts/carehomes_dashboard.js"></script>
+    <script>
+        const profile = document.getElementById("profile");
+        if (profile) {
+          profile.style.display = "none";
+        }
+      </script>
 </body>
 </html>

@@ -6,7 +6,7 @@ async function donateMoney(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
     // Pass the selected carehome_id to the template if it exists in query params
-    const selectedCareHomeId = req.query.carehome_id||null;
+    const selectedCareHomeId = req.query.carehome_id || null;
     console.log(selectedCareHomeId);
     res.render("carehomes/donate_money", { carehomes, selectedCareHomeId });
   } catch (error) {
@@ -15,7 +15,7 @@ async function donateMoney(req, res) {
   }
 }
 async function insertMoney(req, res) {
-  console.log("inside insertMoney")
+  console.log("inside insertMoney");
   console.log("BODY:", req.body);
   console.log("SESSION:", req.session);
   console.log("PARAMS:", req.params);
@@ -30,14 +30,16 @@ async function insertMoney(req, res) {
 
     if (!userId || !carehomeId || isNaN(total)) {
       console.log("Error in insertMoney");
-      return res.status(400).json({ message: "Missing or invalid data OR Login as user and try to donate money" });
+      return res.status(400).json({
+        message:
+          "Missing or invalid data OR Login as user and try to donate money",
+      });
     }
-
 
     await DonationMoney.saveDonation({
       userId,
       amount_donated: total,
-      carehomeId
+      carehomeId,
     });
     res.status(200).json({ error: "Donation saved successfully" });
   } catch (error) {
@@ -67,7 +69,7 @@ async function registerCarehome(req, res) {
       care_home_name: req.body.care_home_name,
       reg_number: req.body.reg_number,
       email: req.body.email,
-      password: hashedPassword, 
+      password: hashedPassword,
       contact: req.body.contact,
       state: req.body.state,
       city: req.body.city,
@@ -94,9 +96,9 @@ async function registerCarehome(req, res) {
   }
 }
 
-
 async function getCarehome(req, res) {
   const careid = parseInt(req.params.carehomeId, 10);
+  const userRole = req.params.userRole;
 
   try {
     console.log("Fetching data for Care Home ID:", careid);
@@ -130,6 +132,8 @@ async function getCarehome(req, res) {
       wishlist,
       careid,
       stats,
+      user: req.session.user,
+      userRole,
     });
   } catch (error) {
     console.error("Error in getcarehome controller:", error);
@@ -140,7 +144,7 @@ async function getCarehome(req, res) {
 async function getallcarehomes(req, res) {
   try {
     const carehomes = await Carehome.getallcarehomes();
-    
+
     res.render("carehomes/carehomes", { carehomes });
   } catch (error) {
     console.log("error while fetching the care homes ", error);
@@ -167,23 +171,21 @@ async function getallcarehomes(req, res) {
 //   }
 // }
 
-async function view_details_care(req, res) 
-{
+async function view_details_care(req, res) {
   try {
     const careId = parseInt(req.params.careid, 10);
     console.log("care id: " + careId);
     const carehome = await Carehome.get_care_data(careId);
-    
 
     if (carehome) {
       // Convert wishlist from string to array
       carehome.wishlist = carehome.wishlist
-        ? carehome.wishlist.split(',').map(item => item.trim())
+        ? carehome.wishlist.split(",").map((item) => item.trim())
         : [];
 
-      res.render('carehomes/view_care', { details: carehome });
+      res.render("carehomes/view_care", { details: carehome });
     } else {
-      res.status(404).send('Carehome not found');
+      res.status(404).send("Carehome not found");
     }
   } catch (error) {
     console.error("Error in viewDetailsCare:", error);
@@ -191,9 +193,49 @@ async function view_details_care(req, res)
   }
 }
 
-function getEditCarehomeProfile(req, res) {}
+async function getEditCarehomeProfile(req, res) {
+  const careId = parseInt(req.params.carehomeId, 10);
+  const carehome = await Carehome.get_care_data(careId);
+  res.render("carehomes/carehome_edit", { carehome });
+}
 
-function editCarehomeProfile() {}
+async function editCarehomeProfile(req, res) {
+  const careId = parseInt(req.params.carehomeId, 10);
+  console.log("updating carehome: ",careId);
+  const {
+    fullname,
+    phne,
+    state,
+    city,
+    mail,
+    gvtid,
+    bank,
+    accnum,
+    ifsc,
+    wishlist,
+  } = req.body;
+
+  console.log(fullname+""+state +""+ city+""+wishlist);
+
+  await Carehome.findOneAndUpdate(
+    { carehomeId: careId },
+    {
+      care_home_name: fullname,
+      contact: phne,
+      state: state,
+      city: city,
+      email: mail,
+      reg_number: gvtid,
+      account_holder: bank,
+      account_number: accnum,
+      ifsc: ifsc,
+      wishlist: wishlist,
+    },
+    { new: true }
+  );
+
+  res.redirect(`/carehome-dashboard/${careId}`);
+}
 
 module.exports = {
   donateMoney,

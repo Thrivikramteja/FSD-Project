@@ -6,6 +6,8 @@ const NGOController = require("../controllers/NGO.controller");
 
 const {isAuth} = require('../controllers/auth.controller');
 
+router.get("/profile/NGO/:ngoID", isAuth, NGOController.getNGO);
+
 router.get('/registerNgo', NGOController.getRegister);
 
 router.post('/registerNgo', NGOController.register);

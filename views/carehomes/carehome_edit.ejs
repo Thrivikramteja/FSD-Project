@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Care Homes</title>
+    <link rel="stylesheet" href="/styles/carehomes_edit.css" />
+    <script src="/scripts/carehome_edit.js" defer></script>
+  </head>
+  <body class="edits1">
+    <div class="toppart">
+      <h2 style="color: rgb(24, 6, 188)">Edit your Details(Carehome)</h2>
+    </div>
+
+    <div class="carehomes">
+      <form
+        class="carehome1"
+        method="POST"
+        action="/carehome-dashboard/<%= carehome.carehomeId %>/edit"
+      >
+        <label for="fullname">Carehome name</label><br />
+        <input  
+          type="text"
+          id="fullname"
+          name="fullname"
+          value="<%= carehome.care_home_name || '' %>"
+        /><br />
+        <span id="fullname-error" style="color: red"></span><br />
+
+        <label for="phne">Mobile number</label><br />
+        <input
+          type="tel"
+          id="phne"
+          name="phne"
+          value="<%= carehome.contact || '' %>"
+        /><br />
+        <span id="phne-error" style="color: red"></span><br />
+
+        <label for="state">State</label><br />
+        <input
+          type="text"
+          name="state"
+          id="state"
+          value="<%= carehome.state || '' %>"
+        /><br />
+        <span id="state-error" style="color: red"></span><br />
+
+        <label for="city">City</label><br />
+        <input
+          type="text"
+          name="city"
+          id="city"
+          value="<%= carehome.city || '' %>"
+        /><br />
+        <span id="city-error" style="color: red"></span><br />
+
+        <label for="mail">Email</label><br />
+        <input
+          type="email"
+          id="mail"
+          name="mail"
+          value="<%= carehome.email || '' %>"
+        /><br />
+        <span id="mail-error" style="color: red"></span><br />
+
+        <label for="gvtid">Government ID</label><br />
+        <input
+          type="text"
+          id="gvtid"
+          name="gvtid"
+          value="<%= carehome.reg_number || '' %>"
+        /><br />
+        <span id="gvtid-error" style="color: red"></span><br />
+
+        <label for="bank">Bank Account Holder name</label><br />
+        <input
+          type="text"
+          id="bank"
+          name="bank"
+          value="<%= carehome.account_holder %>"
+        /><br />
+        <span id="bank-error" style="color: red"></span>
+        <br />
+
+        <label for="accnum"> Bank Account number</label><br />
+        <input
+          type="number"
+          id="accnum"
+          name="accnum"
+          value="<%= carehome.account_number %>"
+        /><br />
+        <span id="accnum-error" style="color: red"></span>
+        <br />
+
+        <label for="ifsc">IFSC code</label><br />
+        <input
+          type="text"
+          id="ifsc"
+          name="ifsc"
+          value="<%= carehome.ifsc %>"
+        /><br />
+        <span id="ifsc-error" style="color: red"></span>
+        <br />
+
+        <label for="wishlist">Wishlist</label><br />
+        <input
+          type="text"
+          id="wishlist"
+          name="wishlist"
+          value="<%= carehome.wishlist || '' %>"
+        /><br />
+        <span id="wishlist-error" style="color: red"></span><br /><br />
+
+        <input type="submit" id="Save" value="Save" />
+      </form>
+    </div>
+  </body>
+</html>

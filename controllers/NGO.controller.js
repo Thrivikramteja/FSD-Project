@@ -1,30 +1,23 @@
 const { NGO, Event } = require("../models/NGO.model");
 const {
   CreatedFundraiser,
-  UserRegisteredEvent,
-  User,
-} = require("../models/user.model"); // Assuming this is where Fundraiser is defined
-const { CareHome } = require("../models/user.model");
-/**
- * Render NGO registration page
- */
+  UserRegisteredEvent
+} = require("../models/user.model"); 
+ 
 function getRegister(req, res) {
   res.render("NGOs/ngo_registration");
 }
 
 async function get_allngo(req, res) {
   try {
-    const NGOs = await NGO.get_all_ngos(); // Await the asynchronous function
-    res.render("NGOs/allngos", { ngos: NGOs }); // Pass the data to the EJS view
+    const NGOs = await NGO.get_all_ngos(); 
+    res.render("NGOs/allngos", { ngos: NGOs }); 
   } catch (err) {
     console.error("Error while fetching NGOs:", err);
-    res.status(500).send("Failed to fetch NGOs"); // Handle errors appropriately
+    res.status(500).send("Failed to fetch NGOs"); 
   }
 }
 
-/**
- * Register a new NGO
- */
 async function register(req, res) {
   try {
     const {
@@ -40,7 +33,6 @@ async function register(req, res) {
       ifsc,
     } = req.body;
 
-    // Create a new NGO instance
     const ngo = new NGO({
       Ngoname,
       darpan_id,
@@ -63,9 +55,6 @@ async function register(req, res) {
   }
 }
 
-/**
- * Get NGO profile for editing
- */
 async function getEditNGOProfile(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
 
@@ -83,9 +72,6 @@ async function getEditNGOProfile(req, res) {
   }
 }
 
-/**
- * Get all events
- */
 async function getEvents(req, res) {
   try {
     const events = await Event.find({ event_date: { $gte: new Date() } });
@@ -96,11 +82,8 @@ async function getEvents(req, res) {
   }
 }
 
-/**
- * Get all fundraisers
- */
 async function getFundraisers(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Use ngoID parameter
+  const ngoID = parseInt(req.params.ngoID, 10); 
 
   try {
     const today = new Date();
@@ -122,11 +105,7 @@ async function getFundraisers(req, res) {
   }
 }
 
-
-
-//for all fundraisers
 async function getallFundraisers(req, res) {
-  // const ngoID = parseInt(req.params.ngoID,10); // Use ngoID parameter
 
   try {
     const today = new Date();
@@ -145,13 +124,10 @@ async function getallFundraisers(req, res) {
     res.status(500).send("Failed to load fundraisers");
   }
 }
-/**
- * Update NGO profile
- */
-async function editNGOProfile(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Parse the ngoID parameter
 
-  // Input validation
+async function editNGOProfile(req, res) {
+  const ngoID = parseInt(req.params.ngoID, 10); 
+
   if (isNaN(ngoID)) {
     return res.status(400).send("Invalid NGO ID");
   }
@@ -159,9 +135,8 @@ async function editNGOProfile(req, res) {
   const { fullname, phone, bank, accnum, ifsc, darpan } = req.body;
 
   try {
-    // Use findOneAndUpdate with ngoId field instead of findByIdAndUpdate
     const updatedNGO = await NGO.findOneAndUpdate(
-      { ngoId: ngoID }, // Find by ngoId, not _id
+      { ngoId: ngoID },
       {
         Ngoname: fullname,
         darpan_id: darpan,
@@ -170,36 +145,22 @@ async function editNGOProfile(req, res) {
         account_number: accnum,
         ifsc,
       },
-      { new: true } // Return the updated document
+      { new: true } 
     );
 
     if (!updatedNGO) {
       return res.status(404).send("NGO not found");
     }
 
-    // Handle successful update
-    res.redirect(`/NGO-dashboard/${ngoID}`); // Or however you handle successful updates
+    res.redirect(`/NGO-dashboard/${ngoID}`); 
   } catch (error) {
     console.error("Error updating NGO profile:", error);
     res.status(500).send("Server error");
   }
 }
-/**
- * Format date to DD-MM-YYYY
- */
-function format_date(dateString) {
-  const formattedDate = new Date(dateString);
-  const day = String(formattedDate.getDate()).padStart(2, "0");
-  const month = String(formattedDate.getMonth() + 1).padStart(2, "0");
-  const year = formattedDate.getFullYear();
-  return `${day}-${month}-${year}`;
-}
 
-/**
- * Render create event form
- */
 function renderCreateEventForm(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Use ngoID parameter
+  const ngoID = parseInt(req.params.ngoID, 10); 
 
   try {
     res.render("NGOs/create_event", { ngoID });
@@ -209,11 +170,8 @@ function renderCreateEventForm(req, res) {
   }
 }
 
-/**
- * Create a new event
- */
 async function createEvent(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Use ngoID parameter
+  const ngoID = parseInt(req.params.ngoID, 10); 
   const { event_location, event_name, deadline, event_time, description } =
     req.body;
 
@@ -242,11 +200,8 @@ async function createEvent(req, res) {
   }
 }
 
-/**
- * Create a new fundraiser
- */
 async function createFundraiser(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Use ngoID parameter
+  const ngoID = parseInt(req.params.ngoID, 10);
   const { fundraiser_name, deadline, goal_amount, description, id_carehome } =
     req.body;
 
@@ -288,19 +243,16 @@ async function registerUser(req, res) {
     const userId = req.session.user.userId;
     const ngoId = req.params.ngoID;
 
-    // Check if the event exists for the given NGO
     const createdEvent = await Event.findOne({ event_name: event, ngoId: ngoId });
     if (!createdEvent) {
       return res.status(404).json({ message: "Event not found." });
     }
 
-    // Check if the user is already registered for the event
     const existingRegistration = await UserRegisteredEvent.findOne({ userId, event_name: event, ngoId });
     if (existingRegistration) {
       return res.status(400).json({ message: "You have already registered for this event." });
     }
 
-    // If not registered, create a new registration
     const userRegisteredEvent = new UserRegisteredEvent({
       userId,
       ngoId,
@@ -312,7 +264,6 @@ async function registerUser(req, res) {
     await userRegisteredEvent.save();
     console.log("User registration successful: ", userRegisteredEvent);
 
-    // Increment the number of registrations for the event
     const newEventRegistration = await Event.findOneAndUpdate(
       { ngoId, event_name: event },
       { $inc: { number_of_registrations: 1 } },
@@ -328,14 +279,10 @@ async function registerUser(req, res) {
 }
 
 
-/**
- * Render create fundraiser form
- */
 async function rendercreatefundraiser(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Use ngoID parameter
+  const ngoID = parseInt(req.params.ngoID, 10); 
 
   try {
-    // const CareHome = require('../models/carehome.model');
     const carehomes = await Carehome.find({});
 
     res.render("NGOs/create_fundraiser", {
@@ -367,9 +314,6 @@ async function render_donate_fundraiser(req,res)
   }
 }
 
-/**
- * Get NGO dashboard data
- */
 async function getNGO(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
 
@@ -451,6 +395,8 @@ async function getNGO(req, res) {
       upcoming_eve,
       ngoID,
       stats,
+      user: req.session.user,
+      userRole: req.session.userRole
     });
   } catch (error) {
     console.error("Error in getNGO controller:", error);
@@ -459,9 +405,9 @@ async function getNGO(req, res) {
 }
 
 async function editEvent(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Retrieve ngoID from route params
+  const ngoID = parseInt(req.params.ngoID, 10);
   const {
-    original_event_name, // Name of the event to identify it
+    original_event_name, 
     new_event_name,
     event_location,
     event_date,
@@ -470,7 +416,6 @@ async function editEvent(req, res) {
   } = req.body;
 
   try {
-    // Ensure required fields are provided
     if (
       !ngoID ||
       !original_event_name ||
@@ -481,10 +426,6 @@ async function editEvent(req, res) {
       return res.status(400).send("Missing required fields");
     }
 
-    // Format the event date
-    // const formatted_event_date = format_date(event_date);
-
-    // Prepare updated event details
     const eventDetails = {
       id_NGO: ngoID,
       original_event_name,
@@ -506,32 +447,20 @@ async function editEvent(req, res) {
 }
 
 async function renderEditEvent(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10); // Retrieve ngoID from route params
+  const ngoID = parseInt(req.params.ngoID, 10); 
   try {
-    // Get the events for the given NGO ID
     const events = await Event.specific_events(ngoID);
-    const eventDetails = {}; // Object to store event data keyed by event_name
+    const eventDetails = {}; 
 
-    // Loop over the events and fetch their details
     for (const event of events) {
       const details = await Event.event_load(ngoID, event.event_name);
-      //   const formattedDetails = {
-      //     event_name: data.event_name,
-      //     description: data.description,
-      //     event_location: data.event_location,
-      //     event_time: data.event_time,
-      //     deadline: data.event_date, // Assuming event_date is the correct column
-      // };
-
-      // Store event details using the event name as the key
       eventDetails[event.event_name] = details;
     }
 
-    // Render the edit events page with the event data
     res.render("NGOs/edit_events", {
       ngoID,
-      events, // List of events
-      eventDetails: JSON.stringify(eventDetails), // Convert eventDetails to JSON string for client-side use
+      events,
+      eventDetails: JSON.stringify(eventDetails),
     });
   } catch (error) {
     console.error("Error in renderEditEvent controller:", error);

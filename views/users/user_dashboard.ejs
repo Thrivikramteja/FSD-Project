@@ -7,12 +7,46 @@
     <link rel="stylesheet" href="/styles/landing_page.css" />
     <link rel="stylesheet" href="/styles/user_dashboard.css" />
     <link rel="stylesheet" href="/styles/footer.css" />
-    <link rel="stylesheet" href="/styles/ngo_das.css" />
+    <!-- <link rel="stylesheet" href="/styles/ngo_das.css" /> -->
     <script src="/scripts/analytics_user.js" defer></script>
   </head>
   <body>
-    <%- include('../shared/includes/header') %>
-
+    <header id="main-header" style="margin-bottom: 5rem;">
+      <div id="logo"><a href="/">CareConnect</a></div>
+      <nav>
+        <ul class="nav-items">
+          <li class="dropdown">
+            <a class="dropdown-toggle">Donate</a>
+            <ul class="dropdown-menu">
+              <li><a href="/donate_items">Items</a></li>
+              <li><a href="/donate_money">Money</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a class="dropdown-toggle">Discover</a>
+            <ul class="dropdown-menu">
+              <li><a href="/events">Events</a></li>
+              <li><a href="/carehomes">Carehomes</a></li>
+              <li><a href="/fundraisers">Fundraisers</a></li>
+              <li><a href="/NGOs">NGOs</a></li>
+            </ul>
+          </li>
+          
+    
+          <% if (!user) { %>
+            <li id="login-button"><a href="/login" id="loginPopupBtn">Login</a></li>
+            <li id="signup-button"><a href="/signup" id="loginPopupBtn">Signup</a></li>
+          <% } else { %>
+            <li id="logout-button"><a href="/logout">Logout</a></li>
+          <% } %>
+          <% if (user) { %>
+            <li><a id="edit" href="/user-dashboard/<%= user.userId %>/edit">Edit Profile</a></li>
+          <% } %>
+          
+        </ul>
+      </nav>
+    </header>
+    
     <div class="name_right">
       <h1>Welcome <br /><%= name %></h1>
     </div>
@@ -123,6 +157,7 @@
       </div>
     </div>
 
+    <%- include('../shared/includes/footer') %>
     <script>
       const profile = document.getElementById("profile");
       if (profile) {
@@ -132,4 +167,4 @@
   </body>
 </html>
 
-<%- include('../shared/includes/footer') %>
+
