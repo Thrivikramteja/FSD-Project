@@ -12,7 +12,7 @@ router.get('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.g
 
 router.put('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.editCarehomeProfile);
 
-router.get('/donate_money', carehomesController.donateMoney);
+router.get('/donate_money',isAuth, carehomesController.donateMoney);
 
 router.post('/donate_money/:carehomeId',isAuth, carehomesController.insertMoney);
 

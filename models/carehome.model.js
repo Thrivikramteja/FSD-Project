@@ -50,7 +50,7 @@ carehomeSchema.statics.ongoing_fund = async function (careId) {
   const currentDate = new Date();
   const fundraisers = await CreatedFundraiser.find({
     carehomeId: careId,
-    deadline: { $gt: currentDate },
+    deadline: { $gte: currentDate },
   });
   return fundraisers;
 };
@@ -130,7 +130,7 @@ carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
 
   // 1. Total Funds Received
   const totalFundsResult = await DonationMoney.aggregate([
-    { $match: { id_carehome: carehomeId } },
+    { $match: { carehomeId: carehomeId } },
     {
       $group: {
         _id: null,
@@ -143,12 +143,12 @@ carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
 
   // 2. Care Home Details
   const carehomeDetails = await this.findOne(
-    { id_carehome: carehomeId },
-    { avg_monthly_expenses: 1, number_of_residents: 1, _id: 0 }
+    {carehomeId: carehomeId},
+    { avg_expense: 1, num_residents: 1, _id: 0 }
   );
 
-  const avgMonthlyExpense = carehomeDetails?.avg_monthly_expenses || 0;
-  const numberOfResidents = carehomeDetails?.number_of_residents || 0;
+  const avgMonthlyExpense = carehomeDetails?.avg_expense || 0;
+  const numberOfResidents = carehomeDetails?.num_residents || 0;
   const avgCostPerResident = numberOfResidents
     ? (avgMonthlyExpense / numberOfResidents).toFixed(2)
     : 0;
@@ -161,7 +161,7 @@ carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
 
   // 3. Highest Donation
   const highestDonationResult = await DonationMoney.aggregate([
-    { $match: { id_carehome: carehomeId } },
+    { $match: { carehomeId: carehomeId } },
     {
       $group: {
         _id: null,
@@ -178,33 +178,34 @@ carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
 carehomeSchema.statics.recentDonations = async function (careId) {
   try {
     // Step 1: Get all donations for the given carehome, sorted by date descending
-    const donations = await DonationMoney.find({ id_carehome: careId }).sort({
+    const donations = await DonationMoney.find({ carehomeId: careId }).sort({
       donated_at: -1,
     });
-
+    
     if (donations.length === 0) {
       return [];
     }
-
-    // Step 2: Get donor names for each donation
-    const result = await Promise.all(
-      donations.map(async (donation) => {
-        try {
-          const donor = await User.findOne({ id_donor: donation.id_donor });
-          return {
-            donor_name: donor ? donor.name : "Anonymous",
-            amount: donation.amount_donated,
-          };
-        } catch (err) {
-          // In case of error fetching donor, still include the donation
-          return {
-            donor_name: "Anonymous",
-            amount: donation.amount_donated,
-          };
-        }
-      })
-    );
-
+    
+    // Step 2: Get donor names for each donation using simple await approach
+    const result = [];
+    
+    for (const donation of donations) {
+      try {
+        const donor = await User.findOne({ id_donor: donation.id_donor });
+        
+        result.push({
+          donor_name: donor ? donor.name : "Anonymous",
+          amount: donation.amount_donated,
+        });
+      } catch (err) {
+        // In case of error fetching donor, still include the donation
+        result.push({
+          donor_name: "Anonymous",
+          amount: donation.amount_donated,
+        });
+      }
+    }
+    
     return result;
   } catch (err) {
     console.error("Error fetching recent donations:", err);
@@ -261,7 +262,7 @@ module.exports = { Carehome, DonationMoney };
 //         mobile,
 //         state,
 //         city,
-//         number_of_residents,
+//         num_residents,
 //         avg_monthly_expenses,
 //         wishlist,
 //         description,
@@ -460,7 +461,7 @@ module.exports = { Carehome, DonationMoney };
 
 //   // Query to get care home details for avg cost per resident, monthly expenses, and number of residents
 //   const queryCarehomeDetails = `
-//       SELECT avg_monthly_expenses, number_of_residents
+//       SELECT avg_monthly_expenses, num_residents
 //       FROM carehomes
 //       WHERE id_carehome = ?;
 //   `;
@@ -491,7 +492,7 @@ module.exports = { Carehome, DonationMoney };
 //       }
 
 //       const avgMonthlyExpense = row ? row.avg_monthly_expenses || 0 : 0;
-//       const numberOfResidents = row ? row.number_of_residents || 0 : 0;
+//       const numberOfResidents = row ? row.num_residents || 0 : 0;
 //       const avgCostPerResident = numberOfResidents
 //         ? (avgMonthlyExpense / numberOfResidents).toFixed(2)
 //         : 0;

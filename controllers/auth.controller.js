@@ -72,6 +72,7 @@ async function login(req, res) {
 
       req.session.isAuth = true;
       req.session.userRole = UserRole;
+      req.session.user = user;
       return res.redirect(`/NGO-dashboard/${user.ngoId}`);
     } else if (UserRole === "Donor") {
       user = await User.getUserByEmail(email);
@@ -107,6 +108,7 @@ async function login(req, res) {
 
       req.session.isAuth = true;
       req.session.userRole = UserRole;
+      req.session.user = user;
       return res.redirect(`/carehome-dashboard/${user.carehomeId}`);
     }
 

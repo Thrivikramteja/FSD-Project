@@ -15,7 +15,10 @@
         <label for="some_home">Choose a care home:</label><br>
         <select name="carehomes" id="some_home">
             <% carehomes.forEach(home => { %>
-                <option value="<%= home.carehomeId %>"><%= home.care_home_name %></option>
+                <option value="<%= home.carehomeId %>" 
+                        <%= (selectedCareHomeId && selectedCareHomeId == home.carehomeId) ? 'selected' : '' %>>
+                    <%= home.care_home_name %>
+                </option>
             <% }); %>   
         </select>
         <button type="button" id="submit">Choose it</button>
