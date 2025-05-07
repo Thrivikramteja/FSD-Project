@@ -1,6 +1,7 @@
 const { User } = require("../models/user.model");
 const { NGO } = require("../models/NGO.model");
 const { Carehome } = require("../models/carehome.model");
+const {admin} = require("../models/admin.model");
 
 const bcrypt = require("bcryptjs");
 
@@ -110,6 +111,17 @@ async function login(req, res) {
       req.session.userRole = UserRole;
       req.session.user = user;
       return res.redirect(`/carehome-dashboard/${user.carehomeId}`);
+    }
+    else if(UserRole === "Admin")
+    {
+      if(email=="fsd@gmail.com"&&password=="123")
+      {
+       
+        // res.session.isAuth = true;
+        // res.session.userRole = UserRole;
+        // res.session.user = user;
+        return res.redirect('/admin-dashboard');
+      }
     }
 
     console.log("Invalid user role.");

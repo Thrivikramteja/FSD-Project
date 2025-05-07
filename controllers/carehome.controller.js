@@ -1,6 +1,7 @@
 const { Carehome } = require("../models/carehome.model");
 const bcrypt = require("bcrypt");
-const { DonationMoney } = require("../models/carehome.model");
+const { DonationMoney , donate_items } = require("../models/carehome.model");
+const { donate_items_mes , user_message } = require("../models/user.model");
 
 async function donateMoney(req, res) {
   try {
@@ -60,6 +61,57 @@ async function donateItems(req, res) {
   }
 }
 
+async function get_don_items(req, res) 
+{
+  try {
+  
+    const carehomeId = parseInt(req.body.carehomes); 
+    console.log("Care Home ID:", carehomeId);
+    
+    const category = req.body.category;             
+    console.log("Category:", category);
+    
+    const description = req.body.description || ""; 
+    console.log("Description:", description);
+    
+    const location = req.body.address;              
+    console.log("Location:", location);
+    
+    const deliveryDate = new Date(req.body.date);  
+    console.log("Delivery Date:", deliveryDate);
+    
+    const userId = req.session.user.userId;        
+    console.log("User ID:", userId);
+    
+
+    
+    if (!carehomeId || !category || !location || !deliveryDate || !userId) {
+      return res.status(400).json({ error: "All fields except description are required." });
+    }
+
+    
+    const newDonationMessage = new donate_items_mes({
+      carehomeId,
+      userId,
+      category,
+      delivery_date: deliveryDate,
+      location,
+      description,
+    });
+
+    
+    await newDonationMessage.save();
+
+    console.log(`New donation message saved successfully for Carehome ID: ${carehomeId}`);
+    
+    
+    res.redirect("/donate_items?success=true");
+  } catch (error) {
+    console.error("Error while saving donation message:", error);
+    res.status(500).json({ error: "Failed to save the donation message. Please try again later." });
+  }
+}
+
 async function registerCarehome(req, res) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   try {
@@ -113,6 +165,11 @@ async function getCarehome(req, res) {
 
     const stats = await Carehome.get_carehome_stats(careid);
 
+    const messages = await Carehome.getMessages(careid);
+
+    const items = await donate_items.get_item_donations(careid);
+    console.log(items);
+
     // console.log("Fetched Data:");
     // console.log("Ongoing Fundraisers:", ongoing_fund);
     // console.log("Completed Fundraisers:", completed_fund);
@@ -130,6 +187,8 @@ async function getCarehome(req, res) {
       wishlist,
       careid,
       stats,
+      messages,
+      items,
     });
   } catch (error) {
     console.error("Error in getcarehome controller:", error);
@@ -191,6 +250,101 @@ async function view_details_care(req, res)
   }
 }
 
+async function accpet_item_doantions(req,res)
+{
+  const whether = req.body.action;
+  console.log("Action (whether):", whether);
+  
+  const carehomeId = req.body.carehomeId;
+  console.log("Care Home ID:", carehomeId);
+  
+  const category = req.body.category;
+  console.log("Category:", category);
+  
+  const delivery = req.body.delivery_date;
+  console.log("Delivery Date:", delivery);
+  
+  const location = req.body.location;
+  console.log("Location:", location);
+  
+  const description = req.body.description || null;
+  console.log("Description:", description);
+  
+  const userId = req.body.userId;
+  console.log("User ID:", userId);
+  
+  if(whether == "accept")
+  {
+    console.log("Care home has accepted the donation: " + carehomeId);
+    const new_donation = new donate_items({
+          userId: userId,
+          carehomeId: carehomeId,
+          category: category,
+          delivery: delivery,
+          description: description,
+          location: location,
+          donated_at: Date.now()
+    });
+    await new_donation.save();
+    console.log("item accepted from user: " + userId);
+    console.log("now removing it from user messages schema for user : " + userId);
+    const deletedMessage = await donate_items_mes.findOneAndDelete({
+      userId: userId,
+      carehomeId: carehomeId,
+      category: category,
+      location: location,
+    });
+
+    if (deletedMessage) 
+    {
+      console.log("Message successfully removed for user: " + userId);
+    } else 
+    {
+      console.log("No matching message found to remove for user: " + userId);
+    }
+    const new_user_mes =  new user_message({
+      carehomeId: carehomeId,
+      userId: userId,
+      message: "accept",
+      category: category,
+      delivery: delivery,
+      when_date: Date.now(),
+    });
+    await new_user_mes.save();
+    console.log("User was acknowledged of acceptance");
+
+  }
+  else
+  {
+    console.log("Care home rejcted the donation of user : " + userId);
+    const deletedMessage = await donate_items_mes.findOneAndDelete({
+      userId: userId,
+      carehomeId: carehomeId,
+      category: category,
+      location: location,
+    });
+
+    if (deletedMessage) 
+    {
+      console.log("Message successfully removed for user: " + userId);
+    } else 
+    {
+      console.log("No matching message found to remove for user: " + userId);
+    }
+    const new_user_mes =  new user_message({
+      carehomeId: carehomeId,
+      userId: userId,
+      message: "reject",
+      category: category,
+      delivery: delivery,
+      when_date: Date.now(),
+    });
+    await new_user_mes.save();
+    console.log("User was acknowledged of rejectance");
+  }
+
+}
+
 function getEditCarehomeProfile(req, res) {}
 
 function editCarehomeProfile() {}
@@ -206,4 +360,6 @@ module.exports = {
   getallcarehomes,
   view_details_care,
   insertMoney,
+  accpet_item_doantions,
+  get_don_items,
 };

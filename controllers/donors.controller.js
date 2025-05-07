@@ -2,6 +2,7 @@ const {
   User,
   CreatedFundraiser,
   UserContributedFundraiser,
+  user_message,
 } = require("../models/user.model");
 // const NGO = require("../models/NGO.model");
 // const Carehome = require("../models/carehome.model");
@@ -31,6 +32,7 @@ async function getdonor(req, res) {
     const contributedFundraisers = await User.contributedFundraisers(user_ID);
     const ongoingfund = await User.ongoingfund(user_ID);
     const upcomingEvents = await User.upcomingEvents(user_ID);
+    const recentMessages = await user_message.get_newmessages(user_ID);
 
     // Render the dashboard with data
     res.render("users/user_dashboard", {
@@ -40,6 +42,7 @@ async function getdonor(req, res) {
       ongoingfund: ongoingfund || [],
       upcomingEvents: upcomingEvents || [],
       user: req.session.user,
+      recentMessages: recentMessages,
     });
   } catch (error) {
     console.error("Error occurred while fetching user dashboard data:", error);
