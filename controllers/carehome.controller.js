@@ -5,7 +5,10 @@ const { DonationMoney } = require("../models/carehome.model");
 async function donateMoney(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
-    res.render("carehomes/donate_money", { carehomes });
+    // Pass the selected carehome_id to the template if it exists in query params
+    const selectedCareHomeId = req.query.carehome_id||null;
+    console.log(selectedCareHomeId);
+    res.render("carehomes/donate_money", { carehomes, selectedCareHomeId });
   } catch (error) {
     console.error("Error fetching carehomes:", error);
     res.status(500).send("Server Error");
@@ -27,22 +30,16 @@ async function insertMoney(req, res) {
 
     if (!userId || !carehomeId || isNaN(total)) {
       console.log("Error in insertMoney");
-      return res.status(400).json({ error: "Missing or invalid data" });
+      return res.status(400).json({ message: "Missing or invalid data OR Login as user and try to donate money" });
     }
 
-    // const donation = new DonationMoney({
-    //   userId,
-    //   amount_donated: total,
-    //   carehomeId,
-    //   donated_at: new Date(),
-    // });
 
     await DonationMoney.saveDonation({
       userId,
       amount_donated: total,
       carehomeId
     });
-    res.status(200).json({ message: "Donation saved successfully" });
+    res.status(200).json({ error: "Donation saved successfully" });
   } catch (error) {
     console.error("Error saving donation:", error);
     res.status(500).json({ error: "Internal server error" });

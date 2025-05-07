@@ -26,13 +26,21 @@
     <aside class="wishlist">
         <h2>Wishlist of Needs</h2>
         <ul>
-            <% if (Array.isArray(wishlist) && wishlist.length > 0) { %>
-                <% wishlist.forEach(item => { %>
-                    <li><%= item.replace(/</g, "&lt;").replace(/>/g, "&gt;") %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No items in wishlist. Please go to the edit page to update.</li>
-            <% } %>
+                    <% let wishlistArray = []; %>
+        <% if (wishlist && typeof wishlist === 'string') { %>
+            <% wishlistArray = wishlist.split(',').map(item => item.trim()); %>
+        <% } else if (Array.isArray(wishlist)) { %>
+            <% wishlistArray = wishlist; %>
+        <% } %>
+
+        <% if (wishlistArray.length > 0) { %>
+            <% wishlistArray.forEach(item => { %>
+                <li><%= item.replace(/</g, "&lt;").replace(/>/g, "&gt;") %></li>
+            <% }); %>
+        <% } else { %>
+            <li>No items in wishlist. Please go to the edit page to update.</li>
+        <% } %>
+
         </ul>
     </aside>
 
@@ -59,7 +67,7 @@
         </section>
 
         <section class="fundraisers">
-            <h2>Current Fundraisers</h2>
+            <h2>Current Associated Fundraisers</h2>
             <div class="fundraiser-list">
                 <% if (Array.isArray(ongoing_fund) && ongoing_fund.length > 0) { %>
                     <% ongoing_fund.forEach((fundraiser, index) => { %>
