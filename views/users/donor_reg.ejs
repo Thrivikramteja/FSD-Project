@@ -12,7 +12,7 @@
     <div class="container">
         <h2>Donor Registration - <%- event || "General Event" %></h2>
 
-        <form id="donorForm" action="/registerUser" method="POST">
+        <form id="donorForm" action="/registerUser/<%= ngoId %>" method="POST">
             <input type="hidden" name="event" value="<%= event %>">
             <input type="hidden" name="ngoID" value="<%= ngoId %>">
 

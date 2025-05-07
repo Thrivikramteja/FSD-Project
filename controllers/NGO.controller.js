@@ -106,7 +106,7 @@ async function getFundraisers(req, res) {
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
+    const fundraisers = await CreatedFundraiser.find({ngoId: ngoID});
     const ongoing_fund = fundraisers.filter((fundraiser) => {
       const deadline =
         fundraiser.deadline instanceof Date
@@ -283,21 +283,50 @@ function getRegisterUser(req, res) {
 }
 
 async function registerUser(req, res) {
-  const { event } = req.body;
-  const userId = await User.get;
-  const ngoId = req.params.ngoID;
-  const createdEvent = await Event.findOne({ event_name: event });
-  const userRegisteredEvent = new UserRegisteredEvent({
-    userId,
-    ngoId,
-    event,
-    event_date: createdEvent.event_date,
-    event_location: createdEvent.event_location,
-  });
+  try {
+    const { event } = req.body;
+    const userId = req.session.user.userId;
+    const ngoId = req.params.ngoID;
 
-  await userRegisteredEvent.save();
-  res.json({ message: "Registration successful!" });
+    // Check if the event exists for the given NGO
+    const createdEvent = await Event.findOne({ event_name: event, ngoId: ngoId });
+    if (!createdEvent) {
+      return res.status(404).json({ message: "Event not found." });
+    }
+
+    // Check if the user is already registered for the event
+    const existingRegistration = await UserRegisteredEvent.findOne({ userId, event_name: event, ngoId });
+    if (existingRegistration) {
+      return res.status(400).json({ message: "You have already registered for this event." });
+    }
+
+    // If not registered, create a new registration
+    const userRegisteredEvent = new UserRegisteredEvent({
+      userId,
+      ngoId,
+      event_name: event,
+      event_date: createdEvent.event_date,
+      event_location: createdEvent.event_location,
+    });
+
+    await userRegisteredEvent.save();
+    console.log("User registration successful: ", userRegisteredEvent);
+
+    // Increment the number of registrations for the event
+    const newEventRegistration = await Event.findOneAndUpdate(
+      { ngoId, event_name: event },
+      { $inc: { number_of_registrations: 1 } },
+      { new: true }
+    );
+    console.log("Registration count updated successfully.");
+
+    res.json({ message: "Registration successful!", updatedEvent: newEventRegistration });
+  } catch (error) {
+    console.error("Error during registration: ", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
 }
+
 
 /**
  * Render create fundraiser form

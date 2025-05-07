@@ -22,8 +22,8 @@
           <label for="some_home">Choose a care home</label>
           <select name="carehomes" id="some_home">
             <% carehomes.forEach(home => { %>
-            <option value="<%= home.name_carehome %>">
-              <%= home.name_carehome %>
+            <option value="<%= home.care_home_name %>">
+              <%= home.care_home_name %>
             </option>
             <% }); %>
           </select>
@@ -44,17 +44,17 @@
         </div>
 
         <!-- Item Quantity -->
-        <div class="mb-3">
+        <!-- <div class="mb-3">
           <label for="quantity" class="form-label">Quantity</label>
           <input
-            type="number"
+            type="text"
             class="form-control"
             id="quantity"
             name="quantity"
             min="1"
             required
           />
-        </div>
+        </div> -->
 
         <!-- Item Description -->
         <div class="mb-3">

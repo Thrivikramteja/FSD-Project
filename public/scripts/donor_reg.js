@@ -66,29 +66,34 @@
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("donorForm");
 
-    form.addEventListener("submit", function (event) {
-        event.preventDefault(); // prevent default form submission
+    // form.addEventListener("submit", function (event) {
+    //     event.preventDefault(); // prevent default form submission
 
-        console.log("before post req");
-        const ngoID = document.getElementById("ngoID").value;
-        const eventName = document.getElementById("eventName").value;
+    //     console.log("before post req");
+    //     const ngoID = document.getElementById("ngoID").value;
+    //     const eventName = document.getElementById("eventName").value;
 
-        console.log(ngoID + "" + eventName);
+    //     console.log(ngoID + "" + eventName);
 
-        fetch(`/registerUser/${ngoID}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ event: eventName })
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message); // show backend message
-        })
-        .catch(err => {
-            console.error("Error:", err);
-            alert("Something went wrong!");
-        });
-    });
+    //     fetch(`/registerUser/${ngoID}`, {
+    //         method: "POST",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         },
+    //         body: JSON.stringify({ event: eventName })
+    //     })
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         alert(data.message); // show backend message
+    //     })
+    //     .catch(err => {
+    //         console.error("Error:", err);
+    //         alert("Something went wrong!");
+    //     });
+    // });
+
+    form.addEventListener("submit",function(event)
+{
+    window.alert("Registration succesful");
+})
 });

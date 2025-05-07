@@ -1,40 +1,7 @@
-const {NGO , Event} = require("../models/NGO.model");
-// const User = require("../models/user.model");
-
-// const promisifyModelMethod = (modelMethod, ...args) =>
-//   new Promise((resolve, reject) => {
-//     modelMethod(...args, (err, data) => {
-//       if (err) {
-//         console.error(`Error in model method:`, err);
-//         reject(err);
-//       } else {
-//         console.log(`Data fetched by model method:`, data);
-//         resolve(data);
-//       }
-//     });
-//   });
-
-
+const { NGO, Event } = require("../models/NGO.model");
 
 async function getLandingPage(req, res) {
-  // const ongoingfund = await promisifyModelMethod(NGO.ongoingfund);
-  // const upcomingEvents = await promisifyModelMethod(NGO.upcomingEvents);
-  // const fundraisers = NGO.getFundraisers((err, fundraisers) => {
-  //   if (err) {
-  //     console.error("Error fetching fundraisers:", err);
-  //     return;
-  //   }
-  //   console.log("Fundraisers:", fundraisers);
-  // });
   const ongoing_fund = await NGO.ongoing_fund();
-
-  // const events = NGO.getEvents((err, events) => {
-  //   if (err) {
-  //     console.error("Error fetching events:", err);
-  //     return;
-  //   }
-  //   console.log("Events:", events);
-  // });
   const upcoming_eve = await Event.upcoming_eve();
 
   res.render("landing-page", { ongoing_fund, upcoming_eve });
@@ -44,7 +11,6 @@ async function getNGO(req, res) {
   const ngoID = req.params.ngoID;
 
   try {
-    console.log("Fetching data for NGO ID:", ngoID);
 
     // Fetch data one by one using async/await and new Promise directly
     const ongoing_fund = await new Promise((resolve, reject) => {
@@ -102,13 +68,6 @@ async function getNGO(req, res) {
       });
     });
 
-    console.log("Fetched Data:");
-    console.log("Ongoing Fundraisers:", ongoing_fund);
-    console.log("Completed Fundraisers:", completed_fund);
-    console.log("Upcoming Events:", upcoming_eve);
-    console.log("Completed Events:", completed_event);
-    console.log("NGO Name:", name);
-
     // Render the EJS template with the fetched data
     res.render("NGOs/ngo_dashboard", {
       name,
@@ -126,7 +85,7 @@ async function getNGO(req, res) {
 
 module.exports = {
   getNGO,
-  getLandingPage
+  getLandingPage,
 };
 
 // async function getdonor(req, res) {

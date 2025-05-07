@@ -34,6 +34,9 @@
       <% } else { %>
         <li id="logout-button"><a href="/logout">Logout</a></li>
       <% } %>
+      <% if (user) { %>
+        <li><a id="profile" href="/profile/<%= user.userId %>">Profile</a></li>
+      <% } %>
     </ul>
   </nav>
 </header>

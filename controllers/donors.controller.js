@@ -1,4 +1,8 @@
-const { User  , CreatedFundraiser , UserContributedFundraiser} = require("../models/user.model");
+const {
+  User,
+  CreatedFundraiser,
+  UserContributedFundraiser,
+} = require("../models/user.model");
 // const NGO = require("../models/NGO.model");
 // const Carehome = require("../models/carehome.model");
 
@@ -35,7 +39,7 @@ async function getdonor(req, res) {
       contributedFundraisers: contributedFundraisers || [],
       ongoingfund: ongoingfund || [],
       upcomingEvents: upcomingEvents || [],
-      user: req.session.user
+      user: req.session.user,
     });
   } catch (error) {
     console.error("Error occurred while fetching user dashboard data:", error);
@@ -50,46 +54,43 @@ async function getdonor(req, res) {
 async function get_deadline(ngoId, fundraiser_name) {
   try {
     const fundraiser = await CreatedFundraiser.findOne(
-      { ngoId: ngoId, fundraiser_name: fundraiser_name }, 
-      { deadline: 1, _id: 0 } 
+      { ngoId: ngoId, fundraiser_name: fundraiser_name },
+      { deadline: 1, _id: 0 }
     );
 
     if (!fundraiser) {
-      throw new Error('Fundraiser not found');
+      throw new Error("Fundraiser not found");
     }
 
     return fundraiser.deadline; // Return the deadline
   } catch (error) {
-    console.error('Error fetching deadline:', error);
+    console.error("Error fetching deadline:", error);
     throw error;
   }
 }
-
 
 async function get_carehomeid(ngoId, fundraiser_name) {
   try {
     const fundraiser = await CreatedFundraiser.findOne(
-      { ngoId: ngoId, fundraiser_name: fundraiser_name }, 
-      { carehomeId: 1, _id: 0 } 
+      { ngoId: ngoId, fundraiser_name: fundraiser_name },
+      { carehomeId: 1, _id: 0 }
     );
 
     if (!fundraiser) {
-      throw new Error('Fundraiser not found');
+      throw new Error("Fundraiser not found");
     }
 
     return fundraiser.carehomeId; // Return the deadline
   } catch (error) {
-    console.error('Error fetching deadline:', error);
+    console.error("Error fetching deadline:", error);
     throw error;
   }
 }
 
-
-
 async function contributed_fund(req, res) {
   try {
     const ngoId = req.params.ngoId;
-   
+
     const fundraiser_name = req.params.fundraiser_name;
     const amount_contributed = req.body.your_amount;
 
@@ -101,7 +102,6 @@ async function contributed_fund(req, res) {
     const userId = req.session.user.userId; // Corrected: Use lowercase 'user'
     console.log("Session ID for user: " + userId);
 
-    
     const deadline = await get_deadline(ngoId, fundraiser_name);
 
     // Log the deadline (for debugging purposes)
@@ -109,7 +109,6 @@ async function contributed_fund(req, res) {
 
     // Check if the fundraiser deadline has passed
     const currentDate = new Date();
-   
 
     // Create a new contribution document using the userContributedFundraisersSchema
     const newContribution = new UserContributedFundraiser({
@@ -117,32 +116,34 @@ async function contributed_fund(req, res) {
       ngoId: ngoId,
       fundraiser_name: fundraiser_name,
       amount_contributed: amount_contributed,
-      contributed_at: currentDate,  // This will be the current date/time of contribution
-      deadline: deadline,  // The fundraiser's deadline
+      contributed_at: currentDate, // This will be the current date/time of contribution
+      deadline: deadline, // The fundraiser's deadline
     });
 
     // Save the new contribution to the database
     await newContribution.save();
 
-
     console.log("save succesful to user id " + userId);
-   
+
     const fundraiser = await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
       { $inc: { amount_raised_so_far: amount_contributed } },
       { new: true }
     );
-    console.log("sucessfuly updated in ngo side")
-     // res.redirect(`users/user_dashboard/${userId}`)
-   
+    console.log("sucessfuly updated in ngo side");
+    // res.redirect(`users/user_dashboard/${userId}`)
   } catch (error) {
     console.error("Error in contributed_fund:", error);
-    res.status(500).json({ message: "An error occurred while processing the contribution." });
+    res
+      .status(500)
+      .json({
+        message: "An error occurred while processing the contribution.",
+      });
   }
 }
 
 async function getEditDonorProfile(req, res) {
-  const userID = req.params.userID;
+  const userID = parseInt(req.params.userID, 10);
 
   try {
     const user = await new Promise((resolve) => {
@@ -169,5 +170,5 @@ module.exports = {
   getdonor,
   getEditDonorProfile,
   editDonorProfile,
-  contributed_fund
+  contributed_fund,
 };

@@ -292,7 +292,7 @@ eventSchema.statics.upcoming_eve = async function () {
     const upcomingEvents = await this.find({
       event_date: { $gte: currentDate }
     });
-    console.log(upcomingEvents);
+    // console.log(upcomingEvents);
     return upcomingEvents;
   } catch (err) {
     console.error("Error fetching upcoming events:", err);

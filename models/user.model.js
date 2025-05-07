@@ -94,7 +94,9 @@ donorSchema.statics.upcomingEvents = async function (userId) {
 
   const upcoming = await UserRegisteredEvent.find({
     event_date: { $gt: currentDate },
+    userId: userId,
   });
+  return upcoming;
 };
 
 const userContributedFundraisersSchema = new mongoose.Schema({

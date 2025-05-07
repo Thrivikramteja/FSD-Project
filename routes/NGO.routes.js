@@ -16,7 +16,6 @@ router.get('/registerUser/:ngoID/:eventName', isAuth, NGOController.getRegisterU
 
 router.post('/registerUser/:ngoID', isAuth, NGOController.registerUser);
 
-// router.get('/fundraisers', NGOController.getFundraisers);
 router.get('/fundraisers', NGOController.getallFundraisers);
 
 router.get('/NGO-dashboard/:ngoID', isAuth, NGOController.getNGO);

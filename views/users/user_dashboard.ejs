@@ -1,159 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Dashboard</title>
-    <link rel="stylesheet" href="/styles/landing_page.css">
-    <link rel="stylesheet" href="/styles/user_dashboard.css">
-    <link rel="stylesheet" href="/styles/footer.css">
-    
-</head>
-<body>
+    <link rel="stylesheet" href="/styles/landing_page.css" />
+    <link rel="stylesheet" href="/styles/user_dashboard.css" />
+    <link rel="stylesheet" href="/styles/footer.css" />
+    <link rel="stylesheet" href="/styles/ngo_das.css" />
+    <script src="/scripts/analytics_user.js" defer></script>
+  </head>
+  <body>
     <%- include('../shared/includes/header') %>
 
-        <div class="name_right">
-            <h1>Welcome <br><%= name %></h1>
+    <div class="name_right">
+      <h1>Welcome <br /><%= name %></h1>
+    </div>
+
+    <div class="user_pro">
+      <img src="/images/user.jpg" alt="profile" class="pro_img" />
+      <p class="greet">Hi <%= name %>.</p>
+      <button id="toggle-stats-btn">Statistics</button>
+      <div id="user-stats" class="user-stats">
+        <h2>Your Statistics</h2>
+        <p class="text-title">Event Statistics:</p>
+        <p class="text-body">
+          <span id="event-count-current">Events Participated this month: </span
+          ><br />
+          <span id="event-count-all">Total events Participated: </span><br />
+        </p>
+        <p class="text-title">Contribution:</p>
+        <p class="text-body">
+          <span id="donation-current">This month contribution: </span><br />
+          <span id="donation-all">All-time contribution: </span><br />
+          <span id="this_mon_don">This month donations:</span><br />
+          <span id="all_time_con">All-time donations: </span><br />
+        </p>
+      </div>
+    </div>
+
+    <div class="dashboard-container">
+      <div class="body_2">
+        <h2>Participated Events</h2>
+        <div class="part_ev">
+          <% if (participatedEvents && participatedEvents.length > 0) { %> <%
+          participatedEvents.forEach(event => { %>
+          <div class="event">
+            <h3><%= event.event_name %></h3>
+            <p>
+              <strong>Date: </strong
+              ><span class="date"><%= event.event_date %></span>
+            </p>
+          </div>
+          <% }); %> <% } else { %>
+          <p class="no-data">No participated events.</p>
+          <% } %>
         </div>
 
-        <div class="user_pro">
-            <img src="/images/user.jpg" alt="profile" class="pro_img">
-            <p class="greet">Hi <%= name %>.</p>
-            <button id="toggle-stats-btn">Statistics</button>
-            <div id="user-stats" class="user-stats">
-                <h2>Your Statistics</h2>
-                <p class="text-title">Event Statistics:</p>
-                <p class="text-body">
-                    <span id="event-count-current">Events Participated this month: </span><br>
-                    <span id="event-count-all">Total events Participated: </span><br>
-                </p>
-                <p class="text-title">Contribution:</p>
-                <p class="text-body">
-                    <span id="donation-current">This month contribution: </span><br>
-                    <span id="donation-all">All-time contribution: </span><br>
-                    <span id="this_mon_don">This month donations:</span><br>
-                    <span id="all_time_con">All-time donations: </span><br>
-                </p>
-            </div>
+        <h2>Fundraisers Contributed</h2>
+        <div class="fund_pa">
+          <% if (contributedFundraisers && contributedFundraisers.length > 0) {
+          %> <% contributedFundraisers.forEach(fundraiser => { %>
+          <div class="event">
+            <h3><%= fundraiser.fundraiser_name %></h3>
+            <p>
+              <strong>Amount Contributed: </strong
+              ><span class="money"><%= fundraiser.amount_contributed %></span>
+            </p>
+            <p>
+              <strong>Status:</strong>
+              <span class="status completed">Completed</span>
+            </p>
+            <p>
+              <strong>Date: </strong
+              ><span class="date"><%= fundraiser.contributed_at %></span>
+            </p>
+          </div>
+          <% }); %> <% } %> <% if (ongoingfund && ongoingfund.length > 0) { %>
+          <% for (let i = 0; i < ongoingfund.length; ++i) { %>
+          <div class="event">
+            <h3><%= ongoingfund[i].name %></h3>
+            <p>
+              <strong>Amount Contributed: </strong
+              ><span class="money"
+                ><%= ongoingfund[i].amount_contributed %></span
+              >
+            </p>
+            <p>
+              <strong>Status:</strong>
+              <span class="status ongoing">Ongoing</span>
+            </p>
+            <p>
+              <strong>Date: </strong
+              ><span class="date"><%= ongoingfund[i].contributed_at %></span>
+            </p>
+          </div>
+          <% } %> <% } %> <% if ((!contributedFundraisers ||
+          contributedFundraisers.length === 0) && (!ongoingfund ||
+          ongoingfund.length === 0)) { %>
+          <p class="no-data">No fundraisers contributed</p>
+          <% } %>
         </div>
-        
+      </div>
+
+      <div class="up_side">
+        <h2>Upcoming Events</h2>
+        <div class="upcoming-events">
+          <% if (upcomingEvents && upcomingEvents.length > 0) { %> <%
+          upcomingEvents.forEach(event => { %>
+          <div class="regist_ev">
+            <h3><%= event.event_name %></h3>
+            <p><strong>Date:</strong> <%= event.event_date %></p>
+            <p><strong>Location:</strong> <%= event.event_location %></p>
+          </div>
+          <% }); %> <% } else { %>
+          <p class="no-data">No upcoming events available.</p>
+          <% } %>
+        </div>
+        <a class="register_more" style="text-decoration: none" href="/events">
+          Register Yourself for more events...
+        </a>
+      </div>
     </div>
-    
-    <div class="dashboard-container">
-         <div class="body_2">
-            <h2>Participated Events</h2>
-            <div class="part_ev">
-                <% if (participatedEvents && participatedEvents.length > 0) { %>
-                    <% participatedEvents.forEach(event => { %>
-                        <div class="event">
-                            <h3><%= event.event_name %></h3>
-                            <p><strong>Date: </strong><span class="date"><%= event.event_date %></span></p>
-                        </div>
-                    <% }); %>
-                <% } else { %>
-                    <p class="no-data">No participated events.</p>
-                <% } %>
-            </div>
-        
-            <h2>Fundraisers Contributed</h2>
-            <div class="fund_pa">
-                <% if (contributedFundraisers && contributedFundraisers.length > 0) { %>
-                    <% contributedFundraisers.forEach(fundraiser => { %>
-                        <div class="event">
-                            <h3><%= fundraiser.fundraiser_name %></h3>
-                            <p><strong>Amount Contributed: </strong><span class="money"><%= fundraiser.amount_contributed %></span></p>
-                            <p><strong>Status:</strong> <span class="status completed">Completed</span></p>
-                            <p><strong>Date: </strong><span class="date"><%= fundraiser.contributed_at %></span></p>
-                        </div>
-                    <% }); %>
-                <% } %>
-            
-                <% if (ongoingfund && ongoingfund.length > 0) { %>
-                    <% for (let i = 0; i < ongoingfund.length; ++i) { %>
-                        <div class="event">
-                            <h3><%= ongoingfund[i].name %></h3>
-                            <p><strong>Amount Contributed: </strong><span class="money"><%= ongoingfund[i].amount_contributed %></span></p>
-                            <p><strong>Status:</strong> <span class="status ongoing">Ongoing</span></p>
-                            <p><strong>Date: </strong><span class="date"><%= ongoingfund[i].contributed_at %></span></p>
-                        </div>
-                    <% } %>
-                <% } %>
-            
-                <% if ((!contributedFundraisers || contributedFundraisers.length === 0) &&
-                      (!ongoingfund || ongoingfund.length === 0)) { %>
-                    <p class="no-data">No fundraisers contributed</p>
-                <% } %>
-            </div>
-            
-        </div>
-        
-        <div class="up_side">
-            <h2>Upcoming Events</h2>
-            <div class="upcoming-events">
-                <% if (upcomingEvents && upcomingEvents.length > 0) { %>
-                    <% upcomingEvents.forEach(event => { %>
-                        <div class="regist_ev">
-                            <h3><%= event.name %></h3>
-                            <p><strong>Date:</strong> <%= event.event_name %></p>
-                            <p><strong>Time:</strong> <%= event.event_time %></p>
-                            <p><strong>Location:</strong> <%= event.event_location %></p>
-                        </div>
-                    <% }); %>
-                <% } else { %>
-                    <p class="no-data">No upcoming events available.</p>
-                <% } %>
-            </div>
-            <a class="register_more"  href="/events">
-                Register Yourself for more events...
-            </a>
-        </div>
-        
-    </div>
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>About CareConnect</h3>
-                <p>CareConnect bridges NGOs, care homes, and generous donors. We empower individuals to support meaningful initiatives and create lasting impact in the lives of those in need.</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul class="footer-links">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Discover NGOs</a></li>
-                    <li><a href="#">Find Care Homes</a></li>
-                    <li><a href="#">Current Fundraisers</a></li>
-                    <li><a href="#">Donate Food/Clothes</a></li>
-                    <li><a href="#">User Dashboard</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Newsletter</h3>
-                <p>Stay updated with our latest fundraisers and success stories.</p>
-                <div class="newsletter-signup">
-                    <input type="email" placeholder="Your email" >
-                    <button>Subscribe</button>
-                </div>
-                <p>Join our community of 10,000+ donors making a difference every day.</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <form class="contact-form" method="POST" action="/contact">
-                    <input type="text" placeholder="Name" name="name" required>
-                    <input type="email" placeholder="Email" name="email" required>
-                    <textarea placeholder="Message" rows="3" name="message" required></textarea>
-                    <button type="submit">Send Message</button>
-                </form>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2025 CareConnect. All rights reserved.</p>
-            
-        </div>
-    </footer>
-    <script src="/scripts/analytics_user.js"></script>  
-</body>
+
+    <script>
+      const profile = document.getElementById("profile");
+      if (profile) {
+        profile.style.display = "none";
+      }
+    </script>
+  </body>
 </html>
+
+<%- include('../shared/includes/footer') %>

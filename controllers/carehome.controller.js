@@ -143,8 +143,7 @@ async function getCarehome(req, res) {
 async function getallcarehomes(req, res) {
   try {
     const carehomes = await Carehome.getallcarehomes();
-      
-    console.log("fetched care homes : ", carehomes);
+    
     res.render("carehomes/carehomes", { carehomes });
   } catch (error) {
     console.log("error while fetching the care homes ", error);

@@ -1,13 +1,6 @@
-// const db = require("../data/sqlite3");
-// const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const { CreatedFundraiser, User } = require("./user.model");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
-
-// const today = new Date();
-// const isoCurrentDate = `${today.getFullYear()}-${String(
-//   today.getMonth() + 1
-// ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
 const carehomeSchema = new mongoose.Schema({
   carehomeId: { type: Number, unique: true },
