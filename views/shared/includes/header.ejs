@@ -1,7 +1,8 @@
-<header id="main-header" style="margin-bottom: 5rem;">
+<header id="main-header" style="margin-bottom: 5rem">
   <div id="logo"><a href="/">CareConnect</a></div>
   <nav>
     <ul class="nav-items">
+      <% if (!user || (user && userRole == 'Donor')) { %>
       <li class="dropdown">
         <a class="dropdown-toggle">Donate</a>
         <ul class="dropdown-menu">
@@ -9,6 +10,8 @@
           <li><a href="/donate_money">Money</a></li>
         </ul>
       </li>
+      <% } %>
+
       <li class="dropdown">
         <a class="dropdown-toggle">Discover</a>
         <ul class="dropdown-menu">
@@ -18,6 +21,7 @@
           <li><a href="/NGOs">NGOs</a></li>
         </ul>
       </li>
+
       <% if (!user) { %>
       <li class="dropdown">
         <a class="dropdown-toggle">Register</a>
@@ -26,23 +30,32 @@
           <li><a href="/registerCarehome">As a Carehome</a></li>
         </ul>
       </li>
-      <% } %>
-
-      <% if (!user) { %>
-        <li id="login-button"><a href="/login" id="loginPopupBtn">Login</a></li>
-        <li id="signup-button"><a href="/signup" id="loginPopupBtn">Signup</a></li>
+      <% } %> <% if (!user) { %>
+      <li id="login-button"><a href="/login" id="loginPopupBtn">Login</a></li>
+      <li id="signup-button">
+        <a href="/signup" id="loginPopupBtn">Signup</a>
+      </li>
       <% } else { %>
-        <li id="logout-button"><a href="/logout">Logout</a></li>
-      <% } %>
-
-      <% if (user && userRole == "Donor") { %>
-        <li><a id="profile" href="/profile/<%= userRole %>/<%= user.userId %>">Profile</a></li>
+      <li id="logout-button"><a href="/logout">Logout</a></li>
+      <% } %> <% if (user && userRole == "Donor") { %>
+      <li>
+        <a id="profile" href="/profile/<%= userRole %>/<%= user.userId %>"
+          >Profile</a
+        >
+      </li>
       <% } else if (user && userRole == "Carehome") { %>
-        <li><a id="profile" href="/profile/<%= userRole %>/<%= user.carehomeId %>">Profile</a></li>
+      <li>
+        <a id="profile" href="/profile/<%= userRole %>/<%= user.carehomeId %>"
+          >Profile</a
+        >
+      </li>
       <% } else if (user && userRole == "NGO") { %>
-        <li><a id="profile" href="/profile/<%= userRole %>/<%= user.ngoId %>">Profile</a></li>
+      <li>
+        <a id="profile" href="/profile/<%= userRole %>/<%= user.ngoId %>"
+          >Profile</a
+        >
+      </li>
       <% } %>
-
     </ul>
   </nav>
 </header>

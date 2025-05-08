@@ -89,6 +89,21 @@ li a:hover {
   border-radius: 4px;
 }
 
+.progress-bar {
+  background: #eaeaea;
+  border-radius: 10px;
+  height: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  background: linear-gradient(to right, #2c6e49, #4e9f76);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+
 /* .popup {
   margin-left: 0;
   background: rgba(0, 0, 0, 0.4);
