@@ -1,7 +1,7 @@
 const { Carehome } = require("../models/carehome.model");
 const bcrypt = require("bcrypt");
-const { DonationMoney , donate_items } = require("../models/carehome.model");
-const { donate_items_mes , user_message } = require("../models/user.model");
+const { DonationMoney, donate_items } = require("../models/carehome.model");
+const { donate_items_mes, user_message } = require("../models/user.model");
 
 async function donateMoney(req, res) {
   try {
@@ -9,7 +9,12 @@ async function donateMoney(req, res) {
     // Pass the selected carehome_id to the template if it exists in query params
     const selectedCareHomeId = req.query.carehome_id || null;
     console.log(selectedCareHomeId);
-    res.render("carehomes/donate_money", { carehomes, selectedCareHomeId });
+    res.render("carehomes/donate_money", {
+      carehomes,
+      selectedCareHomeId,
+      user: req.session.user,
+      userRole: req.session.userRole,
+    });
   } catch (error) {
     console.error("Error fetching carehomes:", error);
     res.status(500).send("Server Error");
@@ -29,20 +34,24 @@ async function insertMoney(req, res) {
     const carehomeId = parseInt(req.params.carehomeId);
     console.log(carehomeId);
 
-    if (!userId || !carehomeId || isNaN(total)) {
-      console.log("Error in insertMoney");
-      return res.status(400).json({
-        message:
-          "Missing or invalid data OR Login as user and try to donate money",
-      });
-    }
+    // if (!userId || !carehomeId || isNaN(total)) {
+    //   console.log("Error in insertMoney");
+    //   res.status(400).json({
+    //     message:
+    //       "Missing or invalid data OR Login as user and try to donate money",
+    //   });
+    // }
 
     await DonationMoney.saveDonation({
       userId,
       amount_donated: total,
       carehomeId,
+      user: req.session.user,
+      userRole: req.session.userRole,
     });
-    res.status(200).json({ error: "Donation saved successfully" });
+    res.redirect("/");
+    // res.status(200).json({ error: "Donation saved successfully" });
+    
   } catch (error) {
     console.error("Error saving donation:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -56,42 +65,43 @@ async function register(req, res) {
 async function donateItems(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
-    res.render("carehomes/donate_items", { carehomes });
+    res.render("carehomes/donate_items", {
+      carehomes,
+      user: req.session.user,
+      userRole: req.session.userRole,
+    });
   } catch (error) {
     console.error("Error fetching carehomes:", error);
     res.status(500).send("Server Error");
   }
 }
 
-async function get_don_items(req, res) 
-{
+async function get_don_items(req, res) {
   try {
-  
-    const carehomeId = parseInt(req.body.carehomes); 
+    const carehomeId = parseInt(req.body.carehomes);
     console.log("Care Home ID:", carehomeId);
-    
-    const category = req.body.category;             
-    console.log("Category:", category);
-    
-    const description = req.body.description || ""; 
-    console.log("Description:", description);
-    
-    const location = req.body.address;              
-    console.log("Location:", location);
-    
-    const deliveryDate = new Date(req.body.date);  
-    console.log("Delivery Date:", deliveryDate);
-    
-    const userId = req.session.user.userId;        
-    console.log("User ID:", userId);
-    
 
-    
+    const category = req.body.category;
+    console.log("Category:", category);
+
+    const description = req.body.description || "";
+    console.log("Description:", description);
+
+    const location = req.body.address;
+    console.log("Location:", location);
+
+    const deliveryDate = new Date(req.body.date);
+    console.log("Delivery Date:", deliveryDate);
+
+    const userId = req.session.user.userId;
+    console.log("User ID:", userId);
+
     if (!carehomeId || !category || !location || !deliveryDate || !userId) {
-      return res.status(400).json({ error: "All fields except description are required." });
+      return res
+        .status(400)
+        .json({ error: "All fields except description are required." });
     }
 
-    
     const newDonationMessage = new donate_items_mes({
       carehomeId,
       userId,
@@ -99,18 +109,22 @@ async function get_don_items(req, res)
       delivery_date: deliveryDate,
       location,
       description,
+      user: req.session.user,
+      userRole: req.session.userRole,
     });
 
-    
     await newDonationMessage.save();
 
-    console.log(`New donation message saved successfully for Carehome ID: ${carehomeId}`);
-    
-    
+    console.log(
+      `New donation message saved successfully for Carehome ID: ${carehomeId}`
+    );
+
     res.redirect("/donate_items?success=true");
   } catch (error) {
     console.error("Error while saving donation message:", error);
-    res.status(500).json({ error: "Failed to save the donation message. Please try again later." });
+    res.status(500).json({
+      error: "Failed to save the donation message. Please try again later.",
+    });
   }
 }
 
@@ -204,7 +218,11 @@ async function getallcarehomes(req, res) {
   try {
     const carehomes = await Carehome.getallcarehomes();
 
-    res.render("carehomes/carehomes", { carehomes });
+    res.render("carehomes/carehomes", {
+      carehomes,
+      user: req.session.user,
+      userRole: req.session.userRole,
+    });
   } catch (error) {
     console.log("error while fetching the care homes ", error);
   }
@@ -242,7 +260,11 @@ async function view_details_care(req, res) {
         ? carehome.wishlist.split(",").map((item) => item.trim())
         : [];
 
-      res.render("carehomes/view_care", { details: carehome });
+      res.render("carehomes/view_care", {
+        details: carehome,
+        user: req.session.user,
+        userRole: req.session.userRole,
+      });
     } else {
       res.status(404).send("Carehome not found");
     }
@@ -252,44 +274,44 @@ async function view_details_care(req, res) {
   }
 }
 
-async function accpet_item_doantions(req,res)
-{
+async function accpet_item_doantions(req, res) {
   const whether = req.body.action;
   console.log("Action (whether):", whether);
-  
+
   const carehomeId = req.body.carehomeId;
   console.log("Care Home ID:", carehomeId);
-  
+
   const category = req.body.category;
   console.log("Category:", category);
-  
+
   const delivery = req.body.delivery_date;
   console.log("Delivery Date:", delivery);
-  
+
   const location = req.body.location;
   console.log("Location:", location);
-  
+
   const description = req.body.description || null;
   console.log("Description:", description);
-  
+
   const userId = req.body.userId;
   console.log("User ID:", userId);
-  
-  if(whether == "accept")
-  {
+
+  if (whether == "accept") {
     console.log("Care home has accepted the donation: " + carehomeId);
     const new_donation = new donate_items({
-          userId: userId,
-          carehomeId: carehomeId,
-          category: category,
-          delivery: delivery,
-          description: description,
-          location: location,
-          donated_at: Date.now()
+      userId: userId,
+      carehomeId: carehomeId,
+      category: category,
+      delivery: delivery,
+      description: description,
+      location: location,
+      donated_at: Date.now(),
     });
     await new_donation.save();
     console.log("item accepted from user: " + userId);
-    console.log("now removing it from user messages schema for user : " + userId);
+    console.log(
+      "now removing it from user messages schema for user : " + userId
+    );
     const deletedMessage = await donate_items_mes.findOneAndDelete({
       userId: userId,
       carehomeId: carehomeId,
@@ -297,14 +319,12 @@ async function accpet_item_doantions(req,res)
       location: location,
     });
 
-    if (deletedMessage) 
-    {
+    if (deletedMessage) {
       console.log("Message successfully removed for user: " + userId);
-    } else 
-    {
+    } else {
       console.log("No matching message found to remove for user: " + userId);
     }
-    const new_user_mes =  new user_message({
+    const new_user_mes = new user_message({
       carehomeId: carehomeId,
       userId: userId,
       message: "accept",
@@ -314,10 +334,7 @@ async function accpet_item_doantions(req,res)
     });
     await new_user_mes.save();
     console.log("User was acknowledged of acceptance");
-
-  }
-  else
-  {
+  } else {
     console.log("Care home rejcted the donation of user : " + userId);
     const deletedMessage = await donate_items_mes.findOneAndDelete({
       userId: userId,
@@ -326,14 +343,12 @@ async function accpet_item_doantions(req,res)
       location: location,
     });
 
-    if (deletedMessage) 
-    {
+    if (deletedMessage) {
       console.log("Message successfully removed for user: " + userId);
-    } else 
-    {
+    } else {
       console.log("No matching message found to remove for user: " + userId);
     }
-    const new_user_mes =  new user_message({
+    const new_user_mes = new user_message({
       carehomeId: carehomeId,
       userId: userId,
       message: "reject",
@@ -344,18 +359,21 @@ async function accpet_item_doantions(req,res)
     await new_user_mes.save();
     console.log("User was acknowledged of rejectance");
   }
-
 }
 
 async function getEditCarehomeProfile(req, res) {
   const careId = parseInt(req.params.carehomeId, 10);
   const carehome = await Carehome.get_care_data(careId);
-  res.render("carehomes/carehome_edit", { carehome });
+  res.render("carehomes/carehome_edit", {
+    carehome,
+    user: req.session.user,
+    userRole: req.session.userRole,
+  });
 }
 
 async function editCarehomeProfile(req, res) {
   const careId = parseInt(req.params.carehomeId, 10);
-  console.log("updating carehome: ",careId);
+  console.log("updating carehome: ", careId);
   const {
     fullname,
     phne,
@@ -369,7 +387,7 @@ async function editCarehomeProfile(req, res) {
     wishlist,
   } = req.body;
 
-  console.log(fullname+""+state +""+ city+""+wishlist);
+  console.log(fullname + "" + state + "" + city + "" + wishlist);
 
   await Carehome.findOneAndUpdate(
     { carehomeId: careId },

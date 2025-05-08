@@ -20,7 +20,7 @@ async function getNGO(req, res) {
       model.ongoing_fund(ngoID, (err, data) => {
         if (err) {
           console.error("Error fetching ongoing_fund:", err);
-          resolve([]); 
+          resolve([]);
         } else {
           resolve(data);
         }
@@ -79,6 +79,8 @@ async function getNGO(req, res) {
       completed_event,
       upcoming_eve,
       ngoID,
+      user: req.session.user,
+      userRole: req.session.userRole,
     });
   } catch (error) {
     console.error("Error in getNGO controller:", error);

@@ -153,7 +153,8 @@ async function getEditDonorProfile(req, res) {
     const user = await User.getUserByUserId(userID);
 
     console.log("fetched details ", user);
-    res.render("users/edit_profile", { user });
+    res.render("users/edit_profile", { user,
+      userRole: req.session.userRole, });
   } catch (error) {
     console.error("Error rendering the Create Event form:", error);
     res.status(500).send("Failed to load the Create Event form");

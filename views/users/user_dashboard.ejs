@@ -46,29 +46,30 @@
       </nav>
     </header>
     
-    <div class="name_right">
-      <h1>Welcome <br /><%= name %></h1>
-    </div>
-
-    <div class="user_pro">
-      <img src="/images/user.jpg" alt="profile" class="pro_img" />
-      <p class="greet">Hi <%= name %>.</p>
-      <button id="toggle-stats-btn">Statistics</button>
-      <div id="user-stats" class="user-stats">
-        <h2>Your Statistics</h2>
-        <p class="text-title">Event Statistics:</p>
-        <p class="text-body">
-          <span id="event-count-current">Events Participated this month: </span
-          ><br />
-          <span id="event-count-all">Total events Participated: </span><br />
-        </p>
-        <p class="text-title">Contribution:</p>
-        <p class="text-body">
-          <span id="donation-current">This month contribution: </span><br />
-          <span id="donation-all">All-time contribution: </span><br />
-          <span id="this_mon_don">This month donations:</span><br />
-          <span id="all_time_con">All-time donations: </span><br />
-        </p>
+    <div style="display: flex; justify-content: space-between; padding: 0 7rem 2rem 13rem;">
+      <div class="name_right">
+        <h1 style="font-size: 3rem; padding-top: 4rem">Welcome <br> <%= name %></h1>
+      </div>
+      <div class="user_pro">
+        <img src="/images/user.jpg" alt="profile" class="pro_img" />
+        <p class="greet">Hi <%= name %>.</p>
+        <button id="toggle-stats-btn">Statistics</button>
+        <div id="user-stats" class="user-stats">
+          <h2>Your Statistics</h2>
+          <p class="text-title">Event Statistics:</p>
+          <p class="text-body">
+            <span id="event-count-current">Events Participated this month: </span
+            ><br />
+            <span id="event-count-all">Total events Participated: </span><br />
+          </p>
+          <p class="text-title">Contribution:</p>
+          <p class="text-body">
+            <span id="donation-current">This month contribution: </span><br />
+            <span id="donation-all">All-time contribution: </span><br />
+            <span id="this_mon_don">This month donations:</span><br />
+            <span id="all_time_con">All-time donations: </span><br />
+          </p>
+        </div>
       </div>
     </div>
 
@@ -141,7 +142,7 @@
         <div class="upcoming-events">
           <% if (upcomingEvents && upcomingEvents.length > 0) { %> <%
           upcomingEvents.forEach(event => { %>
-          <div class="regist_ev">
+          <div class="regist_ev" style="margin-bottom: 2rem;">
             <h3><%= event.event_name %></h3>
             <p><strong>Date:</strong> <%= event.event_date %></p>
             <p><strong>Location:</strong> <%= event.event_location %></p>
@@ -175,7 +176,7 @@
       </div>
       
     </div>
-    
+    <%- include('../shared/includes/footer') %>
     <script>
       const profile = document.getElementById("profile");
       if (profile) {
