@@ -20,6 +20,7 @@ async function donateMoney(req, res) {
     res.status(500).send("Server Error");
   }
 }
+// donationController.js
 async function insertMoney(req, res) {
   console.log("inside insertMoney");
   console.log("BODY:", req.body);
@@ -34,14 +35,14 @@ async function insertMoney(req, res) {
     const carehomeId = parseInt(req.params.carehomeId);
     console.log(carehomeId);
 
-    // if (!userId || !carehomeId || isNaN(total)) {
-    //   console.log("Error in insertMoney");
-    //   res.status(400).json({
-    //     message:
-    //       "Missing or invalid data OR Login as user and try to donate money",
-    //   });
-    // }
+    if (!userId || !carehomeId || isNaN(total)) {
+      console.log("Error in insertMoney");
+      return res.status(400).json({
+        message: "Missing or invalid data OR Login as user and try to donate money",
+      });
+    }
 
+    // Save the donation in the database
     await DonationMoney.saveDonation({
       userId,
       amount_donated: total,
@@ -49,14 +50,17 @@ async function insertMoney(req, res) {
       user: req.session.user,
       userRole: req.session.userRole,
     });
-    res.redirect("/");
-    // res.status(200).json({ error: "Donation saved successfully" });
-    
+    console.log("saved new donation");
+
+    // Send a JSON response to indicate success and redirect URL
+    res.status(200).json({ message: "Donation saved successfully", redirectUrl: "/" });
   } catch (error) {
     console.error("Error saving donation:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+
 
 async function register(req, res) {
   res.render("carehomes/care_reg");

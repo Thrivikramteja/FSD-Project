@@ -238,10 +238,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-
+  
     let isValid = true;
     const inputs = form.querySelectorAll("input");
-
+  
     inputs.forEach((input) => {
       if (!input.checkValidity()) {
         isValid = false;
@@ -252,17 +252,17 @@ document.addEventListener("DOMContentLoaded", () => {
         input.classList.remove("invalid");
       }
     });
-
+  
     if (isValid && totalAmount > 0) {
       submitBtn.disabled = true;
       submitBtn.querySelector(".spinner").classList.remove("hidden");
-
+  
       // Get user info
       const name = document.getElementById("name").value.trim();
       const phone = document.getElementById("phone").value.trim();
       const email = document.getElementById("email").value.trim();
       const pan = document.getElementById("pan").value.trim();
-
+  
       // Send donation details to server with improved error handling
       fetch(`/donate_money/${selectedValue}`, {
         method: "POST",
@@ -272,43 +272,48 @@ document.addEventListener("DOMContentLoaded", () => {
           name,
           phone,
           email,
-          pan
+          pan,
         }),
       })
-        // .then((res) => {
-        //   if (!res.ok) {
-        //     // If response status is not 2xx (success)
-        //     return res.json().then(errorData => {
-        //       throw new Error(errorData.message || "Something went wrong with your donation");
-        //     });
-        //   }
-        //   return res.json();
-        // })
-        // .then((data) => {
-        //   console.log("Donation submitted:", data);
-        //   // Success handling
-        //   submitBtn.disabled = false;
-        //   submitBtn.querySelector(".spinner").classList.add("hidden");
-        //   alert("Thank you for your donation!");
-
-        //   form.reset();
-        //   customAmount.value = "";
-        //   currentAmount = 0;
-        //   updateCalculations();
-        // })
-        // .catch((err) => {
-        //   console.error("Error during donation submit:", err);
-        //   // Display the error message to the user
-        //   alert(err.message);
-        //   // Re-enable the button
-        //   submitBtn.disabled = false;
-        //   submitBtn.querySelector(".spinner").classList.add("hidden");
-        // });
+        .then((res) => {
+          if (!res.ok) {
+            // If response status is not 2xx (success)
+            return res.json().then((errorData) => {
+              throw new Error(errorData.message || "Something went wrong with your donation");
+            });
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("Donation submitted:", data);
+          // Success handling
+          alert("Thank you for your donation!");
+  
+          form.reset();
+          customAmount.value = "";
+          currentAmount = 0;
+          updateCalculations();
+  
+          // Redirect to homepage or other confirmation page
+          if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+          }
+        })
+        .catch((err) => {
+          console.error("Error during donation submit:", err);
+          // Display the error message to the user
+          alert(err.message);
+        })
+        .finally(() => {
+          // Re-enable the button and hide the spinner
+          submitBtn.disabled = false;
+          submitBtn.querySelector(".spinner").classList.add("hidden");
+        });
     } else if (totalAmount === 0) {
       alert("Please select or enter a donation amount");
     }
   });
-
+  
   // Blur validation
   form.querySelectorAll("input").forEach((input) => {
     input.addEventListener("blur", () => {
