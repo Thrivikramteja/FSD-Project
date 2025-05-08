@@ -15,11 +15,11 @@ h2 {
   font-weight: bold;
 }
 
-p {
+/* p {
   color: #606060;
   font-size: 14px;
   margin-top: 5px;
-}
+} */
 
 .container {
   display: grid;

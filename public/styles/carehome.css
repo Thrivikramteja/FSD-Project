@@ -1,16 +1,12 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f8f8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
     margin: 0;
 }
 
 .container {
     display: flex;
-    flex-direction: column;  /* S   tacks items vertically */
+    flex-direction: column;  
     align-items: center;
     width: 100%;
 }
@@ -25,7 +21,7 @@ body {
     width: 90%;
     border: 1px solid #ccc;
     align-items: center;
-    margin-bottom: 20px;  /* Ensures space between cards */
+    margin-bottom: 20px;  
     flex-direction: column;
 }
 

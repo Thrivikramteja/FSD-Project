@@ -275,35 +275,35 @@ document.addEventListener("DOMContentLoaded", () => {
           pan
         }),
       })
-        .then((res) => {
-          if (!res.ok) {
-            // If response status is not 2xx (success)
-            return res.json().then(errorData => {
-              throw new Error(errorData.message || "Something went wrong with your donation");
-            });
-          }
-          return res.json();
-        })
-        .then((data) => {
-          console.log("Donation submitted:", data);
-          // Success handling
-          submitBtn.disabled = false;
-          submitBtn.querySelector(".spinner").classList.add("hidden");
-          alert("Thank you for your donation!");
+        // .then((res) => {
+        //   if (!res.ok) {
+        //     // If response status is not 2xx (success)
+        //     return res.json().then(errorData => {
+        //       throw new Error(errorData.message || "Something went wrong with your donation");
+        //     });
+        //   }
+        //   return res.json();
+        // })
+        // .then((data) => {
+        //   console.log("Donation submitted:", data);
+        //   // Success handling
+        //   submitBtn.disabled = false;
+        //   submitBtn.querySelector(".spinner").classList.add("hidden");
+        //   alert("Thank you for your donation!");
 
-          form.reset();
-          customAmount.value = "";
-          currentAmount = 0;
-          updateCalculations();
-        })
-        .catch((err) => {
-          console.error("Error during donation submit:", err);
-          // Display the error message to the user
-          alert(err.message);
-          // Re-enable the button
-          submitBtn.disabled = false;
-          submitBtn.querySelector(".spinner").classList.add("hidden");
-        });
+        //   form.reset();
+        //   customAmount.value = "";
+        //   currentAmount = 0;
+        //   updateCalculations();
+        // })
+        // .catch((err) => {
+        //   console.error("Error during donation submit:", err);
+        //   // Display the error message to the user
+        //   alert(err.message);
+        //   // Re-enable the button
+        //   submitBtn.disabled = false;
+        //   submitBtn.querySelector(".spinner").classList.add("hidden");
+        // });
     } else if (totalAmount === 0) {
       alert("Please select or enter a donation amount");
     }
