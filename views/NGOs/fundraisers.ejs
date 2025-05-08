@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="/styles/footer.css" />
     <link rel="stylesheet" href="/styles/slide.css" />
     <link rel="stylesheet" href="/styles/landing_page.css" />
+
   </head>
   <body>
     <%- include('../shared/includes/header') %>
-    <section class="nonprofit-section">
+    <section class="nonprofit-container">
       
       <% ongoing_fund.forEach(ongoing_fun => { %>
       <div class="nonprofit-card">
@@ -27,9 +28,9 @@
           </div>
         </div>
         <div class="buttons">
-          <button class="details-btn">View details</button>
+          <!-- <button class="details-btn">View details</button> -->
           <a href="/donate_fundraiser/<%= ongoing_fun.ngoId %>/<%= ongoing_fun.fundraiser_name %>">
-            <button class="select-btn">Donate</button>
+            <button class="select-btn" style="justify-content: center;">Donate</button>
           </a>
         </div>
       </div>
