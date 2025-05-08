@@ -16,7 +16,7 @@ router.get('/donate_money',isAuth, carehomesController.donateMoney);
 
 router.post('/donate_money/:carehomeId',isAuth, carehomesController.insertMoney);
 
-router.get('/donate_items', carehomesController.donateItems);
+router.get('/donate_items',isAuth, carehomesController.donateItems);
 
 router.post('/donate_items_user',carehomesController.get_don_items);
 

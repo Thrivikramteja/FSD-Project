@@ -129,6 +129,7 @@ async function getallFundraisers(req, res) {
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     const fundraisers = await CreatedFundraiser.find({});
+
     const ongoing_fund = fundraisers.filter((fundraiser) => {
       const deadline =
         fundraiser.deadline instanceof Date

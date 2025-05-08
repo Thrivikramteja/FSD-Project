@@ -7,16 +7,14 @@
     <link rel="stylesheet" href="/styles/donor_edit.css" />
   </head>
   <body class="edits1">
-    <div class="toppart">
-      <h2>Edit your Details(USER)</h2>
-    </div>
-
     <div>
       <form
+      style="margin-top: 7rem;"
         class="form-floating-modern"
         method="POST"
         action="/user-dashboard/<%= user.userId %>/edit"
       >
+        <h2 style="text-align: center; padding-bottom: 1rem;">Edit your Details</h2>
         <div class="form-group">
           <label for="fullname">Full name</label>
           <input
@@ -45,7 +43,6 @@
         <button type="submit" id="Save" value="Save">Save</button>
       </form>
     </div>
-
     <script src="/scripts/edit_user.js"></script>
   </body>
 </html>
