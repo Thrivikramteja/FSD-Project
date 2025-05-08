@@ -11,13 +11,39 @@ function getRegister(req, res) {
 
 async function get_allngo(req, res) {
   try {
+    // Fetch all NGOs
     const NGOs = await NGO.get_all_ngos();
-    res.render("NGOs/allngos", { ngos: NGOs });
+
+    // Enrich NGOs with additional data
+    const enrichedNGOs = await Promise.all(
+      NGOs.map(async (ngo) => {
+        const totalFundsRaised = await NGO.get_rev(ngo.ngoId); // Get total funds raised
+        const totalRegistrations = await NGO.tot_reg(ngo.ngoId); // Get total registrations
+        const fundraisersCreated = await NGO.fund_created(ngo.ngoId); // Get fundraisers count
+        const careHomesBenefited = await NGO.benifit_care(ngo.ngoId); // Get care homes count
+
+        return {
+          ...ngo.toObject(), // Convert Mongoose document to plain object
+          totalFundsRaised: totalFundsRaised.length > 0 ? totalFundsRaised[0].total : 0,
+          totalRegistrations: totalRegistrations.length > 0 ? totalRegistrations[0].total : 0,
+          fundraisersCreated,
+          careHomesBenefited,
+        };
+      })
+    );
+
+    // Render the EJS view with enriched NGO data
+    res.render("NGOs/allngos", {
+      ngos: enrichedNGOs,
+      user: req.session.user,
+      userRole: req.session.userRole,
+    });
   } catch (err) {
     console.error("Error while fetching NGOs:", err);
     res.status(500).send("Failed to fetch NGOs");
   }
 }
+
 
 async function register(req, res) {
   try {
@@ -296,8 +322,8 @@ async function registerUser(req, res) {
     }
 
     const userRegisteredEvent = new UserRegisteredEvent({
-      userId,
-      ngoId,
+      userId: userId,
+      ngoId: ngoId,
       event_name: event,
       event_date: createdEvent.event_date,
       event_location: createdEvent.event_location,

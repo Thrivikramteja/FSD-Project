@@ -107,7 +107,7 @@ ngoSchema.statics.getId = async function (email) {
 
 ngoSchema.statics.ongoing_funds = async function (ngoId, callback) {
   try {
-    const fundraisers = await Fundraiser.find({ ngoId: ngoId });
+    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoId });
 
     const ongoing_fund = fundraisers.filter((fundraiser) => {
       const isoDate = toISO(fundraiser.deadline);
@@ -123,7 +123,7 @@ ngoSchema.statics.ongoing_funds = async function (ngoId, callback) {
 
 ngoSchema.statics.completed_fund = async function (ngoId, callback) {
   try {
-    const fundraisers = await Fundraiser.find({ ngoId: ngoId });
+    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoId });
 
     const completed_fund = fundraisers.filter((fundraiser) => {
       const isoDate = toISO(fundraiser.deadline);
@@ -158,7 +158,7 @@ ngoSchema.statics.ongoing_events = async function (ngoId, callback) {
   }
 };
 
-// Get completed events
+
 ngoSchema.statics.completed_event = async function (ngoId, callback) {
   try {
     const events = await Event.find({ ngoId: ngoId });
@@ -197,7 +197,7 @@ ngoSchema.statics.create_fundraiser = async function (
   callback
 ) {
   try {
-    const fundraiser = new Fundraiser(fundraiserDetails);
+    const fundraiser = new CreatedFundraiser(fundraiserDetails);
     await fundraiser.save();
     callback(null, fundraiser);
   } catch (err) {
@@ -216,7 +216,7 @@ ngoSchema.statics.get_stats = async function (ngoId, callback) {
       careHomesBenefited: 0,
     };
 
-    const fundsRaised = await Fundraiser.aggregate([
+    const fundsRaised = await CreatedFundraiser.aggregate([
       { $match: { ngoId: ngoId } },
       { $group: { _id: null, total: { $sum: "$funds_raised" } } },
     ]);
@@ -230,7 +230,7 @@ ngoSchema.statics.get_stats = async function (ngoId, callback) {
 
     stats.totalRegistrations = registrations[0] ? registrations[0].total : 0;
 
-    const fundraisersAndCareHomes = await Fundraiser.aggregate([
+    const fundraisersAndCareHomes = await CreatedFundraiser.aggregate([
       { $match: { ngoId: ngoId } },
       {
         $group: {
@@ -254,6 +254,7 @@ ngoSchema.statics.get_stats = async function (ngoId, callback) {
     callback(err, null);
   }
 };
+
 ngoSchema.statics.get_all_ngos = async function () {
   try {
     const ngos = await this.find({});
@@ -264,31 +265,80 @@ ngoSchema.statics.get_all_ngos = async function () {
   }
 };
 
+ngoSchema.statics.get_rev = async function(ngoID)
+{
+  try
+  {
+    const fundsRaised = await CreatedFundraiser.aggregate([
+      { $match: { ngoId: ngoID } },
+      { $group: { _id: null, total: { $sum: "$amount_raised_so_far" } } },
+    ]);
+    return fundsRaised;
+  }
+  catch(error)
+  {
+    console.log("error in getting revenue " +  error);
+  }
+}
 
-// Inside eventSchema.statics
-// ngoSchema.statics.upcoming_eve = async function () {
-//   try {
-//     const currentDate = new Date();
-//     currentDate.setHours(0, 0, 0, 0); // Set to today's midnight
+ngoSchema.statics.tot_reg = async function(ngoId)
+{
+  try
+  {
+    const total_events = await Event.aggregate([
+      {
+        $match: {ngoId: ngoId}
+      },
+      {
+        $group: {_id: null, total: {$sum: "$number_of_registrations"}}
+      },
+    ]);
+    return total_events;
 
-//     // Find events with event_date today or in the future
-//     const upcomingEvents = await this.find({
-//       event_date: { $gte: currentDate }
-//     });
-// console.log(upcomingEvents);
-//     return upcomingEvents;
-//   } catch (err) {
-//     console.error("Error fetching upcoming events:", err);
-//     throw err; // rethrow to be caught where the function is called
-//   }
-// };
+  }
+  catch(error)
+  {
+    console.log("error while getting total registrations: " + error);
+  }
+}
 
-// This should be on the eventSchema, not ngoSchema
+ngoSchema.statics.fund_created = async function(ngoId)
+{
+  try {
+    const funds_created = await CreatedFundraiser.countDocuments({ ngoId: ngoId });
+    return funds_created;
+  } catch (error) {
+    console.log("Error while getting total fundraisers:", error);
+  }
+  
+}
+
+ngoSchema.statics.benifit_care = async function (ngoId) {
+  try {
+    const careHomeCount = await CreatedFundraiser.aggregate([
+      
+      { $match: { ngoId } },
+      
+      { $group: { _id: "$carehomeId" } },
+      
+      { $count: "distinctCareHomes" }
+    ]);
+
+    return careHomeCount.length > 0 ? careHomeCount[0].distinctCareHomes : 0;
+  } catch (error) {
+    console.error("Error fetching distinct care homes for NGO:", error);
+    throw new Error("Could not fetch distinct care homes for the specified NGO.");
+  }
+};
+
+
+
+
 eventSchema.statics.upcoming_eve = async function () {
   try {
     const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Set to today's midnight
-    // Find events with event_date today or in the future
+    currentDate.setHours(0, 0, 0, 0); 
+    
     const upcomingEvents = await this.find({
       event_date: { $gte: currentDate }
     });
@@ -303,9 +353,9 @@ eventSchema.statics.upcoming_eve = async function () {
 eventSchema.statics.specific_events = async function(ngoID) {
   try {
     const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Set to today's midnight
+    currentDate.setHours(0, 0, 0, 0); 
     
-    // Find events for the specific NGO with event_date today or in the future
+    
     const events = await this.find({
       ngoId: ngoID,
       event_date: { $gte: currentDate }
