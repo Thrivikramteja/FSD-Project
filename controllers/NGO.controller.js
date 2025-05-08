@@ -10,7 +10,7 @@ function getRegister(req, res) {
 
 async function get_allngo(req, res) {
   try {
-    const NGOs = await NGO.get_all_ngos(); 
+    const NGOs = await NGO.get_all_ngos();
     res.render("NGOs/allngos", { ngos: NGOs }); 
   } catch (err) {
     console.error("Error while fetching NGOs:", err);
