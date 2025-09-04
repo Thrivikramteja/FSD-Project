@@ -6,7 +6,7 @@ const { donate_items_mes, user_message } = require("../models/user.model");
 async function donateMoney(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
-    // Pass the selected carehome_id to the template if it exists in query params
+    
     const selectedCareHomeId = req.query.carehome_id || null;
     console.log(selectedCareHomeId);
     res.render("carehomes/donate_money", {
@@ -20,7 +20,7 @@ async function donateMoney(req, res) {
     res.status(500).send("Server Error");
   }
 }
-// donationController.js
+
 async function insertMoney(req, res) {
   console.log("inside insertMoney");
   console.log("BODY:", req.body);
@@ -42,7 +42,7 @@ async function insertMoney(req, res) {
       });
     }
 
-    // Save the donation in the database
+ 
     await DonationMoney.saveDonation({
       userId,
       amount_donated: total,
@@ -52,7 +52,7 @@ async function insertMoney(req, res) {
     });
     console.log("saved new donation");
 
-    // Send a JSON response to indicate success and redirect URL
+
     res.status(200).json({ message: "Donation saved successfully", redirectUrl: "/" });
   } catch (error) {
     console.error("Error saving donation:", error);

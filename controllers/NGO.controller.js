@@ -106,7 +106,9 @@ async function getEditNGOProfile(req, res) {
 
 async function getEvents(req, res) {
   try {
-    const events = await Event.find({ event_date: { $gte: new Date() } });
+    const cur = new Date();
+    cur.setHours(0, 0, 0, 0); 
+    const events = await Event.find({ event_date: { $gte: cur } });
     res.render("NGOs/events", {
       upcoming_eve: events,
       user: req.session.user,
@@ -299,14 +301,16 @@ function getRegisterUser(req, res) {
 async function registerUser(req, res) {
   try {
     const { event } = req.body;
+    console.log(event + "1");
     const userId = req.session.user.userId;
     const ngoId = req.params.ngoID;
-
+    console.log(ngoId);
     const createdEvent = await Event.findOne({
       event_name: event,
       ngoId: ngoId,
     });
-    if (!createdEvent) {
+    console.log(createdEvent);
+        if (!createdEvent) {
       return res.status(404).json({ message: "Event not found." });
     }
 

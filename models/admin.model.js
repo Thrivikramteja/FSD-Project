@@ -17,7 +17,7 @@ adminschema.statics.highest_Donation = async function() {
       .sort({ amount_donated: -1 }) 
       .limit(1); 
   
-    return highestDonation.amount_donated;
+    return highestDonation.amount_donated || 0;
   };
 
 adminschema.statics.highest_contributor_with_name = async function() {

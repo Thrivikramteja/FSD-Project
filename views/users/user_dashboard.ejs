@@ -113,7 +113,7 @@
           <% }); %> <% } %> <% if (ongoingfund && ongoingfund.length > 0) { %>
           <% for (let i = 0; i < ongoingfund.length; ++i) { %>
           <div class="event">
-            <h3><%= ongoingfund[i].name %></h3>
+            <h3><%= ongoingfund[i].fundraiser_name %></h3>
             <p>
               <strong>Amount Contributed: </strong
               ><span class="money"
@@ -121,8 +121,8 @@
               >
             </p>
             <p>
-              <strong>Status:</strong>
-              <span class="status ongoing">Ongoing</span>
+              <strong>Deadline:</strong>
+              <span class="status ongoing"><%= ongoingfund[i].deadline %></span>
             </p>
             <p>
               <strong>Date: </strong
