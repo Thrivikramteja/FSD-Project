@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("pass").addEventListener("input", function () {
     validateField(
       this,
-      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+      /^(?=.*[A-Za-z])(?=.*[0-9]).{8,}$/,
       "Password must be at least 8 characters long and contain both letters and numbers."
     );
 
