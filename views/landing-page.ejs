@@ -1,58 +1,122 @@
 <%- include('./shared/includes/head', { pageTitle: 'CareConnect' }) %>
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/> -->
-    <link rel="stylesheet" href="/styles/faq.css">
-    <link rel="stylesheet" href="/styles/slide.css">
-    <link rel="stylesheet" href="/styles/events.css">
-    <!-- <link rel="stylesheet" href="/styles/donate_mon.css">  -->
-    <link rel="stylesheet" href="/styles/landing_page.css" />
-    <link rel="stylesheet" href="/styles/footer.css">
-  </head> 
-  <body> 
-    <%- include('./shared/includes/header') %>
-    <main>
-        <a href="/fundraisers" style="font-size: 20px; padding: 12px; text-decoration: none; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</a>
-        <div class="nonprofit-container">
-        <% ongoing_fund.forEach(ongoing_fun => { %>
-            <div class="nonprofit-card" >
-                <h3><%= ongoing_fun.fundraiser_name %></h3>
-                <div class="info">
-                    <div>
-                        <h4>₹<%= ongoing_fun.amount_raised_so_far.toLocaleString() %></h4>
-                        <p>Amount Raised</p>
-                    </div>
-                    <div>
-                        <h4>₹<%= ongoing_fun.goal_amount %></h4>
-                        <p>Goal Amount</p>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div 
-                        class="progress" 
-                        style="width: <%= (ongoing_fun.amount_raised_so_far / ongoing_fun.goal_amount * 100).toFixed(2) %>%;">
-                    </div>
-                </div>
-            </div>
-        <% }) %>
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/> -->
+  <link rel="stylesheet" href="/styles/faq.css">
+  <link rel="stylesheet" href="/styles/slide.css">
+  <link rel="stylesheet" href="/styles/events.css">
+  <!-- <link rel="stylesheet" href="/styles/donate_mon.css">  -->
+  <link rel="stylesheet" href="/styles/landing_page.css" />
+  <link rel="stylesheet" href="/styles/footer.css">
+</head>
+<body>
+  <%- include('./shared/includes/header') %>
+  <main>
+    <!-- Carousel Section -->
+    <div class="carousel-container">
+      <div class="carousel-slides" id="carouselSlides">
+        <div class="carousel-slide">
+          <div class="carousel-content">
+            <h2>Help Ashok Deshmane give orphans of farmer suicides a loving home</h2>
+            <p>Support a cause that provides shelter and hope to children affected by farmer suicides.</p>
+            <a href="/donate" class="carousel-btn">Donate now</a>
+          </div>
+          <img class="carousel-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="Feeding Child" />
         </div>
+        <div class="carousel-slide">
+          <div class="carousel-content">
+            <h2>Support Education Initiatives for Rural Kids</h2>
+            <p>Every donation helps provide books, uniforms, and the opportunity to learn.</p>
+            <a href="/donate" class="carousel-btn">Donate now</a>
+          </div>
+          <img class="carousel-img" src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca" alt="Rural Education" />
+        </div>
+        <div class="carousel-slide">
+          <div class="carousel-content">
+            <h2>Feed Hungry Children with Nutritious Meals</h2>
+            <p>Your generosity brings daily nutrition to kids in need.</p>
+            <a href="/donate" class="carousel-btn">Donate now</a>
+          </div>
+          <img class="carousel-img" src="https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99" alt="Nutritious Meals" />
+        </div>
+      </div>
+      <div class="carousel-indicators" id="carouselIndicators">
+        <span class="active"></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
 
-      <a href="/events" style="font-size: 20px; padding: 12px; margin-top: 20px; text-decoration: none; text-align: center; color: black; font-weight: 600">NGO Events</a>
-      <div class="nonprofit-container">
-        <% upcoming_eve.forEach(event => { %>
-            <div class="nonprofit-card" >
-                <h3><%= event.event_name %></h3>
-                <div class="info">
-                    <div>
-                        <h4><%= event.number_of_registrations.toLocaleString() %></h4>
-                        <p>Supporters</p>
-                    </div>
+    <a href="/fundraisers" style="font-size: 20px; padding: 12px; text-decoration: none; margin-top: 20px; text-align: center; color: black; font-weight: 600">Fundraisers</a>
+    <div class="nonprofit-container">
+    <% ongoing_fund.forEach(ongoing_fun => { %>
+        <div class="nonprofit-card" >
+            <h3><%= ongoing_fun.fundraiser_name %></h3>
+            <div class="info">
+                <div>
+                    <h4>₹<%= ongoing_fun.amount_raised_so_far.toLocaleString() %></h4>
+                    <p>Amount Raised</p>
+                </div>
+                <div>
+                    <h4>₹<%= ongoing_fun.goal_amount %></h4>
+                    <p>Goal Amount</p>
                 </div>
             </div>
-        <% }) %>
+            <div class="progress-bar">
+                <div 
+                    class="progress" 
+                    style="width: <%= (ongoing_fun.amount_raised_so_far / ongoing_fun.goal_amount * 100).toFixed(2) %>%;">
+                </div>
+            </div>
+        </div>
+    <% }) %>
     </div>
-    </main>
-    <section>
-      <%- include('./shared/includes/faq_section') %>
-    </section>
-    <%- include('./shared/includes/footer') %>
-  </body>
+
+    <a href="/events" style="font-size: 20px; padding: 12px; margin-top: 20px; text-decoration: none; text-align: center; color: black; font-weight: 600">NGO Events</a>
+    <div class="nonprofit-container">
+      <% upcoming_eve.forEach(event => { %>
+        <div class="nonprofit-card" >
+            <h3><%= event.event_name %></h3>
+            <div class="info">
+                <div>
+                    <h4><%= event.number_of_registrations.toLocaleString() %></h4>
+                    <p>Supporters</p>
+                </div>
+            </div>
+        </div>
+      <% }) %>
+    </div>
+  </main>
+  <section>
+    <%- include('./shared/includes/faq_section') %>
+  </section>
+  <%- include('./shared/includes/footer') %>
+  <!-- Carousel Script -->
+  <script>
+    const slides = document.getElementById('carouselSlides');
+    const indicators = document.getElementById('carouselIndicators').children;
+    let currentIndex = 0;
+    const slideCount = slides.children.length;
+
+    function showSlide(index) {
+      slides.style.transform = `translateX(-${100 * index}vw)`;
+      for (let i = 0; i < indicators.length; i++) {
+        indicators[i].classList.toggle('active', i === index);
+      }
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % slideCount;
+      showSlide(currentIndex);
+    }
+
+    setInterval(nextSlide, 2000);
+
+    for (let i = 0; i < indicators.length; i++) {
+      indicators[i].addEventListener('click', () => {
+        currentIndex = i;
+        showSlide(currentIndex);
+      });
+    }
+    showSlide(currentIndex);
+  </script>
+</body>
 </html>

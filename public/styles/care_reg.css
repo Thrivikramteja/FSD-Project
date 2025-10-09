@@ -113,3 +113,11 @@ button:hover {
         padding: 8px;
     }
 }
+
+body{
+
+     background-image: url('../images/Gemini_Generated_Image_lribytlribytlrib.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
