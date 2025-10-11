@@ -43,6 +43,16 @@ h2 {
   height: auto;
   margin-bottom: 15px;
 }
+.fundraiser-tag {
+  display: inline-block;
+  background: #e0f7fa;
+  color: #00796b;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
 
 
 h3 {

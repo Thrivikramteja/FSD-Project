@@ -10,10 +10,10 @@ const isoCurrentDate = `${today.getFullYear()}-${String(
   today.getMonth() + 1
 ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-// NGO Schema
+
 const ngoSchema = new mongoose.Schema({
   Ngoname: String,
-  darpan_id: String, // Removed auto-increment from here as you don't need it.
+  darpan_id: String, 
   year_established: Number,
   email: { type: String, required: true, unique: true },
   password: String,
