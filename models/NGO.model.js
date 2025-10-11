@@ -57,6 +57,10 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  imagePath: {  
+    type: String,
+    required: true, 
+  },
 });
 
 // NGO Schema Methods

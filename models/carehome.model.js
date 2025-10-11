@@ -20,6 +20,10 @@ const carehomeSchema = new mongoose.Schema({
   account_number: String,
   ifsc: String,
   terms: String,
+  imagePath: {  
+    type: String,
+    required: true, 
+  },
 });
 
 carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
@@ -85,8 +89,6 @@ carehomeSchema.statics.getCarehomeId = async function (email) {
   const carehome = await Carehome.findOne({ email });
   return carehome.carehomeId;
 };
-
-
 
 const donationMoneySchema = new mongoose.Schema({
   userId: {

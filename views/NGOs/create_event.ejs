@@ -9,7 +9,7 @@
 <body>
     <div class="form-container">
         <h2>Create New Event</h2>
-        <form id="eventform" action="/NGO-dashboard/<%= ngoID %>/create-event" method="post" >
+        <form id="eventform" action="/NGO-dashboard/<%= ngoID %>/create-event" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id_NGO" id="ngoId" value="<%= ngoID %>">
             <div class="form-group">
                 <label>Title:</label>
@@ -32,9 +32,13 @@
                 <input type="date" id="date" name="deadline" required>
                 <span id="dateerror" style="color: red; display: none;">Date must be valid (>=today)</span>
             </div>
+
+            <input type="hidden" name="userRole" value="NGO">
+
             <div class="form-group">
                 <label>Image:</label>
-                <input type="file" id="image" accept="image/*" required>
+                <input type="file" id="image" name="image" accept="image/*" required>
+                <input type="hidden" name="type" value="event">
             </div>
 
             <button type="submit" class="gradient-btn">Create Event</button>

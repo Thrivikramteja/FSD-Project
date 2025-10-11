@@ -160,6 +160,10 @@ const createdFundraisersSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  imagePath: {  
+    type: String,
+    required: true, 
+  },
 });
 
 const donate_it_message = new mongoose.Schema({
@@ -185,7 +189,6 @@ const donate_it_message = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true
   }
 });
 

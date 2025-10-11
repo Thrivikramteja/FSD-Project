@@ -19,6 +19,7 @@
       <% carehomes.forEach(carehome => { %>
       <div class="card">
         <div class="content">
+          <img src="/<%= carehome.imagePath %>" alt="Carehome Image">
           <h2 style="padding: 1rem;"><%= carehome.care_home_name %></h2>
           <div class="location">
             <a href="#city"><%= carehome.city %></a> |

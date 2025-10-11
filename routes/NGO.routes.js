@@ -1,10 +1,11 @@
-const express = require("express"); 
+const express = require("express");
 
 const router = express.Router();
 
 const NGOController = require("../controllers/NGO.controller");
+const upload = require("../app");
 
-const {isAuth} = require('../controllers/auth.controller');
+const { isAuth } = require('../controllers/auth.controller');
 
 router.get("/profile/NGO/:ngoID", isAuth, NGOController.getNGO);
 
@@ -22,24 +23,24 @@ router.get('/fundraisers', NGOController.getallFundraisers);
 
 router.get('/NGO-dashboard/:ngoID', isAuth, NGOController.getNGO);
 
-router.get('/NGO-dashboard/:ngoID/create-event',isAuth, NGOController.renderCreateEventForm);
+router.get('/NGO-dashboard/:ngoID/create-event', isAuth, NGOController.renderCreateEventForm);
 
-router.post('/NGO-dashboard/:ngoID/create-event',isAuth, NGOController.createEvent);
+router.post('/NGO-dashboard/:ngoID/create-event', isAuth, upload.single("image"), NGOController.createEvent);
 
 router.get('/NGO-dashboard/:ngoID/create-fundraiser', isAuth, NGOController.rendercreatefundraiser);
 
-router.post('/NGO-dashboard/:ngoID/create-fundraiser',isAuth ,NGOController.createFundraiser);
+router.post('/NGO-dashboard/:ngoID/create-fundraiser', isAuth, upload.single("image"), NGOController.createFundraiser);
 
 router.get('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.getEditNGOProfile);
 
 router.post('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.editNGOProfile);
 
-router.get('/NGOs',NGOController.get_allngo);
+router.get('/NGOs', NGOController.get_allngo);
 
-router.get('/NGO-dashboard/:ngoID/edit-event',NGOController.renderEditEvent);
+router.get('/NGO-dashboard/:ngoID/edit-event', NGOController.renderEditEvent);
 
-router.post('/NGO-dashboard/:ngoID/edit-event',NGOController.editEvent);
+router.post('/NGO-dashboard/:ngoID/edit-event', NGOController.editEvent);
 
-router.get('/donate_fundraiser/:ngoId/:fundraiser_name',NGOController.render_donate_fundraiser);
+router.get('/donate_fundraiser/:ngoId/:fundraiser_name', NGOController.render_donate_fundraiser);
 
 module.exports = router;

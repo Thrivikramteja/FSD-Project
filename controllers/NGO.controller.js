@@ -1,3 +1,5 @@
+const path = require("path");
+
 const { NGO, Event } = require("../models/NGO.model");
 const {
   CreatedFundraiser,
@@ -244,6 +246,7 @@ async function createEvent(req, res) {
       event_time,
       description,
       number_of_registrations: 0,
+      imagePath: req.file.path
     });
 
     await newEvent.save();
@@ -261,20 +264,28 @@ async function createFundraiser(req, res) {
   const { fundraiser_name, deadline, goal_amount, description, id_carehome } =
     req.body;
 
+    console.log(ngoID);
+    console.log(fundraiser_name);
+    console.log(deadline);
+    console.log(goal_amount);
   try {
     if (!ngoID || !fundraiser_name || !deadline || !goal_amount) {
       return res.status(400).send("Missing required fields");
     }
 
-    const newFundraiser = new CreatedFundraiser({
-      ngoId: ngoID,
+    let imagePath = req.file.path
+      .split(path.sep)       
+      .slice(-3)             
+      .join("/");
+    const newFundraiser = new CreatedFundraiser({     
       carehomeId: id_carehome,
       fundraiser_name,
+      ngoId: ngoID,
       goal_amount: Number(goal_amount),
-      funds_raised: 0,
       description,
+      amount_raised_so_far: 0,     
       deadline: new Date(deadline),
-      has_report: false,
+      imagePath: imagePath
     });
 
     await newFundraiser.save();
@@ -370,6 +381,7 @@ async function render_donate_fundraiser(req, res) {
   console.log("from rendereing of fund doantion form");
   const ngoId = parseInt(req.params.ngoId, 10);
   const name_fund = req.params.fundraiser_name;
+  console.log(req.session.user);
   try {
     res.render("NGOs/donate_fundraiser", {
       ngoId,

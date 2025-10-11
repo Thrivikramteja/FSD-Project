@@ -1,12 +1,15 @@
+const path = require("path");
+
 const { Carehome } = require("../models/carehome.model");
 const bcrypt = require("bcrypt");
+
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
 
 async function donateMoney(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
-    
+
     const selectedCareHomeId = req.query.carehome_id || null;
     console.log(selectedCareHomeId);
     res.render("carehomes/donate_money", {
@@ -42,7 +45,7 @@ async function insertMoney(req, res) {
       });
     }
 
- 
+
     await DonationMoney.saveDonation({
       userId,
       amount_donated: total,
@@ -112,9 +115,7 @@ async function get_don_items(req, res) {
       category,
       delivery_date: deliveryDate,
       location,
-      description,
-      user: req.session.user,
-      userRole: req.session.userRole,
+      description
     });
 
     await newDonationMessage.save();
@@ -134,6 +135,11 @@ async function get_don_items(req, res) {
 
 async function registerCarehome(req, res) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  let imagePath = req.file.path
+  .split(path.sep)       
+  .slice(-3)             
+  .join("/");
+  // console.log(imagePath);
   try {
     const carehome = new Carehome({
       care_home_name: req.body.care_home_name,
@@ -151,6 +157,7 @@ async function registerCarehome(req, res) {
       account_number: req.body.account_number,
       ifsc: req.body.ifsc,
       terms: req.body.terms,
+      imagePath: imagePath
     });
 
     try {
