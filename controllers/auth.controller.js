@@ -1,7 +1,7 @@
 const { User } = require("../models/user.model");
 const { NGO } = require("../models/NGO.model");
 const { Carehome } = require("../models/carehome.model");
-const {admin} = require("../models/admin.model");
+const { admin } = require("../models/admin.model");
 
 const bcrypt = require("bcryptjs");
 
@@ -90,8 +90,9 @@ async function login(req, res) {
       }
 
       req.session.isAuth = true;
-      req.session.user = user;
       req.session.userRole = UserRole;
+      req.session.user = user;
+      console.log(user);
       return res.redirect(`/user-dashboard/${user.userId}`);
     } else if (UserRole === "Carehome") {
       user = await Carehome.getCarehome(email);
@@ -112,11 +113,9 @@ async function login(req, res) {
       req.session.user = user;
       return res.redirect(`/carehome-dashboard/${user.carehomeId}`);
     }
-    else if(UserRole === "Admin")
-    {
-      if(email=="fsd@gmail.com"&&password=="123")
-      {
-       
+    else if (UserRole === "Admin") {
+      if (email == "fsd@gmail.com" && password == "123") {
+
         // res.session.isAuth = true;
         // res.session.userRole = UserRole;
         // res.session.user = user;
@@ -132,7 +131,7 @@ async function login(req, res) {
   }
 }
 
-function logout (req, res) {
+function logout(req, res) {
   req.session.destroy(err => {
     if (err) return res.send('Error logging out');
     res.redirect('/');

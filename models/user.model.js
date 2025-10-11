@@ -217,6 +217,10 @@ const createdFundraisersSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  imagePath: {  
+    type: String,
+    required: true, 
+  },
     tag: {
     type: String,
     enum: [
@@ -255,7 +259,6 @@ const donate_it_message = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true
   }
 });
 

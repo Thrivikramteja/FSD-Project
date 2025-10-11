@@ -25,6 +25,13 @@ body {
     flex-direction: column;
 }
 
+.card img {
+  width: 400px;       /* fixed width */
+  height: 250px;      /* fixed height */
+  object-fit: cover;  /* crops image to fill, maintains aspect ratio */
+  border-radius: 5px; /* optional: rounded corners */
+}
+
 .logo {
     padding: 20px;
     display: flex;
@@ -38,7 +45,7 @@ body {
 
 .content {
     flex-grow: 1;
-    margin-left: 20px;
+    margin-bottom: 20px;
     text-align: center;
 }
 

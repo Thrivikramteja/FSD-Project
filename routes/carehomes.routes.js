@@ -1,6 +1,7 @@
 const express = require("express");
 
 const carehomesController = require("../controllers/carehome.controller");
+const upload = require("../app");
 
 const { isAuth }  = require("../controllers/auth.controller");
 
@@ -26,7 +27,7 @@ router.post('/donate_items_user',carehomesController.get_don_items);
 
 router.get('/registerCarehome', carehomesController.register);
 
-router.post('/registerCarehome', carehomesController.registerCarehome);
+router.post('/registerCarehome', upload.single("image"), carehomesController.registerCarehome);
 
 router.get('/carehomes',carehomesController.getallcarehomes);
 

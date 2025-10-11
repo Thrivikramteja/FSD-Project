@@ -15,6 +15,7 @@
       
       <% ongoing_fund.forEach(ongoing_fun => { %>
       <div class="nonprofit-card">
+        <img style="width: 400px;" src="/<%= ongoing_fun.imagePath %>" alt="Fundraiser Theme image">
         <h3><%= ongoing_fun.fundraiser_name %></h3>
 
         <p class="fundraiser-tag">Tag: <%= ongoing_fun.tag %></p>

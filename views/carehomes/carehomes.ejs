@@ -19,6 +19,7 @@
       <% carehomes.forEach(carehome => { %>
       <div class="card">
         <div class="content">
+          <img src="/<%= carehome.imagePath %>" alt="Carehome Image">
           <h2 style="padding: 1rem;"><%= carehome.care_home_name %></h2>
           <div class="location">
             <a href="#city"><%= carehome.city %></a> |
@@ -43,4 +44,52 @@
     </div>
     <%- include('../shared/includes/footer') %>
   </body>
+
+  <script>
+    async function fetchCareHomes() {
+      const container = document.getElementById("carehomeContainer");
+      const loadingText = document.getElementById("loadingText");
+
+      try {
+        // 👇 since your route is '/carehomes'
+        const response = await fetch("/carehomes", { cache: "no-store" });
+
+        if (!response.ok) throw new Error("Failed to fetch care homes.");
+
+        const data = await response.json();
+        loadingText.style.display = "none";
+
+        if (!data.length) {
+          container.innerHTML = "<p style='text-align:center;'>No care homes found.</p>";
+          return;
+        }
+
+        data.forEach((home) => {
+          const card = document.createElement("div");
+          card.classList.add("card");
+          card.innerHTML = `
+            <div class="content">
+              <h2>${home.care_home_name}</h2>
+              <div class="location">
+                <a href="#city">${home.city}</a> | <a href="#state">${home.state}</a>
+              </div>
+              <p>${home.description || "No description available."}</p>
+              <div class="buttons">
+                <a href="/carehomes/viewcare/${home.carehomeId}" class="details-btn">View Details</a>
+                <a href="/donate_money?carehome_id=${home.carehomeId}" class="donate-btn">Donate</a>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        loadingText.textContent = "Error loading care homes.";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchCareHomes);
+  </script>
+
+  
 </html>

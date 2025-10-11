@@ -10,6 +10,13 @@ body {
   margin: 30px auto;
 }
 
+.nonprofit-card img {
+  width: 400px;       /* fixed width */
+  height: 250px;      /* fixed height */
+  object-fit: cover;  /* crops image to fill, maintains aspect ratio */
+  border-radius: 5px; /* optional: rounded corners */
+}
+
 h2 {
   font-size: 24px;
   font-weight: bold;
@@ -38,7 +45,7 @@ h2 {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-.nonprofit-card img {
+/* .nonprofit-card img {
   max-width: 100px;
   height: auto;
   margin-bottom: 15px;
