@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Job</title>
+    
+    <link rel="stylesheet" href="/styles/care_job.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-image">    
+            <h2 class="card-heading">
+                Post a New Job
+                <small>Fill in the details for the job</small>
+            </h2>
+        </div>
+
+        
+        <form class="card-form" method="POST">
+            
+            <div class="input">
+                <input type="text" class="input-field" name="title" required/>
+                <label class="input-label">Job Title</label>
+            </div>
+
+         
+            <div class="input">
+                <textarea class="input-field" name="description" required></textarea>
+                <label class="input-label">Job Description</label>
+            </div>
+
+          
+            <div class="input">
+                <input type="text" class="input-field" name="location"/>
+                <label class="input-label">Location</label>
+            </div>
+
+         
+            <div class="input">
+                <input type="number" class="input-field" name="pay" step="0.01"/>
+                <label class="input-label">Pay</label>
+            </div>
+
+            
+            <div class="input">
+                <select class="input-field" name="type" required>
+                    <option value="" disabled selected hidden></option> <option value="Caretaker">Caretaker</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Other">Other</option>
+                </select>
+                <label class="input-label">Job Type</label>
+            </div>
+
+            
+            <div class="input">
+                <input type="date" class="input-field" name="startDate"/>
+                <label class="input-label">Start Date</label>
+            </div>
+
+           
+            <div class="input">
+                <input type="date" class="input-field" name="endDate"/>
+                <label class="input-label">End Date</label>
+            </div>
+
+           
+            <div class="action">
+                <button type="submit" class="action-button">Post Job</button>
+            </div>
+        </form>
+
+        <div class="overlay hidden">
+            <div class="overlay-content">
+                <div class="spinner"></div>
+                <p class="message">Posting the job...</p>
+            </div>
+        </div>
+
+        <div class="card-info">
+            <p>By posting this job you agree to our <a href="#">Terms and Conditions</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    console.log("inside the script wondering why it is not getting executed");
+
+const form = document.querySelector(".card-form");
+const submitButton = document.querySelector(".action-button");
+const overlay = document.querySelector(".overlay");
+const messageElement = overlay.querySelector(".message");
+const spinner = overlay.querySelector(".spinner");
+
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    console.log("✅ Submit event captured");
+
+    
+    submitButton.disabled = true;
+    messageElement.textContent = "Posting the job...";
+    spinner.style.display = 'block';
+    overlay.classList.remove("hidden");
+
+    const data = {
+        title: form.title.value,
+        description: form.description.value,
+        location: form.location.value,
+        pay: form.pay.value,
+        type: form.type.value,
+        startDate: form.startDate.value,
+        endDate: form.endDate.value
+    };
+    console.log("Data to send:", data);
+
+    try {
+        const response = await fetch("/carehome-dashboard/post-job", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        console.log("Server response:", result);
+
+        if (result.success) {
+            messageElement.textContent = "Job Posted Successfully!";
+            spinner.style.display = 'none';
+             window.location.href = result.redirectUrl;
+            
+        } else 
+        {
+            alert("Error creating job: " + result.message);
+            overlay.classList.add("hidden");
+            submitButton.disabled = false;
+        }
+    } catch (err) {
+        console.error(" Fetch error:", err);
+        alert("A server error occurred. Please try again later.");
+        overlay.classList.add("hidden");
+        submitButton.disabled = false;
+    }
+});
+</script>
+
+
+</body>
+</html>
