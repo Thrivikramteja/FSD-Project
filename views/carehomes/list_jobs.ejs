@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Jobs</title>
+    <link rel="stylesheet" href="/styles/list_job.css">
+</head>
+<body>
+<div class="header-section">
+        <p class="subtitle">Find meaningful work in care homes and community events</p>
+    </div>
+</div>
+
+<div class="search-filter-container">
+    <div class="filter-section">
+        <button class="filter-btn" id="filterBtn">
+            <span>Filters</span>
+        </button>
+        <div class="filter-dropdown" id="filterDropdown">
+            <h3>Filter by Type</h3>
+            <label class="checkbox-label">
+                <input type="checkbox" value="full-time" class="filter-checkbox">
+                <span>Full-time</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" value="part-time" class="filter-checkbox">
+                <span>Part-time</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" value="caretaker" class="filter-checkbox">
+                <span>caretaker</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" value="others" class="filter-checkbox">
+                <span>others</span>
+            </label>
+            <button class="apply-filter-btn" id="applyFilterBtn">Apply Filters</button>
+        </div>
+    </div>
+    
+    <div class="search-section">
+        <input type="text" id="searchInput" placeholder="Search for jobs by title, location, or description..." class="search-input">
+        <button class="search-btn" id="searchBtn">Search</button>
+    </div>
+</div>
+
+<div class="grid-container" id="jobsContainer">
+   
+</div>
+
+<script>
+const userRole = '<%= user ? user.role : "guest" %>'; 
+const userId = '<%= user ? user._id : "" %>';        
+
+let allJobs = [];
+let filteredJobs = [];
+
+
+document.getElementById('filterBtn').addEventListener('click', () => {
+    const dropdown = document.getElementById('filterDropdown');
+    dropdown.classList.toggle('show');
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const filterSection = document.querySelector('.filter-section');
+    const dropdown = document.getElementById('filterDropdown');
+    if (!filterSection.contains(e.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+
+async function fetchJobs() {
+    try {
+        const response = await fetch('/jobs/all');
+        const data = await response.json();
+        allJobs = data.jobs || [];
+        filteredJobs = [...allJobs];
+        displayJobs(filteredJobs);
+    } catch(err) {
+        console.error('Error fetching jobs:', err);
+        document.getElementById('jobsContainer').innerHTML = '<p>Failed to load jobs.</p>';
+    }
+}
+
+function displayJobs(jobs) {
+    const container = document.getElementById('jobsContainer');
+    container.innerHTML = '';
+    
+    if(!jobs || jobs.length === 0){
+        container.innerHTML = '<p>No jobs available at the moment.</p>';
+        return;
+    }
+    
+    jobs.forEach(job => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        
+        const title = document.createElement('div');
+        title.classList.add('title');
+        title.textContent = job.title;
+        
+        const content = document.createElement('div');
+        content.classList.add('content');
+        content.innerHTML = `
+            <p>${job.description}</p>
+            <p><strong>Location:</strong> ${job.location || 'Not specified'}</p>
+            <p><strong>Pay:</strong> ${job.pay || 'Can be discussed'}</p>
+            <p><strong>Type:</strong> ${job.type}</p>
+            <button onclick="applyJob('${job._id}')">Apply</button>
+        `;
+        
+        card.appendChild(title);
+        card.appendChild(content);
+        container.appendChild(card);
+    });
+}
+
+
+document.getElementById('searchBtn').addEventListener('click', performSearch);
+document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') performSearch();
+});
+
+function performSearch() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    filteredJobs = allJobs.filter(job => {
+        return job.title.toLowerCase().includes(searchTerm) ||
+               (job.description && job.description.toLowerCase().includes(searchTerm)) ||
+               (job.location && job.location.toLowerCase().includes(searchTerm));
+    });
+    applyFilters();
+}
+
+
+document.getElementById('applyFilterBtn').addEventListener('click', applyFilters);
+
+function applyFilters() {
+    const checkboxes = document.querySelectorAll('.filter-checkbox:checked');
+    const selectedTypes = Array.from(checkboxes).map(cb => cb.value);
+    
+    let jobsToDisplay = filteredJobs;
+    
+    if(selectedTypes.length > 0) {
+        jobsToDisplay = filteredJobs.filter(job => 
+            selectedTypes.includes(job.type.toLowerCase())
+        );
+    }
+    
+    displayJobs(jobsToDisplay);
+    document.getElementById('filterDropdown').classList.remove('show');
+}
+
+async function applyJob(jobId) {
+    // check user role first
+    if(userRole !== 'donor') {
+        alert("Only donors can apply for jobs.");
+        return;
+    }
+    try {
+        const res = await fetch(`/jobs/apply/${jobId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
+        });
+
+        const result = await res.json();
+        if(result.success) {
+            alert('Applied successfully!');
+        } else {
+            alert('Failed to apply: ' + result.message);
+        }
+    } catch(err) {
+        console.error(err);
+        alert('Server error');
+    }
+}
+
+// fetch jobs on page load
+fetchJobs();
+</script>
+</body>
+</html>

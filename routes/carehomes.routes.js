@@ -5,6 +5,10 @@ const carehomesController = require("../controllers/carehome.controller");
 const { isAuth }  = require("../controllers/auth.controller");
 
 const router = express.Router();
+//route ordering error occured here so please check again error : route matching order
+router.get('/carehome-dashboard/get-job',isAuth,carehomesController.get_createjob);
+
+router.post('/carehome-dashboard/post-job',isAuth,carehomesController.post_createjob);
 
 router.get('/carehome-dashboard/:carehomeId',isAuth, carehomesController.getCarehome);
 
@@ -31,5 +35,9 @@ router.get("/profile/Carehome/:carehomeId", isAuth, carehomesController.getCareh
 router.get("/carehomes/viewcare/:careid",carehomesController.view_details_care);
 
 router.post('/donate_item/action',carehomesController.accpet_item_doantions);
+
+router.get('/jobs/all',carehomesController.get_alljobs);
+
+router.get('/jobs',carehomesController.job_render);
 
 module.exports = router;

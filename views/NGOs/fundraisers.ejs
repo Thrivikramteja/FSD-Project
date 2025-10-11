@@ -16,6 +16,8 @@
       <% ongoing_fund.forEach(ongoing_fun => { %>
       <div class="nonprofit-card">
         <h3><%= ongoing_fun.fundraiser_name %></h3>
+
+        <p class="fundraiser-tag">Tag: <%= ongoing_fun.tag %></p>
         <div class="info">
           <input type="hidden" name="id_NGO" id="ngoId" value="<%= ongoing_fun.ngoId %>">
           <div>
@@ -28,7 +30,6 @@
           </div>
         </div>
         <div class="buttons">
-          <!-- <button class="details-btn">View details</button> -->
           <a href="/donate_fundraiser/<%= ongoing_fun.ngoId %>/<%= ongoing_fun.fundraiser_name %>">
             <button class="select-btn" style="justify-content: center;">Donate</button>
           </a>
