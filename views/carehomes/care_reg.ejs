@@ -92,6 +92,52 @@
         <button type="submit">Register</button>
       </form>
     </div>
+
+
   </body>
 </html>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("registrationForm");
 
+  // Create a message box dynamically
+  const messageBox = document.createElement("div");
+  messageBox.id = "messageBox";
+  messageBox.style.marginTop = "15px";
+  messageBox.style.fontWeight = "bold";
+  messageBox.style.textAlign = "center";
+  form.parentElement.appendChild(messageBox);
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault(); // prevent page reload
+
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/registerCarehome", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        messageBox.style.color = "green";
+        messageBox.textContent = "Registered successfully! Redirecting to login...";
+
+        // Optional: redirect after 2 seconds
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 2000);
+      } else {
+        const errorData = await response.text();
+        messageBox.style.color = "red";
+        messageBox.textContent = "Registration failed: " + errorData;
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      messageBox.style.color = "red";
+      messageBox.textContent = " Something went wrong. Please try again.";
+    }
+  });
+});
+
+<script/>
