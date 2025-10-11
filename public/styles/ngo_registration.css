@@ -93,3 +93,11 @@ button:hover {
     border: 1px solid red;
     background-color: #ffe5e5;
 }
+
+body{
+
+    background-image: url('../images/ngo_reg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}

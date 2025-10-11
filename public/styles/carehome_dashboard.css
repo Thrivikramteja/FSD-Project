@@ -1,442 +1,220 @@
-/* General Styles */
+/* General Layout */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background: #f4f4f4;
   color: #333;
 }
 
-h1 {
-  text-align: center;
-  color: #2980b9;
-  margin: 20px 0;
-}
-
-h2,
-h3 {
+h1, h2, h3 {
   color: #2c3e50;
+  margin-bottom: 10px;
 }
 
-/* Header Styles */
+/* Header */
 .header {
-  background-color: #2980b9;
+  background: #2980b9;
   color: white;
-  padding: 15px;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+}
+
+.header .logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.header-right {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-right a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Layout */
+.container {
+  display: flex;
+  flex-wrap: nowrap;
 }
 
 .wishlist {
-  background-color: #ecf0f1;
+  background: #ecf0f1;
   padding: 15px;
-  width: 250px; /* Fixed width for the wishlist */
-  position: relative; /* Fixed position on the left */
-  top: 60px; /* Below the header */
-  left: 20px; /* Margin from the left */
+  width: 250px;
   border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  max-height: calc(100vh - 80px);
   overflow-y: auto;
-  max-height: calc(100vh - 80px); /* Responsive height */
-  margin-right: 150px;
 }
 
-.wishlist h2 {
-  margin-top: 0;
-}
-
-/* Main Dashboard Styles */
 .dashboard {
-  margin-left: 320px; /* Space for sidebar */
+  flex: 1;
   padding: 20px;
 }
 
-.toggle-button {
-  background-color: #2980b9;
+/* Buttons */
+.btn {
+  padding: 10px 16px;
+  background: #007bff;
   color: white;
   border: none;
-  padding: 10px 15px;
+  border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 20px;
+  transition: background 0.3s;
 }
-.donation-items-container {
-  max-width: 800px;
-  margin: 0 auto;
+
+.btn:hover {
+  background: #0056b3;
+}
+
+.accept {
+  background: #27ae60;
+}
+
+.accept:hover {
+  background: #1e8449;
+}
+
+.reject {
+  background: #e74c3c;
+}
+
+.reject:hover {
+  background: #c0392b;
+}
+
+.hidden {
+  display: none;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-container {
+  margin-top: 15px;
+}
+
+/* Dashboard Stats */
+#dashboard-stats {
+  display: none;
+  margin-top: 20px;
   padding: 20px;
-  background-color: #f9f9f9;
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.donation-header {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.donation-item {
-  background-color: #fff;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  transition: transform 0.2s;
-}
-
-.donation-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.donation-category {
-  font-size: 18px;
-  color: #2c3e50;
-  margin: 0 0 10px 0;
-}
-
-.donation-detail {
-  font-size: 14px;
-  color: #555;
-  margin: 5px 0;
-}
-
-.donation-detail strong {
-  color: #333;
-}
-
-.no-items {
-  font-size: 16px;
-  color: #888;
-  text-align: center;
-  padding: 20px;
-}
-
-/* Dashboard Stats Section Styles */
-.dashboard-stats {
-  padding: 20px; /* Padding around the section */
-  background-color: white; /* Background color for the section */
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-  margin-bottom: 20px; /* Space below the section */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .stats-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; /* Space between cards */
-  justify-content: flex-start; /* Align items from the start */
+  gap: 20px;
 }
 
 .stat-card {
-  background-color: #ffffff; /* White background for cards */
-  border-radius: 10px; /* Rounded corners */
-  padding: 20px; /* Padding inside cards */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-
-  transition: transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
-  position: relative; /* Position for icon */
-  flex: 1 1 calc(25% - 20px);
+  flex: 1 1 200px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px); /* Lift effect on hover */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
-}
-
-.stat-icon {
-  position: absolute; /* Position icon */
-  top: 20px; /* Positioning */
-  right: 20px; /* Positioning */
-  width: 40px; /* Icon size */
-  height: 40px; /* Icon size */
-}
-
-.stat-icon img {
-  width: 100%; /* Responsive icon */
-  height: auto; /* Maintain aspect ratio */
-}
-
-.stat-card h3 {
-  color: #2980b9; /* Title color */
-  margin: 0 0 10px; /* Margin below title */
-  font-size: 1.5em; /* Larger font size for title */
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
 }
 
 .stat-value {
-  font-size: 1em; /* Larger font size for value */
-  color: #27ae60; /* Green color for value */
-  font-weight: bold; /* Bold font for emphasis */
-}
-
-/* Donations Section Styles */
-.donations {
-  background-color: white;
-  border-radius: 5px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 70px;
-}
-
-.donation-card {
-  border: 1px solid #bdc3c7;
-  border-radius: 5px;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-/* View More & View Less Button Styling */
-.view-toggle-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  margin: 10px 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  color: #ffffff;
-  background-color: #007bff; /* Blue Button */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
+  color: #27ae60;
 }
 
-.view-toggle-btn:hover {
-  background-color: #0056b3; /* Darker Blue on Hover */
-}
-
-.hidden {
-  display: none;
-}
-
-/* Fundraisers Section Styles */
+/* Fundraisers */
 .fundraisers {
-  background-color: #eafaf1; /* Light green background */
-  border-radius: 10px; /* Rounded corners */
-  padding: 20px; /* Padding around the content */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-  margin-bottom: 20px; /* Space below the section */
+  background: #eafaf1;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
 }
 
 .fundraiser-list {
-  display: flex; /* Use flexbox for layout */
-  flex-wrap: wrap; /* Allow wrapping of cards */
-  gap: 20px; /* Space between cards */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .fundraiser-card {
-  background-color: #ffffff; /* White background for cards */
-  border: 1px solid #bdc3c7; /* Light border */
-  border-radius: 8px; /* Rounded corners */
-  padding: 15px; /* Padding inside cards */
-  flex: 1 1 calc(25% - 20px); /* Responsive width for 4 cards in a row */
-  margin-bottom: 15px; /* Space below cards */
-  transition: transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+  flex: 1 1 250px;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .fundraiser-card:hover {
-  transform: translateY(-5px); /* Lift effect on hover */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
-}
-
-.fundraiser-card h3 {
-  color: #2980b9; /* Title color */
-  margin: 0 0 10px; /* Margin below title */
-}
-
-.fundraiser-card p {
-  color: #2c3e50; /* Text color */
-  margin: 0; /* Reset margin */
-}
-
-.fundraiser-card p strong {
-  color: #e74c3c; /* Red color for end date */
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
 }
 
 .progress-bar {
-  background-color: #bdc3c7; /* Background for progress bar */
-  border-radius: 5px; /* Rounded corners */
-  height: 10px; /* Height of the progress bar */
-  overflow: hidden; /* Hide overflow */
+  background: #ddd;
+  border-radius: 5px;
+  height: 10px;
+  margin-top: 10px;
+  overflow: hidden;
 }
 
 .progress {
-  background-color: #27ae60; /* Green for progress */
-  height: 100%; /* Full height */
-  transition: width 0.3s; /* Smooth transition for progress */
+  background: #27ae60;
+  height: 100%;
+  transition: width 0.3s;
 }
 
-/* Footer Styles */
-.footer {
-  background-color: #2980b9;
-  color: white;
+/* Donations Section */
+.donations-section, .message-section, .donation-items-container {
+  background: white;
   padding: 20px;
-  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin: 20px 0;
 }
 
-.footer-container {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+.donation, .message-item, .donation-item {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: #fafafa;
 }
 
-.footer-section {
-  flex: 1;
-  margin: 10px;
-  min-width: 200px;
-}
-
-.footer-links {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-links li {
-  margin: 5px 0;
-}
-
-.footer-links a {
-  color: white;
-  text-decoration: none;
-}
-
-.newsletter-signup {
-  display: flex;
-  justify-content: space-between;
-}
-
-.newsletter-signup input {
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  flex: 1;
-  margin-right: 10px;
-}
-
-.newsletter-signup button {
-  background-color: #27ae60;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Responsive Styles */
+/* Responsive */
 @media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
   .wishlist {
     width: 100%;
-    position: relative; /* Change to relative on small screens */
-    top: auto; /* Reset top */
-    left: auto; /* Reset left */
-    margin: 0; /* Reset margin */
+    max-height: auto;
   }
-
-  .dashboard {
-    margin-left: 0; /* Reset margin for dashboard */
-  }
-
-  .footer-container {
+  .fundraiser-list, .stats-row {
     flex-direction: column;
-    align-items: center;
-  }
-
-  .stat-card {
-    flex: 1 1 calc(50% - 20px); /* Two cards in
-                /* Two cards in a row on smaller screens */
-  }
-
-  .fundraiser-card {
-    flex: 1 1 calc(50% - 20px); /* Two cards in a row on smaller screens */
-  }
-}
-
-/* Additional Styles for Better Visuals */
-.stat-card {
-  text-align: center; /* Center text in stat cards */
-}
-
-.stat-card h3 {
-  margin-bottom: 5px; /* Space below title */
-}
-
-.stat-card .stat-value {
-  margin-top: 10px; /* Space above value */
-}
-
-.fundraiser-card h3 {
-  margin-bottom: 10px; /* Space below title */
-}
-
-.fundraiser-card p {
-  margin-bottom: 5px; /* Space below paragraph */
-}
-
-.hidden {
-  display: none;
-}
-.btn {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-#dashboard-stats {
-  display: none;
-}
-
-.btn:hover {
-  background-color: #0056b3;
-}
-
-.donations-section {
-  width: 90%;
-  max-width: 600px;
-  margin: auto;
-  text-align: left;
-  margin-bottom: 70px;
-}
-
-.donation {
-  padding: 12px;
-  border: 1px solid #ccc;
-  margin: 5px 0;
-  border-radius: 5px;
-  background: #f9f9f9;
-  font-size: 16px;
-}
-
-.button-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-#view-more-btn {
-  padding: 10px 16px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-#view-more-btn:hover {
-  background-color: #0056b3;
-}
-
-/* Responsive Styling */
-@media (max-width: 600px) {
-  .donation {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  #view-more-btn {
-    width: 100%;
   }
 }

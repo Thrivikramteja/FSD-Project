@@ -43,20 +43,20 @@
 </head>
 <body>
 
-
     <div class="select_event" id="selected">
-        <select name="event">
-            <option value="none">please select among the events</option>
+        <select name="event" id="eventSelect">
+            <option value="none" data-event-id="">please select among the events</option>
             <% if (Array.isArray(events) && events.length > 0) { %>
                 <% events.forEach(event => { %>
-                    <option value="<%= event.event_name %>"><%= event.event_name %></option>
+                    <option value="<%= event.event_name %>" data-event-id="<%= event._id %>">
+                        <%= event.event_name %>
+                    </option>
                 <% }); %>
             <% } else { %>
                 <option value="">No events available</option>
             <% } %>
         </select>
         <span id="val_error" style="color: red; display: none;">Must select one event before proceeding</span>
-
     </div>
     
     <div class="form-container">
@@ -64,6 +64,9 @@
         <form id="eventform" action="/NGO-dashboard/<%= ngoID %>/edit-event" method="post" >
             <input type="hidden" name="id_NGO" id="ngoId" value="<%= ngoID %>">
             <input type="hidden" name="original_event_name" value="" id="original_name">
+            <!-- ADDED THIS - Store the ObjectId -->
+            <input type="hidden" name="event_object_id" value="" id="event_object_id">
+            
             <div class="form-group">
                 <label>Title:</label>
                 <input type="text" id="title" name="new_event_name" required>
@@ -90,7 +93,7 @@
                 <input type="file" id="image" accept="image/*" required>
             </div>
 
-            <button type="submit" class="gradient-btn">Create Event</button>
+            <button type="submit" class="gradient-btn">Update Event</button>
         </form>
     </div>
     <footer class="footer">
@@ -135,12 +138,10 @@
         
         <div class="footer-bottom">
             <p>&copy; 2025 CareConnect. All rights reserved.</p>
-            
         </div>
     </footer>
     
     <script>
-       
     document.addEventListener("DOMContentLoaded", function () {
         const selectEvent = document.querySelector('.select_event select');
         const selectedHeading = document.querySelector('h2');
@@ -161,6 +162,8 @@
         // Event listener for when the select option changes
         selectEvent.addEventListener('change', function () {
             const selectedEventName = selectEvent.value;
+            const selectedOption = selectEvent.options[selectEvent.selectedIndex];
+            const eventObjectId = selectedOption.getAttribute('data-event-id'); // ADDED THIS
 
             // Reset form and hide elements
             formContainer.style.display = 'none';
@@ -174,7 +177,9 @@
 
             if (selectedEventName) {
                 selectedHeading.textContent = 'Edit Event: ' + selectedEventName;
-                original_name.value = selectedEventName
+                original_name.value = selectedEventName;
+                document.getElementById('event_object_id').value = eventObjectId; // ADDED THIS LINE
+                
                 // Show the form container
                 formContainer.style.display = 'block';
 
@@ -201,10 +206,7 @@
             dateError.style.display = "none";
         });
     });
-
-
     </script>
-    
     
 </body>
 </html>
