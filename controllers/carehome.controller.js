@@ -455,6 +455,40 @@ async function post_createjob(req, res) {
     }
 }
 
+async function get_alljobs(req, res) {
+    try {
+        
+
+        const jobs = await CareHomeJob.find().sort({ createdAt: -1 });
+
+        
+        res.json({
+            success: true,
+            jobs
+        });
+    } catch (err) {
+        console.error("Error fetching jobs:", err);
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+}
+
+async function job_render(req,res)
+{
+  try
+  {
+    console.log("rendering the list of jobs page");
+    res.render('carehomes/list_jobs');
+  }
+  catch
+  {
+    console.log("some error occured while loading the jobs page ");
+  }
+}
+
+
 module.exports = {
   donateMoney,
   register,
@@ -469,5 +503,8 @@ module.exports = {
   accpet_item_doantions,
   get_don_items,
   get_createjob,
-  post_createjob
+  post_createjob,
+  get_alljobs,
+  job_render,
+
 };
