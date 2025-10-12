@@ -9,12 +9,15 @@
   <body class="edits1">
     <div>
       <form
-      style="margin-top: 7rem;"
+        style="margin-top: 7rem;"
         class="form-floating-modern"
         method="POST"
         action="/user-dashboard/<%= user.userId %>/edit"
       >
         <h2 style="text-align: center; padding-bottom: 1rem;">Edit your Details</h2>
+        
+        <div id="message-container" style="padding: 10px; margin-bottom: 10px;"></div>
+
         <div class="form-group">
           <label for="fullname">Full name</label>
           <input
@@ -40,7 +43,15 @@
           <input type="email" id="mail" name="mail" value="<%= user.email %>" />
         </div>
 
-        <button type="submit" id="Save" value="Save">Save</button>
+       <button type="submit" id="Save" value="Save" style="margin-right: 15px;">Save</button>
+        
+        <a href="/user-dashboard/<%= user.userId %>" 
+           style="display: inline-block; padding: 10px 20px; 
+                  background-color: #f0f0f0; color: #333; 
+                  border: 1px solid #ccc; border-radius: 4px; 
+                  text-decoration: none; cursor: pointer;">
+            ← Back to Dashboard
+        </a>
       </form>
     </div>
     <script src="/scripts/edit_user.js"></script>

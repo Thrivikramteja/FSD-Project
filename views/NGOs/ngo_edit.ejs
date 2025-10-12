@@ -1,95 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit NGO Details</title>
-    <link rel="stylesheet" href="/styles/ngo_edit.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit NGO Details</title>
+    <link rel="stylesheet" href="/styles/ngo_edit.css">
 </head>
 <body class="edits1">
-    <div class="toppart">
-        <h2 style="color: rgb(24, 6, 188);">EDIT YOUR DETAILS (NGO)</h2>
-    </div>
+    <div class="toppart">
+        <h2 style="color: rgb(24, 6, 188);">EDIT YOUR DETAILS (NGO)</h2>
+        
+        <div id="message-container" style="padding: 10px; margin-bottom: 10px;"></div>
+    </div>
+ <p style="color: black; background: yellow; padding: 10px;">
+        DEBUG: <%= JSON.stringify(ngo) %>
+    </p>
 
-    <div class="ngos">
-        <form class="ngo1" method="post" action="/NGO-dashboard/<%= ngoID %>/edit">
-            <label for="fullname">NGO name</label><br>
-            <input type="text" id="fullname" name="fullname" value="<%= ngo.name_NGO || '' %>"><br>
-            <span id="fullname-error" style="color:red;"></span><br>
+    <div class="ngos">
+        <form id="ngoEditForm" class="ngo1" method="post" action="/NGO-dashboard/<%= ngoID %>/edit">
+            <label for="fullname">NGO name</label><br>
+                        <input type="text" id="fullname" name="fullname" value="<%= ngo.Ngoname || '' %>"><br>
+            <span id="fullname-error" style="color:red;"></span><br>
 
-            <!-- <label for="mail">Email</label><br>
-            <input type="email" id="mail" name="mail" value=""><br>
-            <span id="mail-error" style="color:red;"></span><br> -->
+            <label for="phone">Contact number:</label><br>
+            <input type="text" id="phone" name="phone" value="<%= ngo.phone || '' %>"><br>
+            <span id="phone-error" style="color:red;"></span><br>
 
-            <label for="phone">Contact number:</label><br>
-            <input type="text" id="phone" name="phone" value="<%= ngo.phone || '' %>"><br>
-            <span id="phone-error" style="color:red;"></span><br>
+            <label for="bank">Bank Account Holder name</label><br>
+                        <input type="text" id="bank" name="bank" value="<%= ngo.account_holder_name %>"><br>
+            <span id="bank-error" style="color:red;"></span><br>
 
-            <label for="bank">Bank Account Holder name</label><br>
-            <input type="text" id="bank" name="bank" value="<%= ngo.bank_acc_holder_name %>"><br>
-            <span id="bank-error" style="color:red;"></span><br>
+            <label for="accnum">Bank Account number</label><br>
+                        <input type="number" id="accnum" name="accnum" value="<%= ngo.account_number %>"><br>
+            <span id="accnum-error" style="color:red;"></span><br>
 
-            <label for="accnum">Bank Account number</label><br>
-            <input type="number" id="accnum" name="accnum" value="<%= ngo.bank_acc_number %>"><br>
-            <span id="accnum-error" style="color:red;"></span><br>
+            <label for="ifsc">IFSC code</label><br>
+            <input type="text" id="ifsc" name="ifsc" value="<%= ngo.IFSC_code %>"><br>
+            <span id="ifsc-error" style="color:red;"></span><br>
 
-            <label for="ifsc">IFSC code</label><br>
-            <input type="text" id="ifsc" name="ifsc" value="<%= ngo.IFSC_code %>"><br>
-            <span id="ifsc-error" style="color:red;"></span><br>
+            <label for="darpan">Darpan ID</label><br>
+            <input type="text" id="darpan" name="darpan" value="<%= ngo.darpan_id || '' %>"><br>
+            <span id="darpan-error" style="color:red;"></span><br>
 
-            <label for="darpan">Darpan ID</label><br>
-            <input type="text" id="darpan" name="darpan" value="<%= ngo.darpan_id || '' %>"><br>
-            <span id="darpan-error" style="color:red;"></span><br>
+            <div style="margin-top: 20px;">
+                <button type="submit" style="margin-right: 15px;">Update</button>
+                
+                <a href="/NGO-dashboard/<%= ngoID %>" 
+                   style="display: inline-block; padding: 10px 20px; 
+                          background-color: #f0f0f0; color: #333; 
+                          border: 1px solid #ccc; border-radius: 4px; 
+                          text-decoration: none; cursor: pointer;">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
 
-            <button type="submit">Update</button>
-        </form>
-    </div>
+    <script>
+        // (Rest of your JavaScript remains unchanged)
+        document.addEventListener("DOMContentLoaded", function () {
+            const editForm = document.getElementById('ngoEditForm');
+            const messageContainer = document.getElementById('message-container');
+            const ENDPOINT_URL = editForm.action;
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            function validateField(input, pattern, errorMsg) {
-                const errorElement = document.getElementById(input.id + "-error");
-                if (!pattern.test(input.value.trim())) {
-                    errorElement.textContent = errorMsg;
-                    return false; 
-                } else {
-                    errorElement.textContent = "";
-                    return true; 
-                }
-            }
+            function displayMessage(type, message) {
+                if (!messageContainer) return;
+                messageContainer.innerHTML = ''; 
+                
+                let color = type === 'success' ? '#488d63' : 'red';
+                let bgColor = type === 'success' ? '#e6ffe6' : '#ffe6e6';
+                
+                const messageHTML = `
+                    <div style="padding: 10px; border: 1px solid ${color}; background-color: ${bgColor}; color: ${color}; border-radius: 4px;">
+                        <strong>${type.toUpperCase()}:</strong> ${message}
+                    </div>
+                `;
+                messageContainer.innerHTML = messageHTML;
+            }
 
-            const fields = [
-                { id: "fullname", pattern: /.+/, errorMsg: "Full Name is required." },
-                { id: "phone", pattern: /^[0-9]{10}$/, errorMsg: "Enter a valid 10-digit mobile number." },
-                { id: "mail", pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, errorMsg: "Enter a valid email address." },
-                { id: "darpan", pattern: /^[A-Za-z0-9]{10,15}$/, errorMsg: "Darpan ID must be 10-15 alphanumeric characters." },
-            ];
+            function validateField(input, pattern, errorMsg) {
+                const errorElement = document.getElementById(input.id + "-error");
+                // Check if the input element exists before validating
+                if (!input) {
+                    return true;
+                }
+                
+                if (!pattern.test(input.value.trim())) {
+                    errorElement.textContent = errorMsg;
+                    return false; 
+                } else {
+                    errorElement.textContent = "";
+                    return true; 
+                }
+            }
 
-            fields.forEach(({ id, pattern, errorMsg }) => {
-                const input = document.getElementById(id);
-                input.addEventListener("input", function () {
-                    validateField(input, pattern, errorMsg);
-                });
-            });
+            const fields = [
+                { id: "fullname", pattern: /.+/, errorMsg: "NGO Name is required." },
+                { id: "phone", pattern: /^[0-9]{10}$/, errorMsg: "Enter a valid 10-digit mobile number." },
+                // { id: "mail", pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, errorMsg: "Enter a valid email address." }, 
+                { id: "bank", pattern: /.+/, errorMsg: "Bank Holder Name is required." },
+                { id: "accnum", pattern: /^[0-9]{9,18}$/, errorMsg: "Enter a valid account number." }, // Basic acc number validation
+                { id: "ifsc", pattern: /^[A-Z0-9]{11}$/, errorMsg: "Enter a valid 11-character IFSC code." }, // Basic IFSC validation
+                { id: "darpan", pattern: /^[A-Za-z0-9]{10,15}$/, errorMsg: "Darpan ID must be 10-15 alphanumeric characters." },
+            ];
 
-            document.querySelector("form").addEventListener("submit", function (event) {
-                let isValid = true;
+            fields.forEach(({ id, pattern, errorMsg }) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener("input", function () {
+                        validateField(input, pattern, errorMsg);
+                    });
+                }
+            });
 
-                fields.forEach(({ id, pattern, errorMsg }) => {
-                    const input = document.getElementById(id);
-                    if (!validateField(input, pattern, errorMsg)) {
-                        if (isValid) {
-                            input.focus(); 
-                        }
-                        isValid = false; 
-                    }
-                });
+            editForm.addEventListener("submit", async function (event) {
+                // 1. **STOP PAGE RELOAD**
+                event.preventDefault(); 
+                
+                messageContainer.innerHTML = ''; // Clear message on new submission
+                
+                let isValid = true;
+                let firstInvalidInput = null;
 
-                if (!isValid) {
-                    event.preventDefault(); 
-                }
-            });
-        });
-    </script>
+                fields.forEach(({ id, pattern, errorMsg }) => {
+                    const input = document.getElementById(id);
+                    // Only validate fields that exist in the DOM
+                    if (input) {
+                        if (!validateField(input, pattern, errorMsg)) {
+                            isValid = false;
+                            if (!firstInvalidInput) {
+                                firstInvalidInput = input;
+                            }
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    firstInvalidInput.focus();
+                    displayMessage('error', 'Please correct the errors before updating.');
+                    return; // Stop the function if validation fails
+                }
+                
+                // --- If validation passes, proceed with fetch ---
+
+                const formData = new FormData(editForm);
+                // Convert to JSON object
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    // 2. Send the data using fetch
+                    const response = await fetch(ENDPOINT_URL, {
+                        method: 'POST', 
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        // 3. SHOW SUCCESS MESSAGE
+                        displayMessage('success', 'Details updated successfully! Changes saved.');
+                        
+                        // Optional: Reload the page after success to reflect changes if needed, 
+                        // but since the back button is available, we'll rely on that.
+                        // setTimeout(() => { window.location.href = `/NGO-dashboard/${ngoID}`; }, 1500);
+
+                    } else {
+                        // Handle server errors
+                        const errorData = await response.json().catch(() => ({ message: 'Failed to update details.' }));
+                        console.error('Update Failed:', errorData);
+                        displayMessage('danger', `Update failed: ${errorData.message || 'Server error. Please try again.'}`);
+                    }
+
+                } catch (error) {
+                    // Handle network errors
+                    console.error('Network Error:', error);
+                    displayMessage('danger', 'A network error occurred. Check connection.');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

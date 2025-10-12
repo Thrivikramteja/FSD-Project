@@ -178,39 +178,64 @@ async function getallFundraisers(req, res) {
 }
 
 async function editNGOProfile(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
+ const ngoID = parseInt(req.params.ngoID, 10);
 
-  if (isNaN(ngoID)) {
-    return res.status(400).send("Invalid NGO ID");
-  }
+ if (isNaN(ngoID)) {
+ return res.status(400).json({ message: "Invalid NGO ID" });
+ }
 
-  const { fullname, phone, bank, accnum, ifsc, darpan } = req.body;
+ // Data is accessed correctly from req.body (thanks to express.json() middleware)
+ const { fullname, phone, bank, accnum, ifsc, darpan } = req.body; 
 
-  try {
-    const updatedNGO = await NGO.findOneAndUpdate(
-      { ngoId: ngoID },
-      {
-        Ngoname: fullname,
-        darpan_id: darpan,
-        phone,
-        account_holder_name: bank,
-        account_number: accnum,
-        ifsc,
-      },
-      { new: true }
-    );
+ try {
+ const updatedNGO = await NGO.findOneAndUpdate(
+{ ngoId: ngoID },
+ {
+ Ngoname: fullname,
+ darpan_id: darpan,
+ phone,
+ account_holder_name: bank,
+ account_number: accnum,
+ IFSC_code: ifsc, // Corrected field name based on typical convention
+ },
+ { new: true }
+ );
 
-    if (!updatedNGO) {
-      return res.status(404).send("NGO not found");
-    }
+ if (!updatedNGO) {
+ return res.status(404).json({ message: "NGO not found" });
+ }
 
-    res.redirect(`/NGO-dashboard/${ngoID}`);
-  } catch (error) {
-    console.error("Error updating NGO profile:", error);
-    res.status(500).send("Server error");
-  }
+ // ** FIX: Send a 200 OK JSON response instead of redirecting **
+ // This allows the frontend fetch script to display the non-reload success message.
+ res.status(200).json({ 
+ success: true, 
+ message: "NGO profile updated successfully.",
+ ngo: updatedNGO 
+ });
+ } catch (error) {
+ console.error("Error updating NGO profile:", error);
+ // Send a 500 error response with a clear message for the frontend to display
+ res.status(500).json({ 
+ success: false, 
+ message: "Failed to update profile due to a server error." 
+ });
+ }
 }
 
+function renderCreateEventForm(req, res) {
+ const ngoID = parseInt(req.params.ngoID, 10);
+
+ try {
+ res.render("NGOs/create_event", {
+ ngoID,
+user: req.session.user,
+ userRole: req.session.userRole,
+ });
+} catch (error) {
+ console.error("Error rendering the Create Event form:", error);
+ res.status(500).send("Failed to load the Create Event form");
+ }
+}
 function renderCreateEventForm(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
 
