@@ -94,6 +94,44 @@
         <button type="submit">Register</button>
       </form>
     </div>
+
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("registrationForm");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // prevent default form submission
+
+    const formData = new FormData(form); // includes all inputs + file
+
+    try {
+      const response = await fetch("/registerCarehome", {
+        method: "POST",
+        body: formData, // do NOT set Content-Type; browser handles it
+      });
+
+      // Check if backend redirected
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
+
+      const text = await response.text(); // fallback for debugging
+      console.log("Server response:", text);
+
+      if (response.ok) {
+        alert("Care Home Registered Successfully!");
+        window.location.href = "/login"; // match your controller redirect
+      } else {
+        alert("Registration failed. Please check all fields and try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Something went wrong. Please try again later.");
+    }
+  });
+});
+</script>
+
   </body>
 </html>
-
