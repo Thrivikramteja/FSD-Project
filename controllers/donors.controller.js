@@ -8,17 +8,17 @@ const {
 // const Carehome = require("../models/carehome.model");
 
 // const promisifyModelMethod = (modelMethod, ...args) =>
-//   new Promise((resolve, reject) => {
-//     modelMethod(...args, (err, data) => {
-//       if (err) {
-//         console.error(`Error in model method:`, err);
-//         reject(err);
-//       } else {
-//         console.log(`Data fetched by model method:`, data);
-//         resolve(data);
-//       }
-//     });
-//   });
+//   new Promise((resolve, reject) => {
+//     modelMethod(...args, (err, data) => {
+//       if (err) {
+//         console.error(`Error in model method:`, err);
+//         reject(err);
+//       } else {
+//         console.log(`Data fetched by model method:`, data);
+//         resolve(data);
+//       }
+//     });
+//   });
 
 async function getdonor(req, res) {
   const user_ID = parseInt(req.params.userId, 10);
@@ -165,17 +165,36 @@ async function getEditDonorProfile(req, res) {
   }
 }
 
+// ** MODIFIED FUNCTION FOR FETCH API SUBMISSION **
 async function editDonorProfile(req, res) {
-  const {fullname, phone, mail} = req.body;
+  const { fullname, phone, mail } = req.body;
   const userId = parseInt(req.params.userId, 10);
 
-  await User.findOneAndUpdate(
-    { userId: userId },                       
-    { name: fullname, mobile_number: phone, email: mail },                
-    { new: true }                             
-  );
+  // ** Data is correctly received here as JSON via req.body **
 
-  res.redirect(`/user-dashboard/${userId}`);
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { userId: userId }, 
+      { name: fullname, mobile_number: phone, email: mail }, 
+      { new: true } 
+    );
+    
+    // ** FIX: Send a 200 OK JSON response instead of redirecting **
+    // This allows the frontend fetch script to display the non-reload success message.
+    res.status(200).json({ 
+      success: true, 
+      message: "Donor profile updated successfully.",
+      user: updatedUser 
+    });
+
+  } catch (error) {
+    console.error("Error updating donor profile:", error);
+    // Send a 500 error response with a clear message for the frontend to display
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to update profile due to a server error." 
+    });
+  }
 }
 
 module.exports = {
