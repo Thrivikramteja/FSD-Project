@@ -95,51 +95,42 @@
       </form>
     </div>
 
-
-  </body>
-</html>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registrationForm");
 
-  // Create a message box dynamically
-  const messageBox = document.createElement("div");
-  messageBox.id = "messageBox";
-  messageBox.style.marginTop = "15px";
-  messageBox.style.fontWeight = "bold";
-  messageBox.style.textAlign = "center";
-  form.parentElement.appendChild(messageBox);
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Prevent normal form submit
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault(); // prevent page reload
-
-    const formData = new FormData(form);
+    const formData = new FormData(form); // Collect all form fields, including file
 
     try {
       const response = await fetch("/registerCarehome", {
         method: "POST",
-        body: formData,
+        body: formData, // Must use FormData for file uploads
       });
 
-      if (response.ok) {
-        messageBox.style.color = "green";
-        messageBox.textContent = "Registered successfully! Redirecting to login...";
+      // Handle redirect or JSON response depending on your backend
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
 
-        // Optional: redirect after 2 seconds
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 2000);
+      const data = await response.text(); // Or response.json() if you change backend to send JSON
+      console.log("Server response:", data);
+
+      if (response.ok) {
+        alert("Care Home Registered Successfully!");
+        window.location.href = "/login"; // matches your controller redirect
       } else {
-        const errorData = await response.text();
-        messageBox.style.color = "red";
-        messageBox.textContent = "Registration failed: " + errorData;
+        alert("Registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      messageBox.style.color = "red";
-      messageBox.textContent = " Something went wrong. Please try again.";
+      alert("Something went wrong. Please try again later.");
     }
   });
 });
-
-<script/>
+</script>
+  </body>
+</html>
