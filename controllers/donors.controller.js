@@ -94,55 +94,59 @@ async function get_carehomeid(ngoId, fundraiser_name) {
 async function contributed_fund(req, res) {
   try {
     const ngoId = req.params.ngoId;
-
     const fundraiser_name = req.params.fundraiser_name;
     const amount_contributed = req.body.your_amount;
-
+    
     if (!req.session.user || !req.session.user.userId) {
       console.log("User not authenticated or session data missing");
       return res.redirect("/login?error=Please log in to contribute");
     }
-
-    const userId = req.session.user.userId; // Corrected: Use lowercase 'user'
+    
+    const userId = req.session.user.userId;
     console.log("Session ID for user: " + userId);
-
+    
     const deadline = await get_deadline(ngoId, fundraiser_name);
-
-    // Log the deadline (for debugging purposes)
     console.log("Deadline for the fundraiser:", deadline);
-
-    // Check if the fundraiser deadline has passed
+    
     const currentDate = new Date();
-
-    // Create a new contribution document using the userContributedFundraisersSchema
+    
+   
+    const fundraiser = await CreatedFundraiser.findOne({ 
+      ngoId, 
+      fundraiser_name 
+    });
+    
+    if (!fundraiser) {
+      return res.status(404).json({ message: "Fundraiser not found" });
+    }
+    
     const newContribution = new UserContributedFundraiser({
       userId: userId,
       ngoId: ngoId,
       fundraiser_name: fundraiser_name,
       amount_contributed: amount_contributed,
-      contributed_at: currentDate, // This will be the current date/time of contribution
-      deadline: deadline, // The fundraiser's deadline
+      contributed_at: currentDate,
+      deadline: deadline,
+      fundraiserObjectId: fundraiser._id  
     });
-
-    // Save the new contribution to the database
+    
     await newContribution.save();
-
-    console.log("save succesful to user id " + userId);
-
-    const fundraiser = await CreatedFundraiser.findOneAndUpdate(
+    console.log("save successful to user id " + userId);
+    
+    
+    await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
       { $inc: { amount_raised_so_far: amount_contributed } },
       { new: true }
     );
-    console.log("sucessfuly updated in ngo side");
-    // res.redirect(`users/user_dashboard/${userId}`)
+    
+    console.log("successfully updated in ngo side");
+    
   } catch (error) {
     console.error("Error in contributed_fund:", error);
-    res
-      .status(500)
-      .json({
-        message: "An error occurred while processing the contribution.",
-      });
+    res.status(500).json({
+      message: "An error occurred while processing the contribution.",
+    });
   }
 }
 

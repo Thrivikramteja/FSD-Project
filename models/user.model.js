@@ -72,26 +72,77 @@ const userRegisteredEventsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // ADD THIS ONE FIELD
+  eventObjectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event', 
+    required: true,
+  }
 });
+
 
 donorSchema.statics.participatedEvents = async function (userId) {
   const currentDate = new Date();
-  const events = await UserRegisteredEvent.find({
-    userId: userId,
-    event_date: { $lt: currentDate },
-  });
+  
+  const events = await UserRegisteredEvent.aggregate([
+    // Match user's registrations
+    { $match: { userId: userId } },
+    
+    // Lookup current event data using eventObjectId
+    {
+      $lookup: {
+        from: 'events', // Your events collection name
+        localField: 'eventObjectId',
+        foreignField: '_id',
+        as: 'eventData'
+      }
+    },
+    
+    
+    { $unwind: '$eventData' },
+    
+    
+    {
+      $match: {
+        'eventData.event_date': { $lt: currentDate }
+      }
+    }
+  ]);
+  
   return events;
 };
 
 donorSchema.statics.upcomingEvents = async function (userId) {
   const currentDate = new Date();
-
-  const upcoming = await UserRegisteredEvent.find({
-    event_date: { $gt: currentDate },
-    userId: userId,
-  });
+  
+  const upcoming = await UserRegisteredEvent.aggregate([
+    
+    { $match: { userId: userId } },
+    
+    
+    {
+      $lookup: {
+        from: 'events', 
+        localField: 'eventObjectId',
+        foreignField: '_id',
+        as: 'eventData'
+      }
+    },
+    
+    
+    { $unwind: '$eventData' },
+    
+    
+    {
+      $match: {
+        'eventData.event_date': { $gt: currentDate }
+      }
+    }
+  ]);
+  
   return upcoming;
 };
+
 
 const userContributedFundraisersSchema = new mongoose.Schema({
   userId: {
@@ -118,6 +169,12 @@ const userContributedFundraisersSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+
+  fundraiserObjectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CreatedFundraiser',
+    required: true,
+  }
 });
 
 donorSchema.statics.contributedFundraisers = async function (userId) 
@@ -160,6 +217,23 @@ const createdFundraisersSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  imagePath: {  
+    type: String,
+    required: true, 
+  },
+    tag: {
+    type: String,
+    enum: [
+      "Health",
+      "Education",
+      "General",
+      "Emergency",
+      "Environment",
+      "Animal Welfare",
+      "Others",
+    ],
+    default: "General",
+  },
 });
 
 const donate_it_message = new mongoose.Schema({
@@ -185,7 +259,6 @@ const donate_it_message = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true
   }
 });
 

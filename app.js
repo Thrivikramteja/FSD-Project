@@ -2,6 +2,32 @@ const path = require("path");
 
 const express = require("express");
 const session = require("express-session");
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    let folder = "uploads/"
+
+    if (req.body.userRole == "Carehome") {
+      folder += "Carehomes"
+    } else if (req.body.userRole == "NGO") {
+      if (req.body.type === "event") {
+        folder += "Events"
+      } else if (req.body.type === "fundraiser") {
+        folder += "Fundraisers"
+      }
+    }
+
+    cb(null, path.join(__dirname, "public", folder));
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`)
+  }
+});
+
+const upload = multer({ storage });
+
+module.exports = upload;
 
 require("./data/database.js");
 
@@ -31,14 +57,13 @@ const app = express();
 // );
 
 
-
-// Make sure this middleware is added BEFORE your routes
 app.use(session({
-  secret: 'your_secret_key', // Replace with a real secret key
+  secret: 'your_secret_key', 
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24 // 1 day in milliseconds
+    maxAge: 1000 * 60 * 60 * 24,
+    secure: false
   }
 }));
 

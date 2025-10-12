@@ -10,16 +10,19 @@
   <link rel="stylesheet" href="/styles/landing_page.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <a href="/" class="logo">CareConnect</a>
-    <nav>
-      <ul class="header-right">
-        <li><a href="/carehome-dashboard/<%= careid %>/edit">Edit Profile</a></li>
-        <li><a href="/logout">Logout</a></li>
-      </ul>
-    </nav>
-  </header>
+    
+    <header id="header">
+        <a href="/" style="font-size: large;">CareConnect</a>
+        <nav >
+            <ul class="header_right">
+                <a href="/logout" style="margin-right: 3rem;">Logout</a>
+                <a href="/carehome-dashboard/<%= careid %>/edit" style="margin-right: 3rem;">Edit Profile</a>
+                <a href="/carehome-dashboard/get-job">Create a job</a>
+            </ul>  
+        </nav>
+    </header>
+      
+      <h1><%= name %></h1>
 
   <!-- Main Content -->
   <div class="container">

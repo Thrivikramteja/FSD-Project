@@ -40,18 +40,18 @@
                     <h2>Your Details</h2>
                     <input type="hidden" name="id_NGO" id="ngoId" value="<%= ngoId %>">
                     <div class="form-group">
-                        <label for="name">Full name</label>
-                        <input type="text" id="name" name="full_name" required>
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" value="<%= user.name %>" name="full_name" required>
                         <div class="error-message" id="nameError">Please enter your full name</div>
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone number</label>
-                        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+                        <input type="tel" id="phone" value="<%= user.mobile_number %>" name="phone" pattern="[0-9]{10}" required>
                         <div class="error-message" id="phoneError">Please enter a valid 10-digit number</div>
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+                        <input type="email" id="email" value="<%= user.email %>" name="email" required>
                         <div class="error-message" id="emailError">Please enter a valid email</div>
                     </div>
                     <div class="form-group">
@@ -59,8 +59,8 @@
                         <input type="text" id="pan" name="pan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" required>
                         <div class="error-message" id="panError">Please enter a valid PAN</div>
                     </div>
-                    <input type="hidden" name="donation_amount" id="donationAmount" value="0">
-                    <input type="hidden" name="tip_amount" id="tipAmount" value="0">
+                    <!-- <input type="hidden" name="donation_amount" id="donationAmount" value="0">
+                    <input type="hidden" name="tip_amount" id="tipAmount" value="0"> -->
                     <button type="submit">Donate Now</button>
                     <p class="secured-payment">All payments are securely processed</p>
                 </div>

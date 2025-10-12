@@ -1,3 +1,5 @@
+const path = require("path");
+
 const { NGO, Event } = require("../models/NGO.model");
 const {
   CreatedFundraiser,
@@ -269,6 +271,7 @@ async function createEvent(req, res) {
       event_time,
       description,
       number_of_registrations: 0,
+      imagePath: req.file.path
     });
 
     await newEvent.save();
@@ -283,23 +286,33 @@ async function createEvent(req, res) {
 
 async function createFundraiser(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
-  const { fundraiser_name, deadline, goal_amount, description, id_carehome } =
+  const { fundraiser_name, deadline, goal_amount, description, id_carehome, tag } =
     req.body;
 
+    console.log(ngoID);
+    console.log(fundraiser_name);
+    console.log(deadline);
+    console.log(goal_amount);
   try {
     if (!ngoID || !fundraiser_name || !deadline || !goal_amount) {
       return res.status(400).send("Missing required fields");
     }
 
-    const newFundraiser = new CreatedFundraiser({
-      ngoId: ngoID,
+    let imagePath = req.file.path
+      .split(path.sep)       
+      .slice(-3)             
+      .join("/");
+    const newFundraiser = new CreatedFundraiser({     
       carehomeId: id_carehome,
       fundraiser_name,
+      ngoId: ngoID,
       goal_amount: Number(goal_amount),
-      funds_raised: 0,
       description,
+      amount_raised_so_far: 0,     
       deadline: new Date(deadline),
       has_report: false,
+      tag: tag || "General", 
+      imagePath: imagePath
     });
 
     await newFundraiser.save();
@@ -330,45 +343,50 @@ async function registerUser(req, res) {
     const userId = req.session.user.userId;
     const ngoId = req.params.ngoID;
     console.log(ngoId);
+    
     const createdEvent = await Event.findOne({
       event_name: event,
       ngoId: ngoId,
     });
     console.log(createdEvent);
-        if (!createdEvent) {
+    
+    if (!createdEvent) {
       return res.status(404).json({ message: "Event not found." });
     }
-
+    
     const existingRegistration = await UserRegisteredEvent.findOne({
       userId,
       event_name: event,
       ngoId,
     });
+    
     if (existingRegistration) {
       return res
         .status(400)
         .json({ message: "You have already registered for this event." });
     }
-
+    
     const userRegisteredEvent = new UserRegisteredEvent({
       userId: userId,
       ngoId: ngoId,
       event_name: event,
       event_date: createdEvent.event_date,
       event_location: createdEvent.event_location,
+      eventObjectId: createdEvent._id  // ADD THIS LINE - the MongoDB _id
     });
-
+    
     await userRegisteredEvent.save();
     console.log("User registration successful: ", userRegisteredEvent);
-
+    
     const newEventRegistration = await Event.findOneAndUpdate(
       { ngoId, event_name: event },
       { $inc: { number_of_registrations: 1 } },
       { new: true }
     );
+    
     console.log("Registration count updated successfully.");
-
     res.redirect("/");
+    
   } catch (error) {
     console.error("Error during registration: ", error);
     res.status(500).json({ message: "Internal server error." });
@@ -395,6 +413,7 @@ async function render_donate_fundraiser(req, res) {
   console.log("from rendereing of fund doantion form");
   const ngoId = parseInt(req.params.ngoId, 10);
   const name_fund = req.params.fundraiser_name;
+  console.log(req.session.user);
   try {
     res.render("NGOs/donate_fundraiser", {
       ngoId,
@@ -503,6 +522,7 @@ async function getNGO(req, res) {
 async function editEvent(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
   const {
+    event_object_id,  
     original_event_name,
     new_event_name,
     event_location,
@@ -510,11 +530,11 @@ async function editEvent(req, res) {
     event_time,
     description,
   } = req.body;
-
+  
   try {
     if (
       !ngoID ||
-      !original_event_name ||
+      !event_object_id ||  
       !event_location ||
       !event_date ||
       !event_time
@@ -522,20 +542,22 @@ async function editEvent(req, res) {
       return res.status(400).send("Missing required fields");
     }
 
-    const eventDetails = {
-      id_NGO: ngoID,
-      original_event_name,
-      new_event_name,
-      event_location,
-      event_date,
-      event_time,
-      description,
-    };
-
-    const result = await Event.edit_event(eventDetails);
+    // Use ObjectId to find and update the event directly
+    const result = await Event.findByIdAndUpdate(
+      event_object_id,  // Use ObjectId - much more reliable!
+      {
+        event_name: new_event_name || original_event_name,
+        event_location,
+        event_date,
+        event_time,
+        description,
+      },
+      { new: true }
+    );
 
     console.log("Event Updated:", result);
     res.redirect(`/NGO-dashboard/${ngoID}`);
+    
   } catch (error) {
     console.error("Error in editEvent controller:", error);
     res.status(500).send("Failed to update event");

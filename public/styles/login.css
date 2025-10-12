@@ -79,9 +79,19 @@ input {
   background-color: #1d3ecb;
 }
 
+body{
+  background-image: url("../images/b2.jpg");
+  background-repeat: no-repeat;            
+  background-size: cover;                  
+  background-position: center;             
+  background-attachment: fixed;  
+}
+
 /* Responsive Design */
 @media (max-width: 480px) {
   main {
     width: 90%;
   }
 }
+
+

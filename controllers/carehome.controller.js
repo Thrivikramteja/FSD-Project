@@ -1,12 +1,16 @@
+const path = require("path");
+
 const { Carehome } = require("../models/carehome.model");
 const bcrypt = require("bcrypt");
+
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
+const  { CareHomeJob } = require('../models/carehome.model');
 
 async function donateMoney(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
-    
+
     const selectedCareHomeId = req.query.carehome_id || null;
     console.log(selectedCareHomeId);
     res.render("carehomes/donate_money", {
@@ -42,7 +46,7 @@ async function insertMoney(req, res) {
       });
     }
 
- 
+
     await DonationMoney.saveDonation({
       userId,
       amount_donated: total,
@@ -112,9 +116,7 @@ async function get_don_items(req, res) {
       category,
       delivery_date: deliveryDate,
       location,
-      description,
-      user: req.session.user,
-      userRole: req.session.userRole,
+      description
     });
 
     await newDonationMessage.save();
@@ -134,6 +136,11 @@ async function get_don_items(req, res) {
 
 async function registerCarehome(req, res) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  let imagePath = req.file.path
+  .split(path.sep)       
+  .slice(-3)             
+  .join("/");
+  // console.log(imagePath);
   try {
     const carehome = new Carehome({
       care_home_name: req.body.care_home_name,
@@ -151,6 +158,7 @@ async function registerCarehome(req, res) {
       account_number: req.body.account_number,
       ifsc: req.body.ifsc,
       terms: req.body.terms,
+      imagePath: imagePath
     });
 
     try {
@@ -413,6 +421,81 @@ async function editCarehomeProfile(req, res) {
   res.redirect(`/carehome-dashboard/${careId}`);
 }
 
+async function get_createjob(req,res)
+{
+  console.log("rendering job posting form");
+  res.render('carehomes/create_job');
+}
+
+async function post_createjob(req, res) {
+    try {
+      console.log("just now posting the fresh job");
+        const carehome = req.session.user; 
+        if (!carehome) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+
+        const { title, description, location, pay, type, startDate, endDate } = req.body;
+
+        const job = new CareHomeJob({
+            postedBy: carehome._id, 
+            title,
+            description,
+            location,
+            pay,
+            type,
+            startDate: startDate ? new Date(startDate) : null,
+            endDate: endDate ? new Date(endDate) : null
+        });
+
+        await job.save();
+
+        return res.json({
+            success: true,
+            message: "Job created successfully",
+            redirectUrl: `/carehome-dashboard/${carehome.carehomeId}`
+        });
+
+    } catch (err) {
+        console.error("Error posting job:", err);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+}
+
+async function get_alljobs(req, res) {
+    try {
+        
+
+        const jobs = await CareHomeJob.find().sort({ createdAt: -1 });
+
+        
+        res.json({
+            success: true,
+            jobs
+        });
+    } catch (err) {
+        console.error("Error fetching jobs:", err);
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+}
+
+async function job_render(req,res)
+{
+  try
+  {
+    console.log("rendering the list of jobs page");
+    res.render('carehomes/list_jobs');
+  }
+  catch
+  {
+    console.log("some error occured while loading the jobs page ");
+  }
+}
+
+
 module.exports = {
   donateMoney,
   register,
@@ -426,4 +509,9 @@ module.exports = {
   insertMoney,
   accpet_item_doantions,
   get_don_items,
+  get_createjob,
+  post_createjob,
+  get_alljobs,
+  job_render,
+
 };

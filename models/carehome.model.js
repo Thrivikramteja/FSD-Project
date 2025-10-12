@@ -20,6 +20,10 @@ const carehomeSchema = new mongoose.Schema({
   account_number: String,
   ifsc: String,
   terms: String,
+  imagePath: {  
+    type: String,
+    required: true, 
+  },
 });
 
 carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
@@ -85,8 +89,6 @@ carehomeSchema.statics.getCarehomeId = async function (email) {
   const carehome = await Carehome.findOne({ email });
   return carehome.carehomeId;
 };
-
-
 
 const donationMoneySchema = new mongoose.Schema({
   userId: {
@@ -161,7 +163,6 @@ donationMoneySchema.statics.saveDonation = async function({ userId, amount_donat
 carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
   const stats = [];
 
-  // 1. Total Funds Received
   const totalFundsResult = await DonationMoney.aggregate([
     { $match: { carehomeId: carehomeId } },
     {
@@ -260,8 +261,24 @@ catch(error)
 }
 };
 
+//new feature : jobs
+//schema for care home posted job
+const careHomeJobSchema = new mongoose.Schema({
+  postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Carehome', required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  location: String,
+  pay: Number,
+  type: { type: String, enum: ['Caretaker', 'Part-time', 'Full-time', 'Other'], default: 'Other' },
+  startDate: Date,
+  endDate: Date,
+  createdAt: { type: Date, default: Date.now }
+});
+
 
 const Carehome = mongoose.model("Carehome", carehomeSchema);
 const DonationMoney = mongoose.model("DonationMoney", donationMoneySchema);
 const donate_items = mongoose.model("donate_items",donationitemschema);
-module.exports = { Carehome, DonationMoney , donate_items};
+const CareHomeJob = mongoose.model("CareHomeJob", careHomeJobSchema);
+
+module.exports = { Carehome, DonationMoney , donate_items,CareHomeJob};
