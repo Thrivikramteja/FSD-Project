@@ -50,6 +50,7 @@ h2 {
   height: auto;
   margin-bottom: 15px;
 }
+  */
 .fundraiser-tag {
   display: inline-block;
   background: #e0f7fa;
@@ -142,11 +143,10 @@ h3 {
 }
 
 
-@media (max-width: 1024px) {
+ @media (max-width: 1024px) {
   .nonprofit-container {
-      grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
-  }
-}
+      grid-template-columns: repeat(2, 1fr);
+  }}
 
 @media (max-width: 768px) {
   .nonprofit-container {

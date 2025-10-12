@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Jobs</title>
     <link rel="stylesheet" href="/styles/list_job.css">
+    <link rel="stylesheet" href="/styles/landing_page.css" />
+    <link rel="stylesheet" href="/styles/footer.css">
 </head>
 <body>
-<div class="header-section">
-        <p class="subtitle">Find meaningful work in care homes and community events</p>
-    </div>
-</div>
+    <%- include('../shared/includes/header') %>
 
-<div class="search-filter-container">
+    <div class="search-filter-container">
     <div class="filter-section">
         <button class="filter-btn" id="filterBtn">
             <span>Filters</span>
@@ -45,9 +44,12 @@
     </div>
 </div>
 
+
 <div class="grid-container" id="jobsContainer">
+    
    
 </div>
+<%- include('../shared/includes/footer') %>
 
 <script>
 const userRole = '<%= user ? user.role : "guest" %>'; 

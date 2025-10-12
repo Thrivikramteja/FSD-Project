@@ -1,8 +1,8 @@
-* {
-    margin: 0;
-    padding: 0;
+/* * {
+     margin: 0;
+    padding: 0; 
     box-sizing: border-box;
-}
+} */
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -199,7 +199,7 @@ body {
 /* Grid Container */
 .grid-container {
     max-width: 1400px;
-    margin: 0 auto 40px auto;
+    margin: 0 40px 40px 40px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 25px;
@@ -239,14 +239,14 @@ body {
 }
 
 .content p {
-    margin-bottom: 12px;
+    margin-bottom: 6px;
+    margin-top: 6px;
     color: #444;
-    line-height: 1.6;
+    line-height: 1.2;
 }
 
 .content p:first-child {
-    flex: 1;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     color: #666;
 }
 
@@ -256,7 +256,7 @@ body {
 }
 
 .content button {
-    margin-top: auto;
+    margin-top: 6px;
     padding: 14px 28px;
     background-color: #26a69a;
     color: white;

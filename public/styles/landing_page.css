@@ -25,7 +25,8 @@ main {
 .carousel-slides {
   display: flex;
   transition: transform 0.5s ease-in-out;
-  width: 300vw; /* 3 slides */
+  width: 300vw;
+  /* 3 slides */
 }
 
 .carousel-slide {
@@ -43,14 +44,17 @@ main {
   margin-left: 60px;
   max-width: 40vw;
 }
+
 .carousel-content h2 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
 }
+
 .carousel-content p {
   font-size: 1.1rem;
   margin-bottom: 1.2rem;
 }
+
 .carousel-btn {
   padding: 12px 28px;
   background-color: #e53d3d;
@@ -63,6 +67,7 @@ main {
   text-decoration: none;
   display: inline-block;
 }
+
 .carousel-img {
   width: 340px;
   height: 250px;
@@ -70,6 +75,7 @@ main {
   border-radius: 10px;
   margin-right: 70px;
 }
+
 .carousel-indicators {
   position: absolute;
   bottom: 17px;
@@ -78,6 +84,7 @@ main {
   display: flex;
   gap: 9px;
 }
+
 .carousel-indicators span {
   display: block;
   width: 13px;
@@ -87,6 +94,7 @@ main {
   opacity: 0.6;
   cursor: pointer;
 }
+
 .carousel-indicators .active {
   background: #e53d3d;
   opacity: 1;
@@ -111,6 +119,7 @@ main {
   text-decoration: none;
   color: #333;
 }
+
 .nav-items {
   list-style: none;
   display: flex;
@@ -118,16 +127,22 @@ main {
   margin: 0;
   padding: 0;
 }
+
 .nav-items li {
   position: relative;
 }
+
 .nav-items a {
   text-decoration: none;
   color: #333;
   padding: 10px;
   display: block;
 }
+
 .dropdown-menu {
+  /* overflow: hidden;
+  position: relative; */
+  z-index: 1000;
   display: none;
   position: absolute;
   background: white;
@@ -137,16 +152,21 @@ main {
   padding: 10px 0;
   min-width: 180px;
 }
+
 .dropdown-menu li {
   padding: 5px 15px;
 }
+
 .dropdown-menu a {
   display: block;
   padding: 5px 10px;
 }
+
 .dropdown:hover .dropdown-menu {
   display: block;
+  overflow: hidden;
 }
+
 #login-button a {
   border: 2px solid grey;
   padding: 8px 20px;
