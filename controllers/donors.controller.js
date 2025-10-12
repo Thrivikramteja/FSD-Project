@@ -24,9 +24,9 @@ async function getdonor(req, res) {
   const user_ID = parseInt(req.params.userId, 10);
   const userRole = req.params.userRole;
   try {
-    console.log(`Fetching data for userId: ${user_ID}`); // Debug the userId being passed
+    console.log(`Fetching data for userId: ${user_ID}`); 
 
-    // Fetch data from model
+  
     const name = await User.getname(user_ID);
     const participatedEvents = await User.participatedEvents(user_ID);
     const contributedFundraisers = await User.contributedFundraisers(user_ID);
@@ -165,12 +165,12 @@ async function getEditDonorProfile(req, res) {
   }
 }
 
-// ** MODIFIED FUNCTION FOR FETCH API SUBMISSION **
+
 async function editDonorProfile(req, res) {
   const { fullname, phone, mail } = req.body;
   const userId = parseInt(req.params.userId, 10);
 
-  // ** Data is correctly received here as JSON via req.body **
+  
 
   try {
     const updatedUser = await User.findOneAndUpdate(
@@ -179,8 +179,7 @@ async function editDonorProfile(req, res) {
       { new: true } 
     );
     
-    // ** FIX: Send a 200 OK JSON response instead of redirecting **
-    // This allows the frontend fetch script to display the non-reload success message.
+  
     res.status(200).json({ 
       success: true, 
       message: "Donor profile updated successfully.",
@@ -189,7 +188,7 @@ async function editDonorProfile(req, res) {
 
   } catch (error) {
     console.error("Error updating donor profile:", error);
-    // Send a 500 error response with a clear message for the frontend to display
+    
     res.status(500).json({ 
       success: false, 
       message: "Failed to update profile due to a server error." 

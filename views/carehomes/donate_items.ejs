@@ -1,109 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Donate Items</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
-    <link rel="stylesheet" href="/styles/landing_page.css" />
-    <link rel="stylesheet" href="/styles/footer.css" />
-  </head>
-  <body>
-    <%- include('../shared/includes/header') %>
-    <div class="container mt-5">
-      <h2 class="text-center mb-4">Donate Items</h2>
+<head>
+<meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Donate Items</title>
+<link
+ rel="stylesheet"
+ href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+ />
+<link rel="stylesheet" href="/styles/landing_page.css" />
+<link rel="stylesheet" href="/styles/footer.css" />
+    
+    <style>
+        :root {
+            --primary-green: #388e3c;
+            --light-green: #e8f5e9;
+            --text-color: #424242;
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --card-bg: white;
+        }
 
-      <form action="/donate_items_user" method="POST">
-        <!-- Donation Type -->
-        <div class="mb-3">
-          <label for="some_home">Choose a care home</label>
-          <select name="carehomes" id="some_home">
-            <% carehomes.forEach(home => { %>
-            <option value="<%= home.carehomeId %>">
-              <%= home.care_home_name %>
-            </option>
-            <% }); %>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="category" class="form-label"
-            >Select Donation Category</label
-          >
-          <select class="form-select" id="category" name="category" required>
-            <option value="" disabled selected>Select an option</option>
-            <option value="Food">Food</option>
-            <option value="Clothes">Clothes</option>
-            <option value="Books">Books</option>
-            <option value="Toys">Toys</option>
-            <option value="Medical Supplies">Medical Supplies</option>
-            <option value="others">Others</option>
-          </select>
-        </div>
+        body {
+            background-color: var(--light-green); 
+        }
 
-        <!-- Item Quantity -->
-        <!-- <div class="mb-3">
-          <label for="quantity" class="form-label">Quantity</label>
-          <input
-            type="text"
-            class="form-control"
-            id="quantity"
-            name="quantity"
-            min="1"
-            required
-          />
-        </div> -->
+        .donate-card-wrapper {
+            max-width: 550px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-        <!-- Item Description -->
-        <div class="mb-3">
-          <label for="description" class="form-label"
-            >Description (Optional)</label
-          >
-          <textarea
-            class="form-control"
-            id="description"
-            name="description"
-            rows="3"
-          ></textarea>
-        </div>
+        .donate-card {
+          margin-top: -45px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 15px var(--shadow-color);
+            border: 1px solid var(--primary-green);
+        }
 
-        
-        <div class="mb-3">
-          <label for="address" class="form-label">Pickup/Drop Location</label>
-          <input
-            type="text"
-            class="form-control"
-            id="address"
-            name="address"
-            required
-          />
-        </div>
+   
+        h2 {
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 30px !important;
+        }
 
-        <div class="mb-3">
-          <label for="date" class="form-label">Date of delivery</label>
-          <input
-            type="date"
-            class="form-control"
-            id="date"
-            name="date"
-            required
-          />
-        </div>
+        .form-control, .form-select {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px 15px;
+            transition: border-color 0.3s;
+        }
 
-        <!-- Submit Button -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary" style="background-color: #488d63;;">Donate Now</button>
-        </div>
-      </form>
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(56, 142, 60, 0.25);
+        }
+
+     
+        label {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+       
+        .btn-primary {
+            background-color: var(--primary-green) !important;
+            border-color: var(--primary-green) !important;
+            padding: 10px 30px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #4caf50 !important;
+            border-color: #4caf50 !important;
+        }
+
+        #message-container .alert-success {
+            background-color: var(--light-green);
+            color: var(--primary-green);
+            border-color: var(--primary-green);
+            font-weight: 600;
+        }
+    </style>
+ </head>
+ <body>
+ <%- include('../shared/includes/header') %>
+ <div class="container mt-5">
+ <h2 class="text-center mb-4" style="margin-top: -45px;">Donate Items</h2>
+
+      <div class="donate-card-wrapper">
+        <div id="message-container" class="mb-3"></div>
+
+   <form id="donateItemsForm" action="/donate_items_user" method="POST" class="donate-card">
+ <div class="mb-3">
+ <label for="some_home">Choose a care home</label>
+<select name="carehomes" id="some_home" class="form-select" required>
+ <option value="" disabled selected>Select a Care Home</option>
+ <% carehomes.forEach(home => { %>
+ <option value="<%= home.carehomeId %>">
+ <%= home.care_home_name %>
+ </option>
+ <% }); %>
+ </select>
+ </div>
+ <div class="mb-3">
+ <label for="category" class="form-label"
+ >Select Donation Category</label
+ >
+ <select class="form-select" id="category" name="category" required>
+ <option value="" disabled selected>Select an option</option>
+ <option value="Food">Food</option>
+<option value="Clothes">Clothes</option>
+ <option value="Books">Books</option>
+ <option value="Toys">Toys</option>
+ <option value="Medical Supplies">Medical Supplies</option>
+ <option value="others">Others</option>
+</select>
+ </div>
+
+ <div class="mb-3">
+ <label for="description" class="form-label"
+ >Description (Optional)</label
+ >
+ <textarea
+ class="form-control"
+ id="description"
+ name="description"
+ rows="3"
+ ></textarea>
+ </div>
+
+
+ <div class="mb-3">
+ <label for="address" class="form-label">Pickup/Drop Location</label>
+<input
+ type="text"
+ class="form-control"
+ id="address"
+ name="address"
+ required
+/>
+ </div>
+
+ <div class="mb-3">
+   <label for="date" class="form-label">Date of delivery</label>
+ <input
+ type="date"
+ class="form-control"
+ id="date"
+ name="date"
+ required
+ />
+ </div>
+
+ <div class="text-center">
+ <button type="submit" class="btn btn-primary">Donate Now</button>
+ </div>
+ </form>
     </div>
-    <%- include('../shared/includes/footer') %>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      document.querySelector("form").addEventListener("submit", function () {
-        alert("Sent message to carehome, wait for response");
+ </div>
+ <%- include('../shared/includes/footer') %>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
+ <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          const donateForm = document.getElementById("donateItemsForm");
+          const messageContainer = document.getElementById("message-container");
+          const ENDPOINT_URL = donateForm.action;
+
+         
+          function displayMessage(type, message) {
+              messageContainer.innerHTML = '';
+              const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+              
+              const messageHTML = `
+                  <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                      <strong>${message}</strong>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              `;
+              messageContainer.innerHTML = messageHTML;
+          }
+
+          if (donateForm) {
+              donateForm.addEventListener("submit", async function (event) {
+                  
+               
+                  event.preventDefault(); 
+                  
+                  messageContainer.innerHTML = ''; 
+
+                  if (!donateForm.checkValidity()) {
+                      return; 
+                  }
+
+                  
+                  const formData = new FormData(donateForm);
+                  const data = Object.fromEntries(formData.entries());
+
+                  try {
+                      const response = await fetch(ENDPOINT_URL, {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify(data)
+                      });
+
+                      if (response.ok) {
+                         
+                          displayMessage('success', 'Sent message to care home! Awaiting confirmation.');
+                          donateForm.reset(); 
+                      } else {
+                         
+                          const errorData = await response.json().catch(() => ({ message: 'Server failed to save request.' }));
+                          console.error('Submission Failed:', errorData);
+                          displayMessage('danger', `Submission Failed: ${errorData.message || 'Please check your input and try again.'}`);
+                      }
+
+                  } catch (error) {
+                      
+                      console.error('Network Error:', error);
+                      displayMessage('danger', 'A network error occurred. Check your connection.');
+                  }
+              });
+          }
       });
-    </script>
-  </body>
+ </script>
+ </body>
 </html>

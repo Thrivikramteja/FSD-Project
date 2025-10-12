@@ -3,23 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Care Homes</title>
+    <title>Edit Care Home Details</title>
     <link rel="stylesheet" href="/styles/carehomes_edit.css" />
-    <script src="/scripts/carehome_edit.js" defer></script>
+    <script src="/scripts/carehome_edit.js" defer></script> 
   </head>
   <body class="edits1">
     <div class="toppart">
       <h2 style="color: rgb(24, 6, 188)">Edit your Details(Carehome)</h2>
+      
+      <div id="message-container" style="padding: 10px; margin-bottom: 10px;"></div>
     </div>
 
     <div class="carehomes">
       <form
+        id="carehomeEditForm"
         class="carehome1"
         method="POST"
         action="/carehome-dashboard/<%= carehome.carehomeId %>/edit"
       >
         <label for="fullname">Carehome name</label><br />
-        <input  
+        <input 
           type="text"
           id="fullname"
           name="fullname"
@@ -110,8 +113,18 @@
           value="<%= carehome.wishlist || '' %>"
         /><br />
         <span id="wishlist-error" style="color: red"></span><br /><br />
-
-        <input type="submit" id="Save" value="Save" />
+        
+        <div style="margin-top: 20px;">
+            <input type="submit" id="Save" value="Save" style="margin-right: 15px;" />
+            
+            <a href="/carehome-dashboard/<%= carehome.carehomeId %>" 
+               style="display: inline-block; padding: 10px 20px; 
+                      background-color: #f0f0f0; color: #333; 
+                      border: 1px solid #ccc; border-radius: 4px; 
+                      text-decoration: none; cursor: pointer;">
+                ← Back to Dashboard
+            </a>
+        </div>
       </form>
     </div>
   </body>

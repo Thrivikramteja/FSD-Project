@@ -1,207 +1,176 @@
-.edits1{
-    background-image:url(greenbackground.avif);
+
+:root {
+    --primary-green: #388e3c;      
+    --light-green: #e8f5e9;         
+    --accent-color: #66bb6a;        
+    --bg-color: #f7f9fb;            
+    --text-color: #424242;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --border-radius: 10px;
+    --form-max-width: 600px;
+    --input-focus-shadow: rgba(76, 175, 80, 0.5); 
+}
+
+
+.edits1 {
+    background-image: url(greenbackground.avif);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    margin-top: 5%;
-    
-}
-
-.carehomes{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
     display: flex;
+    flex-direction: column;
+    align-items: center; 
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
-.carehome1,.carehome2{
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(100px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    flex: 1;
-    max-width: 65%;
-    flex-direction: row;
+
+.toppart {
+    background: linear-gradient(135deg, var(--primary-green) 0%, #4caf50 100%);
+    width: 100%;
+    padding: 1.5rem;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
+.toppart h2 {
+    color: white !important;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 1.8rem;
+}
+
+
+.ngos, .carehomes {
+    display: flex;
     justify-content: center;
-    margin-left: 5%;
-    border: 1.5px solid blue;
-    margin-top: 40px;
+    width: 100%;
     padding: 20px;
-    border-radius: 20px;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    font-size: 18px;
-    }
+    box-sizing: border-box;
+}
 
-    #fullname,#phne,#mail,#gvtid,#pinc,#wishlist,#state,#city{
-        height: 26px;
-        width: 600px;
-        padding: 10px;
-        border-radius: 10px;
-        background-color: rgb(224, 205, 254);
-        border: none;
-        color: blue;
-        font-size: 15px;
-    }
 
-    label{
-        color: rgb(144, 11, 106);
-    }
+.ngo1, .carehome1 { 
 
-    #Save{
-        background-color: #e74c3c;
-        color: white;
-        padding: 10px;
-        height: 40px;
-        width: 80px;
-        border-radius: 10px;
-        border: none;
-        font-weight: 400;
-        font-family: Arial, Helvetica, sans-serif;
-        margin-left: 60%;
-    }
-    .cancelbut{
-        padding: 10px;
-        height: 40px;
-        width: 80px;
-        border-radius: 10px;
-        border: none;
-        font-weight: 400;
-        font-family: Arial, Helvetica, sans-serif;
-        
-        background-color: white;
-    }
+     max-width: var(--form-max-width); 
+    width: 100%;
+    
+    
+    margin-top: -10px; 
+    margin-bottom: 40px; 
+    
+    background: var(--card-bg); 
+    padding: 30px 40px;
+    border-radius: var(--border-radius); 
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--primary-green);
+    
+    position: relative; 
+    z-index: 5;
+    box-sizing: border-box;
+}
 
-    .need{
-        border-radius: 15px;
-        margin-left: 15%;
-        margin-top: 50px;
-        width: 350px;
-    }
-    
-    .toppart{
-        justify-content: center;
-        margin-left: 5%;
-        margin-top: 15px;
-        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    }
-    input[type="text"]:hover, input[type="email"]:hover, input[type="tel"]:hover, input[type="number"]:hover, input[type="file"]:hover {
-        background-color: rgb(235, 225, 255);
-        border: 2px solid blue;
-        box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.5);
-    }
-    
-    #Save:hover {
-        transform: scale(1.2);
-    }
-    .cancelbut:hover{
-        transform: scale(1.2);
-    }
-    
-    .need:hover {
-        transform: scale(1.1); 
-        opacity: 0.7; 
-    }
-    
-    .carehome2{
-        margin-left: 13%;
-    
-    }
-    
-    #bank,#accnum,#ifsc,#accname{
-        height: 26px;
-        width: 300px;
-        padding: 10px;
-        border-radius: 10px;
-        background-color: rgb(224, 205, 254);
-        border: none;
-        color: blue;
-        font-size: 12px;
-    }
-    
-    #careSave{
-        background-color: #e74c3c;
-        color: white;
-        padding: 10px;
-        height: 40px;
-        width: 80px;
-        border-radius: 10px;
-        border: none;
-        font-weight: 400;
-        font-family: Arial, Helvetica, sans-serif;
-        margin-left: 50%;
-    }
-    .carecancelbut{
-        padding: 10px;
-        height: 40px;
-        width: 80px;
-        border-radius: 10px;
-        border: none;
-        font-weight: 400;
-        font-family: Arial, Helvetica, sans-serif;
-        
-        background-color: white;
-    }
-    
-    #careSave:hover {
-        transform: scale(1.2);
-    }
-    .carecancelbut:hover{
-        transform: scale(1.2);
-    }
-    
-    .logofit{
-        margin-left: 15%;
-        margin-top: 15%;
-        height: 330px;
-        width: 380px;
-    }
 
-    @media screen and (max-width: 1024px) {
-        .carehomes, .ngos, .formedit {
-            flex-direction: column;
-            align-items: center;
-        }
-    
-        .carehome1, .carehome2, .ngo1, .ngo2, .personaldetails, .form2 {
-            max-width: 90%;
-            margin: 20px auto;
-        }
-    
-        #fullname, #phne, #mail, #gvtid, #pinc, #wishlist, #darpan, #desc, 
-        #address, #panc, #gstnum, #gstaddress, #gstpinc {
-            width: 90%;
-        }
-    
-        .need {
-            width: 80%;
-            margin: 20px auto;
-        }
-    
-        #Save, #careSave, #gstSave {
-            width: 100%;
-            margin-left: 0;
-        }
-    }
-    
-    @media screen and (max-width: 768px) {
-        .carehomes, .ngos, .formedit {
-            flex-direction: column;
-            align-items: center;
-        }
-    
-        .toppart {
-            text-align: center;
-        }
-    
-        .carehome1, .carehome2, .ngo1, .ngo2, .personaldetails, .form2 {
-            width: 95%;
-        }
-    
-        .need {
-            width: 100%;
-        }
-    
-        .logofit {
-            width: 100%;
-            height: auto;
-            margin: 10px auto;
-        }
-    }
-    
+#message-container {
+    width: 100%; 
+    max-width: var(--form-max-width);
+    margin: 20px auto 0 auto;
+}
+#message-container div {
+    padding: 12px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    text-align: center;
+    background-color: var(--light-green);
+    color: var(--primary-green);
+    border: none !important;
+}
+
+
+
+.ngo1 label, .carehome1 label {
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    display: block;
+    color: var(--primary-green);
+}
+
+.ngo1 input[type="text"], .ngo1 input[type="number"],
+.carehome1 input[type="text"], .carehome1 input[type="tel"], .carehome1 input[type="email"], .carehome1 input[type="number"], .carehome1 select {
+    width: 100%; 
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 2px solid var(--light-green); 
+    border-radius: var(--border-radius);
+    background-color: var(--light-green);
+    box-sizing: border-box;
+    transition: all 0.3s ease-out; 
+}
+
+
+.ngo1 input:hover, .carehome1 input:hover {
+    border-color: var(--accent-color); 
+}
+.ngo1 input:focus, .carehome1 input:focus, .carehome1 select:focus {
+    border-color: var(--primary-green) !important; 
+    background-color: white !important;
+    box-shadow: 0 0 0 4px var(--input-focus-shadow); 
+    outline: none;
+}
+
+
+.ngo1 div[style*="margin-top: 20px"], .carehome1 div[style*="margin-top: 20px"] {
+    display: flex;
+    justify-content: center;
+    gap: 15px; 
+    padding-top: 20px;
+}
+
+
+.ngo1 button[type="submit"], .carehome1 input[type="submit"] {
+    background-color: var(--primary-green);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(56, 142, 60, 0.3);
+    transition: all 0.2s ease;
+}
+
+.ngo1 button[type="submit"]:hover, .carehome1 input[type="submit"]:hover {
+    background-color: #4caf50;
+    transform: translateY(-2px);
+}
+
+
+.ngo1 a[href*="-dashboard"], .carehome1 a[href*="-dashboard"] {
+    padding: 12px 20px;
+    background-color: var(--bg-color);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.ngo1 a[href*="-dashboard"]:hover, .carehome1 a[href*="-dashboard"]:hover {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+
+span[id*="-error"] {
+    display: block;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    color: #e74c3c !important; 
+}
