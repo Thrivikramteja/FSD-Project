@@ -49,6 +49,7 @@
     <div class="nonprofit-container">
     <% ongoing_fund.forEach(ongoing_fun => { %>
         <div class="nonprofit-card" >
+            <img src="<%= ongoing_fun.imagePath %>" alt="Fundraiser image">
             <h3><%= ongoing_fun.fundraiser_name %></h3>
             <div class="info">
                 <div>

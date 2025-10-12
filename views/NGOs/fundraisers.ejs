@@ -11,6 +11,51 @@
   </head>
   <body>
     <%- include('../shared/includes/header') %>
+    <div class="search-filter-container">
+      <div class="filter-section">
+          <button class="filter-btn" id="filterBtn">
+              <span>Filters</span>
+          </button>
+          <div class="filter-dropdown" id="filterDropdown">
+          <h3>Filter by Tag</h3>
+          <label class="checkbox-label">
+          <input type="checkbox" value="Health" class="filter-checkbox">
+          <span>Health</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="Education" class="filter-checkbox">
+            <span>Education</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="General" class="filter-checkbox">
+            <span>General</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="Emergency" class="filter-checkbox">
+            <span>Emergency</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="Environment" class="filter-checkbox">
+            <span>Environment</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="Animal Welfare" class="filter-checkbox">
+            <span>Animal Welfare</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="Others" class="filter-checkbox">
+            <span>Others</span>
+          </label>
+          <button class="apply-filter-btn" id="applyFilterBtn">Apply Filters</button>
+      </div>
+    </div>
+
+  <div class="search-section">
+      <input type="text" id="searchInput" placeholder="Search for fundraisers by name or tag..." class="search-input">
+      <button class="search-btn" id="searchBtn">Search</button>
+  </div>
+
+
     <section class="nonprofit-container">
       
       <% ongoing_fund.forEach(ongoing_fun => { %>
@@ -39,5 +84,121 @@
       <% }) %>
     </section>
     <%- include('../shared/includes/footer') %>
+
+    <script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const container = document.getElementById("fundraiser-container");
+
+  try {
+    const response = await fetch("/fundraisers");
+    if (!response.ok) throw new Error("Failed to fetch fundraisers");
+
+    const htmlText = await response.text();
+    container.innerHTML = htmlText;
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p style='color:red;'>Failed to load fundraisers. Please try again later.</p>";
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("fundraiser-container");
+
+  // Wait until the fetch finishes
+  async function initFilters() {
+    const filterBtn = document.getElementById("filterBtn");
+    const filterDropdown = document.getElementById("filterDropdown");
+    const applyFilterBtn = document.getElementById("applyFilterBtn");
+    const checkboxes = document.querySelectorAll(".filter-checkbox");
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+
+    // Toggle filter dropdown
+    filterBtn?.addEventListener("click", () => {
+      filterDropdown.classList.toggle("show");
+    });
+
+    // Close dropdown if clicking outside
+    document.addEventListener("click", (e) => {
+      if (!filterDropdown.contains(e.target) && !filterBtn.contains(e.target)) {
+        filterDropdown.classList.remove("show");
+      }
+    });
+
+    function filterCards() {
+      const selectedTags = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value.toLowerCase());
+
+      const searchTerm = searchInput.value.toLowerCase();
+
+      const cards = container.querySelectorAll(".nonprofit-card");
+      cards.forEach(card => {
+        const tag = card.querySelector(".fundraiser-tag").textContent.toLowerCase();
+        const name = card.querySelector("h3").textContent.toLowerCase();
+        const matchesTag = selectedTags.length === 0 || selectedTags.includes(tag);
+        const matchesSearch = name.includes(searchTerm);
+        if (matchesTag && matchesSearch) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+
+    // Apply filters when button clicked
+    applyFilterBtn?.addEventListener("click", filterCards);
+
+    // Apply search on button click or Enter
+    searchBtn?.addEventListener("click", filterCards);
+    searchInput?.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        filterCards();
+      }
+    });
+  }
+
+  // Initialize filters after content loaded
+  initFilters();
+
+  function applyFilters() {
+  const selectedTags = Array.from(document.querySelectorAll(".filter-checkbox:checked"))
+    .map(cb => cb.value.toLowerCase());
+
+  const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+  const cards = document.querySelectorAll(".nonprofit-card");
+  cards.forEach(card => {
+    const tagText = card.querySelector(".fundraiser-tag").textContent.toLowerCase();
+    const tag = tagText.replace("tag: ", "").trim();
+    const name = card.querySelector("h3").textContent.toLowerCase();
+
+    const matchesTag = selectedTags.length === 0 || selectedTags.includes(tag);
+    const matchesSearch = name.includes(searchTerm);
+
+    if (matchesTag && matchesSearch) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+  const filterDropdown = document.getElementById("filterDropdown");
+  filterDropdown.classList.remove("show");
+}
+
+document.getElementById("applyFilterBtn").addEventListener("click", applyFilters);
+document.getElementById("searchBtn").addEventListener("click", applyFilters);
+document.getElementById("searchInput").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    applyFilters();
+  }
+});
+
+
+});
+</script>
+
   </body>
 </html>

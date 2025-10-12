@@ -50,5 +50,64 @@
             <button type="submit">Register</button>
         </form>
     </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("ngo_form");
+  const messageBox = document.createElement("div");
+  messageBox.id = "messageBox";
+  messageBox.style.fontWeight = "bold";
+  form.parentNode.appendChild(messageBox);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      Ngoname: document.getElementById("name").value.trim(),
+      darpan_id: document.getElementById("darpan_id").value.trim(),
+      year_established: document.getElementById("year_established").value,
+      email: document.getElementById("email").value.trim(),
+      password: document.getElementById("password").value,
+      phone: document.getElementById("phone").value.trim(),
+      address: document.getElementById("address").value.trim(),
+      account_holder_name: document.getElementById("bank_name").value.trim(),
+      account_number: document.getElementById("account_number").value.trim(),
+      ifsc: document.getElementById("ifsc").value.trim()
+    };
+
+    
+    if (formData.password !== document.getElementById("confirm_password").value) {
+      messageBox.style.color = "red";
+      messageBox.textContent = "Passwords do not match!";
+      return;
+    }
+
+    try {
+      const res = await fetch("/registerNgo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+
+      if (res.ok) {
+        messageBox.style.color = "green";
+        messageBox.textContent = "Registration successful! Redirecting...";
+        setTimeout(() => {
+          window.location.href = "/login"; // redirect after 1 second
+        }, 1000);
+      } else {
+        
+        messageBox.style.color = "red";
+        messageBox.textContent = "Registration failed: Failed to register NGO";
+      }
+    } catch (err) {
+      messageBox.style.color = "red";
+      messageBox.textContent = "Error connecting to server. Try again later.";
+      console.error(err);
+    }
+  });
+});
+</script>
+
 </body>
 </html>

@@ -31,4 +31,50 @@
     <% }) %>
     <%- include('../shared/includes/footer') %>
 </body>
+
+<script>
+    async function loadNGOs() {
+      const container = document.getElementById('ngos-container');
+      try {
+        const response = await fetch('/NGOs', {
+          method: 'GET',
+          cache: 'no-store' 
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const ngos = await response.json();
+        container.innerHTML = ''; 
+
+        ngos.forEach(ngo => {
+          const orgDiv = document.createElement('div');
+          orgDiv.className = 'organization';
+          orgDiv.innerHTML = `
+            <div class="org-details">
+              <h2>${ngo.Ngoname}</h2>
+              <p>${ngo.phone}</p>
+              <p>${ngo.email}</p>
+            </div>
+            <div class="revenue">
+              <p>FY YOE - 2025</p>
+              <p><strong>Total Revenue</strong><br>Rs. ${ngo.totalFundsRaised}</p>
+              <p><strong>Total Registrations</strong><br>${ngo.totalRegistrations}</p>
+              <p><strong>Fundraisers Created</strong><br>${ngo.fundraisersCreated}</p>
+              <p><strong>Care Homes Benefited</strong><br>${ngo.careHomesBenefited}</p>
+            </div>
+          `;
+          container.appendChild(orgDiv);
+        });
+
+        console.log("NGOs loaded successfully (Status:", response.status, ")");
+      } catch (error) {
+        console.error("Failed to load NGOs:", error);
+        container.innerHTML = '<p style="color:red;">Failed to load NGO data. Please try again later.</p>';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadNGOs);
+  </script>
 </html>

@@ -513,7 +513,10 @@ async function job_render(req,res)
   try
   {
     console.log("rendering the list of jobs page");
-    res.render('carehomes/list_jobs');
+    res.render('carehomes/list_jobs', {
+      user: req.session.user,
+    userRole: req.session.userRole,
+    });
   }
   catch
   {

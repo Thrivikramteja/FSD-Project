@@ -10,19 +10,19 @@
     <script src="/signupproject.js" defer></script>
     <style>
       .error-message {
-        margin: 20px auto; /* Center horizontally with auto margins */
+        margin: 20px auto; 
         border-radius: 8px;
         background-color: rgb(181, 242, 203);
         color: rgb(161, 37, 9);
         text-align: center;
-        display: flex; /* Use flexbox to center text */
-        align-items: center; /* Vertically center the text */
-        justify-content: center; /* Horizontally center the text */
-        height: auto; /* Allow height to adjust dynamically */
-        width: 300px; /* Set a fixed width or adjust as needed */
-        padding: 10px; /* Add padding for spacing */
-        font-size: 14px; /* Adjust font size */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a slight shadow for better aesthetics */
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        height: auto; 
+        width: 300px; 
+        padding: 10px;
+        font-size: 14px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
       }
     </style>
   </head>
@@ -108,5 +108,85 @@
 
       <img src="images/careconnectLogo.jpg" class="logophoto" />
     </div>
+
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form[name='myForm']");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); // prevent default form submission
+
+      // Collect form data
+      const fullname = document.getElementById("fullname").value.trim();
+      const mail = document.getElementById("mail").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("pass").value.trim();
+      const repass = document.getElementById("repass").value.trim();
+      const checkbox = document.getElementById("notification").checked;
+
+      // Clear previous error messages
+      document.getElementById("fullname-error").textContent = "";
+      document.getElementById("mail-error").textContent = "";
+      document.getElementById("pass-error").textContent = "";
+      document.getElementById("repass-error").textContent = "";
+
+      // Basic client-side validation
+      let hasError = false;
+
+      if (fullname === "") {
+        document.getElementById("fullname-error").textContent = "Name is required";
+        hasError = true;
+      }
+
+      if (mail === "") {
+        document.getElementById("mail-error").textContent = "Email is required";
+        hasError = true;
+      }
+
+      if (password === "") {
+        document.getElementById("pass-error").textContent = "Password is required";
+        hasError = true;
+      }
+
+      if (repass !== password) {
+        document.getElementById("repass-error").textContent = "Passwords do not match";
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      try {
+        const response = await fetch("/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullname,
+            mail,
+            phone,
+            password,
+            repass,
+            checkbox,
+          }),
+        });
+
+        if (response.redirected) {
+          window.location.href = response.url; // redirect to login page
+        } else {
+          const data = await response.text();
+          // Display server error message if exists
+          const errorDiv = document.createElement("div");
+          errorDiv.classList.add("error-message");
+          errorDiv.textContent = data;
+          form.prepend(errorDiv);
+        }
+      } catch (err) {
+        console.error("Signup error:", err);
+      }
+    });
+  });
+</script>
+
   </body>
 </html>
