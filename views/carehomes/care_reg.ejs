@@ -100,30 +100,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registrationForm");
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // Prevent normal form submit
+    e.preventDefault(); // prevent default form submission
 
-    const formData = new FormData(form); // Collect all form fields, including file
+    const formData = new FormData(form); // includes all inputs + file
 
     try {
       const response = await fetch("/registerCarehome", {
         method: "POST",
-        body: formData, // Must use FormData for file uploads
+        body: formData, // do NOT set Content-Type; browser handles it
       });
 
-      // Handle redirect or JSON response depending on your backend
+      // Check if backend redirected
       if (response.redirected) {
         window.location.href = response.url;
         return;
       }
 
-      const data = await response.text(); // Or response.json() if you change backend to send JSON
-      console.log("Server response:", data);
+      const text = await response.text(); // fallback for debugging
+      console.log("Server response:", text);
 
       if (response.ok) {
         alert("Care Home Registered Successfully!");
-        window.location.href = "/login"; // matches your controller redirect
+        window.location.href = "/login"; // match your controller redirect
       } else {
-        alert("Registration failed. Please try again.");
+        alert("Registration failed. Please check all fields and try again.");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -132,5 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+
   </body>
 </html>

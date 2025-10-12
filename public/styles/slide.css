@@ -144,10 +144,10 @@ h3 {
 
 @media (max-width: 1024px) {
   .nonprofit-container {
-      grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
-  }
+      grid-template-columns: repeat(2, 1fr); /* 2 cards per row 
 }
-
+}
+*/
 @media (max-width: 768px) {
   .nonprofit-container {
       grid-template-columns: repeat(1, 1fr); /* 1 cards per row */
@@ -170,4 +170,300 @@ h3 {
   body {
       font-size: 12px;
   }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e8f5e9;
+    min-height: 100vh;
+    padding: 0;
+}
+
+/* Header Section */
+.header-section {
+    background-color: #26a69a;
+    padding: 40px 20px 30px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.header-section h1 {
+    color: white;
+    font-size: 2.2rem;
+    margin: 0;
+}
+
+.subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+/* Search and Filter Container */
+.search-filter-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 40px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.filter-section {
+    position: relative;
+}
+
+.filter-btn {
+    background-color: white;
+    border: 2px solid #b2dfdb;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #00897b;
+}
+
+.filter-btn:hover {
+    background-color: #b2dfdb;
+    transform: translateY(-2px);
+}
+
+.filter-dropdown {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    background-color: white;
+    border: 2px solid #b2dfdb;
+    border-radius: 16px;
+    padding: 20px;
+    min-width: 250px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 100;
+}
+
+.filter-dropdown.show {
+    display: block;
+}
+
+.filter-dropdown h3 {
+    color: #00897b;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-label:hover {
+    background-color: #f1f8f7;
+}
+
+.filter-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #26a69a;
+}
+
+.checkbox-label span {
+    color: #444;
+    font-size: 0.95rem;
+}
+
+.apply-filter-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #26a69a;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.apply-filter-btn:hover {
+    background-color: #00897b;
+}
+
+.search-section {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 25px;
+    border: 2px solid #b2dfdb;
+    border-radius: 50px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #26a69a;
+    box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
+}
+
+.search-btn {
+    background-color: #26a69a;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background-color: #00897b;
+    transform: translateY(-2px);
+}
+
+.search-btn:active {
+    transform: translateY(0);
+}
+
+/* Fundraiser Grid */
+.nonprofit-container {
+    max-width: 1400px;
+    margin: 0 auto 40px auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    padding: 0 40px;
+}
+
+.nonprofit-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #b2dfdb;
+}
+
+.nonprofit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.nonprofit-card img {
+    width: 100%;
+    object-fit: cover;
+    height: 200px;
+}
+
+.nonprofit-card h3 {
+    padding: 15px 20px 5px 20px;
+    font-size: 1.3rem;
+    color: #004d40;
+}
+
+.fundraiser-tag {
+    padding: 0 20px 10px 20px;
+    font-size: 0.95rem;
+    color: #00897b;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px 15px 20px;
+}
+
+.info h4 {
+    margin: 0;
+    color: #004d40;
+}
+
+.info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    padding: 15px 0 20px 0;
+}
+
+.select-btn {
+    padding: 12px 25px;
+    background-color: #26a69a;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.select-btn:hover {
+    background-color: #00897b;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .nonprofit-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .nonprofit-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .search-filter-container {
+        flex-direction: column;
+    }
+    
+    .search-section {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .nonprofit-container {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+    }
+    
+    .search-filter-container {
+        padding: 0 20px;
+    }
+    
+    .search-section {
+        flex-direction: column;
+    }
+    
+    .search-btn {
+        width: 100%;
+    }
 }
