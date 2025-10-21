@@ -6,6 +6,8 @@ const { isAuth } = require("../controllers/auth.controller");
 
 const router = express.Router();
 
+// router.get("/user-dashboard/:userId", isAuth, donorsController.getDonor);
+
 router.get("/user-dashboard/:userId", isAuth, donorsController.getdonor);
 
 router.get("/profile/Donor/:userId", isAuth, donorsController.getdonor);

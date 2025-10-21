@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
-const  { CareHomeJob } = require('../models/carehome.model');
+const { CareHomeJob } = require('../models/carehome.model');
 
 async function donateMoney(req, res) {
   try {
@@ -85,66 +85,66 @@ async function donateItems(req, res) {
 }
 
 async function get_don_items(req, res) {
- try {
- const carehomeId = parseInt(req.body.carehomes);
- console.log("Care Home ID:", carehomeId);
+  try {
+    const carehomeId = parseInt(req.body.carehomes);
+    console.log("Care Home ID:", carehomeId);
 
- const category = req.body.category;
- console.log("Category:", category);
+    const category = req.body.category;
+    console.log("Category:", category);
 
- const description = req.body.description || "";
- console.log("Description:", description);
+    const description = req.body.description || "";
+    console.log("Description:", description);
 
- const location = req.body.address;
- console.log("Location:", location);
+    const location = req.body.address;
+    console.log("Location:", location);
 
- const deliveryDate = new Date(req.body.date);
- console.log("Delivery Date:", deliveryDate);
+    const deliveryDate = new Date(req.body.date);
+    console.log("Delivery Date:", deliveryDate);
 
- const userId = req.session.user.userId;
- console.log("User ID:", userId);
+    const userId = req.session.user.userId;
+    console.log("User ID:", userId);
 
- if (!carehomeId || !category || !location || !deliveryDate || !userId) {
- return res
- .status(400)
- .json({ error: "All fields except description are required." });
- }
+    if (!carehomeId || !category || !location || !deliveryDate || !userId) {
+      return res
+        .status(400)
+        .json({ error: "All fields except description are required." });
+    }
 
- const newDonationMessage = new donate_items_mes({
- carehomeId,
-userId,
- category,
- delivery_date: deliveryDate,
- location,
- description
- });
-
- await newDonationMessage.save();
-
- console.log(
- `New donation message saved successfully for Carehome ID: ${carehomeId}`
- );
-
-
- res.status(200).json({
-        success: true,
-        message: "Your donation request has been sent to the care home successfully."
+    const newDonationMessage = new donate_items_mes({
+      carehomeId,
+      userId,
+      category,
+      delivery_date: deliveryDate,
+      location,
+      description
     });
-    
- } catch (error) {
- console.error("Error while saving donation message:", error);
- res.status(500).json({
- error: "Failed to save the donation message. Please try again later.",
- });
- }
+
+    await newDonationMessage.save();
+
+    console.log(
+      `New donation message saved successfully for Carehome ID: ${carehomeId}`
+    );
+
+
+    res.status(200).json({
+      success: true,
+      message: "Your donation request has been sent to the care home successfully."
+    });
+
+  } catch (error) {
+    console.error("Error while saving donation message:", error);
+    res.status(500).json({
+      error: "Failed to save the donation message. Please try again later.",
+    });
+  }
 }
 
 async function registerCarehome(req, res) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   let imagePath = req.file.path
-  .split(path.sep)       
-  .slice(-3)             
-  .join("/");
+    .split(path.sep)
+    .slice(-3)
+    .join("/");
 
   try {
     const carehome = new Carehome({
@@ -389,139 +389,135 @@ async function getEditCarehomeProfile(req, res) {
 }
 
 async function editCarehomeProfile(req, res) {
-    const careId = parseInt(req.params.carehomeId, 10);
-    console.log("updating carehome: ", careId);
-    
-   
-    const {
-      fullname,
-      phne,
-      state,
-      city,
-      mail,
-      gvtid,
-      bank,
-      accnum,
-      ifsc,
-      wishlist,
-    } = req.body;
+  const careId = parseInt(req.params.carehomeId, 10);
+  console.log("updating carehome: ", careId);
 
-    console.log(fullname + "" + state + "" + city + "" + wishlist);
 
-    try {
-      const updatedCarehome = await Carehome.findOneAndUpdate(
-        { carehomeId: careId },
-        {
-          care_home_name: fullname,
-          contact: phne,
-          state: state,
-          city: city,
-          email: mail,
-          reg_number: gvtid,
-          account_holder: bank,
-          account_number: accnum,
-          ifsc: ifsc,
-          wishlist: wishlist,
-        },
-        { new: true }
-      );
+  const {
+    fullname,
+    phne,
+    state,
+    city,
+    mail,
+    gvtid,
+    bank,
+    accnum,
+    ifsc,
+    wishlist,
+  } = req.body;
 
-      if (!updatedCarehome) {
-      
-        return res.status(404).json({ message: "Care Home not found for update." });
-      }
+  console.log(fullname + "" + state + "" + city + "" + wishlist);
 
-      res.status(200).json({ 
-          success: true, 
-          message: "Care Home details updated successfully.",
-          carehome: updatedCarehome
-      });
+  try {
+    const updatedCarehome = await Carehome.findOneAndUpdate(
+      { carehomeId: careId },
+      {
+        care_home_name: fullname,
+        contact: phne,
+        state: state,
+        city: city,
+        email: mail,
+        reg_number: gvtid,
+        account_holder: bank,
+        account_number: accnum,
+        ifsc: ifsc,
+        wishlist: wishlist,
+      },
+      { new: true }
+    );
 
-    } catch (error) {
-        console.error("Error updating Care Home profile:", error);
-        
-        res.status(500).json({ 
-            success: false, 
-            message: "Server error occurred while updating the profile." 
-        });
+    if (!updatedCarehome) {
+
+      return res.status(404).json({ message: "Care Home not found for update." });
     }
+
+    res.status(200).json({
+      success: true,
+      message: "Care Home details updated successfully.",
+      carehome: updatedCarehome
+    });
+
+  } catch (error) {
+    console.error("Error updating Care Home profile:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error occurred while updating the profile."
+    });
+  }
 }
 
-async function get_createjob(req,res)
-{
+async function get_createjob(req, res) {
   console.log("rendering job posting form");
   res.render('carehomes/create_job');
 }
 
 async function post_createjob(req, res) {
-    try {
-      console.log("just now posting the fresh job");
-        const carehome = req.session.user; 
-        if (!carehome) {
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        }
-
-        const { title, description, location, pay, type, startDate, endDate } = req.body;
-
-        const job = new CareHomeJob({
-            postedBy: carehome._id, 
-            title,
-            description,
-            location,
-            pay,
-            type,
-            startDate: startDate ? new Date(startDate) : null,
-            endDate: endDate ? new Date(endDate) : null
-        });
-
-        await job.save();
-
-        return res.json({
-            success: true,
-            message: "Job created successfully",
-            redirectUrl: `/carehome-dashboard/${carehome.carehomeId}`
-        });
-
-    } catch (err) {
-        console.error("Error posting job:", err);
-        return res.status(500).json({ success: false, message: "Server error" });
+  try {
+    console.log("just now posting the fresh job");
+    const carehome = req.session.user;
+    if (!carehome) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+
+    const { title, description, location, pay, type, startDate, endDate } = req.body;
+
+    const job = new CareHomeJob({
+      postedBy: carehome._id,
+      title,
+      description,
+      location,
+      pay,
+      type,
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null
+    });
+
+    await job.save();
+
+    return res.json({
+      success: true,
+      message: "Job created successfully",
+      redirectUrl: `/carehome-dashboard/${carehome.carehomeId}`
+    });
+
+  } catch (err) {
+    console.error("Error posting job:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
 }
 
 async function get_alljobs(req, res) {
-    try {
-        
-
-        const jobs = await CareHomeJob.find().sort({ createdAt: -1 });
-
-        
-        res.json({
-            success: true,
-            jobs
-        });
-    } catch (err) {
-        console.error("Error fetching jobs:", err);
-        res.status(500).json({
-            success: false,
-            message: "Server error"
-        });
-    }
+  try {
+    const jobs = await CareHomeJob.find().sort({ createdAt: -1 });
+    res.json({
+      success: true,
+      jobs
+    });
+  } catch (err) {
+    console.error("Error fetching jobs:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
 }
 
-async function job_render(req,res)
-{
-  try
-  {
+async function job_render(req, res) {
+  try {
     console.log("rendering the list of jobs page");
     res.render('carehomes/list_jobs', {
       user: req.session.user,
-    userRole: req.session.userRole,
+      userRole: req.session.userRole,
     });
   }
-  catch
-  {
+  catch {
     console.log("some error occured while loading the jobs page ");
   }
+}
+
+function apply_job(req, res) {
+  res.render("carehomes/apply_job", {user: req.session.user,});
 }
 
 
@@ -542,5 +538,5 @@ module.exports = {
   post_createjob,
   get_alljobs,
   job_render,
-
+  apply_job
 };

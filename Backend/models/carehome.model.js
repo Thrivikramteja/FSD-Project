@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { CreatedFundraiser, User } = require("./user.model");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
-const { donate_items_mes} = require('./user.model');
+const { donate_items_mes } = require('./user.model');
 
 const carehomeSchema = new mongoose.Schema({
   carehomeId: { type: Number, unique: true },
@@ -20,9 +20,9 @@ const carehomeSchema = new mongoose.Schema({
   account_number: String,
   ifsc: String,
   terms: String,
-  imagePath: {  
+  imagePath: {
     type: String,
-    required: true, 
+    required: true,
   },
 });
 
@@ -40,8 +40,7 @@ carehomeSchema.statics.getCarehome = async function (email) {
   const carehome = await Carehome.findOne({ email });
   return carehome;
 };
-carehomeSchema.statics.getallcarehomes =async function ()
-{
+carehomeSchema.statics.getallcarehomes = async function () {
   const carehomes = await Carehome.find({});
   return carehomes;
 }
@@ -74,8 +73,7 @@ carehomeSchema.statics.getallcarehoms = async function () {
   return carehomes;
 };
 
-carehomeSchema.statics.get_care_data = async function (careId) 
-{
+carehomeSchema.statics.get_care_data = async function (careId) {
   const carehome = await Carehome.findOne({ carehomeId: careId });
   return carehome;
 };
@@ -139,7 +137,7 @@ const donationitemschema = new mongoose.Schema({
   }
 });
 
-donationitemschema.statics.get_item_donations = async function(carehomeId) {
+donationitemschema.statics.get_item_donations = async function (carehomeId) {
   const donations = await this.find({ carehomeId: carehomeId })
     .sort({ donated_at: -1 }) // Sort by `donated_at` in descending order (newest first)
     .limit(4); // Limit to the first 4 results
@@ -148,7 +146,7 @@ donationitemschema.statics.get_item_donations = async function(carehomeId) {
 };
 
 
-donationMoneySchema.statics.saveDonation = async function({ userId, amount_donated, carehomeId }) {
+donationMoneySchema.statics.saveDonation = async function ({ userId, amount_donated, carehomeId }) {
   const donation = new this({
     userId,
     amount_donated,
@@ -176,7 +174,7 @@ carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
 
 
   const carehomeDetails = await this.findOne(
-    {carehomeId: carehomeId},
+    { carehomeId: carehomeId },
     { avg_expense: 1, num_residents: 1, _id: 0 }
   );
 
@@ -192,7 +190,7 @@ carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
     { title: "Average Cost Per Resident", value: avgCostPerResident }
   );
 
-  
+
   const highestDonationResult = await DonationMoney.aggregate([
     { $match: { carehomeId: carehomeId } },
     {
@@ -210,35 +208,35 @@ carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
 
 carehomeSchema.statics.recentDonations = async function (careId) {
   try {
-   
+
     const donations = await DonationMoney.find({ carehomeId: careId }).sort({
       donated_at: -1,
     });
-    
+
     if (donations.length === 0) {
       return [];
     }
-    
-    
+
+
     const result = [];
-    
+
     for (const donation of donations) {
       try {
         const donor = await User.findOne({ id_donor: donation.id_donor });
-        
+
         result.push({
           donor_name: donor ? donor.name : "Anonymous",
           amount: donation.amount_donated,
         });
       } catch (err) {
-        
+
         result.push({
           donor_name: "Anonymous",
           amount: donation.amount_donated,
         });
       }
     }
-    
+
     return result;
   } catch (err) {
     console.error("Error fetching recent donations:", err);
@@ -246,18 +244,15 @@ carehomeSchema.statics.recentDonations = async function (careId) {
   }
 };
 
-carehomeSchema.statics.getMessages = async function (carehomeId)
-{
-try
-{
-  const messages = await donate_items_mes.find({carehomeId: carehomeId});
-  return messages;
-}
-catch(error)
-{
-  console.log("error while getting messages: " + error);
-  throw error;
-}
+carehomeSchema.statics.getMessages = async function (carehomeId) {
+  try {
+    const messages = await donate_items_mes.find({ carehomeId: carehomeId });
+    return messages;
+  }
+  catch (error) {
+    console.log("error while getting messages: " + error);
+    throw error;
+  }
 };
 
 //new feature : jobs
@@ -277,7 +272,7 @@ const careHomeJobSchema = new mongoose.Schema({
 
 const Carehome = mongoose.model("Carehome", carehomeSchema);
 const DonationMoney = mongoose.model("DonationMoney", donationMoneySchema);
-const donate_items = mongoose.model("donate_items",donationitemschema);
+const donate_items = mongoose.model("donate_items", donationitemschema);
 const CareHomeJob = mongoose.model("CareHomeJob", careHomeJobSchema);
 
-module.exports = { Carehome, DonationMoney , donate_items,CareHomeJob};
+module.exports = { Carehome, DonationMoney, donate_items, CareHomeJob };

@@ -41,4 +41,6 @@ router.get('/jobs/all',carehomesController.get_alljobs);
 
 router.get('/jobs',carehomesController.job_render);
 
+router.get('/jobs/apply/:jobId', carehomesController.apply_job);
+
 module.exports = router;

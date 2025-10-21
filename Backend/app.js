@@ -3,6 +3,7 @@ const path = require("path");
 const express = require("express");
 const session = require("express-session");
 const multer = require('multer');
+require('dotenv').config();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -31,9 +32,6 @@ module.exports = upload;
 
 require("./data/database.js");
 
-// require("./data/sqlite3");
-// const SQLiteStore = require("connect-sqlite3")(session);
-
 const baseRoutes = require("./routes/base.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
 const carehomeRoutes = require("./routes/carehomes.routes.js");
@@ -43,22 +41,8 @@ const adminRoutes = require('./routes/admin.routes.js');
 
 const app = express();
 
-// app.use(
-//   session({
-//     store: new SQLiteStore({
-//       db: "sessions.db",
-//       dir: "./data",
-//     }),
-//     secret: "the-very-very-strongest-secret-key",
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 },
-//   })
-// );
-
-
 app.use(session({
-  secret: 'your_secret_key', 
+  secret: process.env.SECRET_KEY, 
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -72,22 +56,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static("public"));
-
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-app.use(express.static("public"));
+app.use('/uploads', express.static('uploads'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// const isAuth = (req, res, next) => {
-//   if (req.session.isAuth) {
-//     next();
-//   } else {
-//     res.redirect("/login");
-//   }
-// };
 
 app.use(baseRoutes);
 app.use(authRoutes);
