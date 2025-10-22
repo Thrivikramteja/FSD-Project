@@ -1,4 +1,3 @@
-/* Main Footer Styles */
 .footer {
   background-color: #4e9f76;;
   color: #ffffff;
@@ -15,7 +14,6 @@
   gap: 30px;
 }
 
-/* Footer Section Styles */
 .footer-section {
   flex: 1;
   min-width: 250px;
@@ -44,7 +42,6 @@
   margin-bottom: 15px;
 }
 
-/* Links in Footer */
 .footer-links li {
   margin-bottom: 12px;
   list-style: none;
@@ -65,7 +62,6 @@
   text-decoration: underline;
 }
 
-/* Social Media Icons */
 .social-icons {
   display: flex;
   gap: 15px;
@@ -90,7 +86,6 @@
   color: #4e9f76;
 }
 
-/* Contact Form Styles */
 .contact-form input,
 .contact-form textarea {
   width: 100%;
@@ -153,7 +148,6 @@
   background-color: #c9f7d6;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .footer-section {
     flex-basis: 100%;

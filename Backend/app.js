@@ -60,11 +60,20 @@ app.use('/uploads', express.static('uploads'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.get("/api/check-session", (req, res) => {
+  if (req.session.user) {
+    res.json({ loggedIn: true, role: req.session.user.role });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
 app.use(baseRoutes);
 app.use(authRoutes);
 app.use(carehomeRoutes);
 app.use(donorRoutes);
 app.use(NGORoutes);
 app.use(adminRoutes);
+
 
 app.listen(3000, () => console.log("Server running on port 3000"));

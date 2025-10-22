@@ -6,28 +6,14 @@ const { isAuth } = require("../controllers/auth.controller");
 
 const router = express.Router();
 
-// router.get("/user-dashboard/:userId", isAuth, donorsController.getDonor);
-
 router.get("/user-dashboard/:userId", isAuth, donorsController.getdonor);
 
 router.get("/profile/Donor/:userId", isAuth, donorsController.getdonor);
 
-router.get(
-  "/user-dashboard/:userId/edit",
-  isAuth,
-  donorsController.getEditDonorProfile
-);
+router.get("/user-dashboard/:userId/edit", isAuth, donorsController.getEditDonorProfile);
 
-router.post(
-  "/user-dashboard/:userId/edit",
-  isAuth,
-  donorsController.editDonorProfile
-);
+router.post("/user-dashboard/:userId/edit", isAuth, donorsController.editDonorProfile);
 
-router.post(
-  "/donate_money/:ngoId/:fundraiser_name",
-  isAuth,
-  donorsController.contributed_fund
-);
+router.post("/donate_money/:ngoId/:fundraiser_name", isAuth, donorsController.contributed_fund);
 
 module.exports = router;

@@ -1,0 +1,68 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 4rem;
+  background: linear-gradient(135deg, #e6f5e9 0%, #a7e3bb 50%, #76c57a 100%);
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: black;
+  letter-spacing: -0.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.nav-items {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  list-style: none;
+  margin: 0;
+}
+
+.nav-items li a,
+.nav-items li button {
+  font-size: 18px;
+  font-weight: 550;
+  color: #111827;
+  background: none;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-items li a:hover,
+.nav-items li button:hover {
+  color: #e63946;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-actions button {
+  background-color: #e63946;
+  color: #ffffff;
+  border: none;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.1s ease-in-out;
+}
+
+.user-actions button:hover {
+  background-color: #c53030;
+  transform: translateY(-2px);
+}
