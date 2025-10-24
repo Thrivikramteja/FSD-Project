@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
 
-const Header = ({ navItems, userName, onLogout, onLogin }) => {
+const Header = ({ navItems, userName, onLogout }) => {
   const navigate = useNavigate();
   return (
     <header className={styles.header}>
@@ -26,7 +26,7 @@ const Header = ({ navItems, userName, onLogout, onLogin }) => {
               </>
             ) : (
               <>
-                <button onClick={onLogin}>Login</button>
+                <button onClick={() => navigate('/login')}>Login</button>
               </>
             )}
           </li>

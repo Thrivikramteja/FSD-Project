@@ -48,9 +48,6 @@ const Carousel = () => {
                         <div className={styles["carousel-content"]}>
                             <h2>{slide.title}</h2>
                             <p>{slide.description}</p>
-                            <a href="/donate" className={styles["carousel-btn"]}>
-                                Donate now
-                            </a>
                         </div>
                         <img className={styles["carousel-img"]} src={slide.img} alt={slide.alt} />
                     </div>

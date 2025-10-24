@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import LandingPage from "../pages/Landingpage";
 import DiscoverPage from "../pages/Discoverpage";
-// import LoginPage from "./pages/LoginPage";
+import LoginPage from "../pages/Loginpage";
 // import DonorDashboard from "../pages/DonorDashboard";
 // import NgoDashboard from "../pages/NgoDashboard";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
@@ -14,7 +14,7 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/discover" element={<DiscoverPage />} />
-      {/* <Route path="/login" element={<LoginPage />} /> */}
+      <Route path="/login" element={<LoginPage />} />
 
       {/* Protected Routes */}
       {/* <Route
