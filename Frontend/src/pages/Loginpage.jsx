@@ -19,7 +19,7 @@ function Loginpage() {
   };
 
   const validateForm = () => {
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
     if (!emailPattern.test(formData.email.trim())) {
       setError("Enter a valid email address.");
       return false;
@@ -64,7 +64,7 @@ function Loginpage() {
     <div className={styles.loginPage}>
       <main className={styles.loginMain}>
         <form onSubmit={handleSubmit} className={styles.loginForm}>
-          <div className={styles.loginTitle}>
+          <div className={styles.loginTitle}> 
             <h1>Login</h1>
           </div>
 
