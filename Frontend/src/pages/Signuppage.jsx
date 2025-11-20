@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import DonorSignup from './donorSignup'
-import CarehomeRegister from './carehomeRegister'
-import NGORegister from './ngoRegister'
-import "../signupForm/signup.css"
+import DonorSignup from '../components/signupForm/donorSignup'
+import CarehomeRegister from '../components/signupForm/carehomeRegister'
+import NGORegister from '../components/signupForm/ngoRegister'
+import "../components/signupForm/signup.css"
 
 export default function Signup() {
     const [usertype, setUsertype] = useState("");

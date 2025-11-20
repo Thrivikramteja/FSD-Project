@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "../pages/Landingpage";
 import DiscoverPage from "../pages/Discoverpage";
 import LoginPage from "../pages/Loginpage";
-import Signup from "../components/signupForm/signup"
+import Signup from "../pages/Signuppage"
 // import DonorDashboard from "../pages/DonorDashboard";
 // import NgoDashboard from "../pages/NgoDashboard";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
