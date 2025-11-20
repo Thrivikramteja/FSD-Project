@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import "../signupForm/signup.css"
 
 export default function DonorSignup() {
     const [message, setMessage] = useState("");
@@ -62,7 +63,7 @@ export default function DonorSignup() {
 
     return (
         <div className="container">
-            <h1 style={{ color: "rgb(119, 183, 23)" }}>SIGN UP</h1>
+            <h1>Donor Signup</h1>
 
             {message && (
                 <div
@@ -118,10 +119,12 @@ export default function DonorSignup() {
 
                     <br /><br />
 
-                    <label>
-                        <Field type="checkbox" name="checkbox" />
-                        {" "}I agree to receive notifications
-                    </label>
+                    <div className="checkbox-container">
+                        <Field type="checkbox" name="checkbox" id="checkbox" />
+                        <label htmlFor="checkbox">I agree to receive notifications</label>
+                    </div>
+
+                    <ErrorMessage name="checkbox" component="div" className="error" />
 
                     <br /><br />
 

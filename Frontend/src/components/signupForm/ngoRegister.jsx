@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import "../signupForm/signup.css"
 
 export default function NGORegister() {
   const [message, setMessage] = useState("");

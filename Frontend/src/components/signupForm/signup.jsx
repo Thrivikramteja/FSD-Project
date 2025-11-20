@@ -1,26 +1,34 @@
-import useState from 'react'
+import { useState } from 'react'
 import DonorSignup from './donorSignup'
 import CarehomeRegister from './carehomeRegister'
 import NGORegister from './ngoRegister'
+import "../signupForm/signup.css"
 
 export default function Signup() {
     const [usertype, setUsertype] = useState("");
-    return (
-        <div>
-            <h1>Sign Up</h1>
 
-            <p>Register as:</p>
-            <select value={usertype} onChange={(e) => { setUsertype(e.target.value) }}>
+    return (
+        <div className="signup-wrapper">
+            <h1 style={{marginBottom: "6px"}}>Sign Up</h1>
+
+            <p style={{marginBottom: "8px"}}>Register as:</p>
+
+            <select 
+                className="role-select"
+                value={usertype} 
+                onChange={(e) => setUsertype(e.target.value)}
+            >
                 <option value="">--Select--</option>
                 <option value="Donor">Donor</option>
                 <option value="Carehome">Carehome</option>
                 <option value="NGO">NGO</option>
             </select>
 
-            {usertype === "Donor" && <DonorSignup />}
-            {usertype === "Carehome" && <CarehomeRegister />}
-            {usertype === "NGO" && <NGORegister />}
+            <div className="form-area">
+                {usertype === "Donor" && <DonorSignup />}
+                {usertype === "Carehome" && <CarehomeRegister />}
+                {usertype === "NGO" && <NGORegister />}
+            </div>
         </div>
     );
 }
-

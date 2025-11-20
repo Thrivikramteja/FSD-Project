@@ -1,0 +1,135 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url("../../assets/signupBack.png");  
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  font-family: Arial, sans-serif;
+}
+
+.signup-wrapper {
+  max-width: 450px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  text-align: center;
+}
+
+.role-select {
+  width: 60%;
+  padding: 10px;
+  margin: 10px 0 20px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.role-select:focus {
+  border-color: #137d49;
+  outline: none;
+  box-shadow: 0 0 5px rgba(19,125,73,0.3);
+}
+
+.form-area {
+  margin-top: 20px;
+}
+
+.container {
+  max-width: 450px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  font-family: Arial, sans-serif;
+}
+
+.container h1, .container h2 {
+  text-align: center;
+  color: #137d49;
+  margin-bottom: 20px;
+}
+
+.container label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.container input,
+.container select,
+.container textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: 0.2s;
+}
+
+.container input:focus,
+.container select:focus,
+.container textarea:focus {
+  border-color: #137d49;
+  outline: none;
+  box-shadow: 0 0 5px rgba(19,125,73,0.3);
+}
+
+.container button {
+  width: 100%;
+  padding: 12px;
+  background: #137d49;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.container button:hover {
+  background: #0d5c36;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: -8px;
+  margin-bottom: 10px;
+}
+
+.msg-box {
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.msg-success {
+  background: #d6f5e3;
+  color: #137d49;
+}
+
+.msg-error {
+  background: #ffd8d6;
+  color: #b30000;
+}
+
+select {
+  width: 200px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;   
+  white-space: nowrap;
+}

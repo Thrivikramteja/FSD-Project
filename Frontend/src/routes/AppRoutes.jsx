@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "../pages/Landingpage";
 import DiscoverPage from "../pages/Discoverpage";
 import LoginPage from "../pages/Loginpage";
+import Signup from "../components/signupForm/signup"
 // import DonorDashboard from "../pages/DonorDashboard";
 // import NgoDashboard from "../pages/NgoDashboard";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
@@ -15,6 +16,7 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/discover" element={<DiscoverPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<Signup />} />
 
       {/* Protected Routes */}
       {/* <Route

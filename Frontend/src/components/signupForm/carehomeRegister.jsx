@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import "../signupForm/signup.css"
 
 export default function CarehomeRegistration() {
   const [message, setMessage] = useState("");
@@ -70,7 +71,7 @@ export default function CarehomeRegistration() {
     try {
       const response = await fetch("/registerCarehome", {
         method: "POST",
-        body: formData, 
+        body: formData,
       });
 
       if (response.ok) {
@@ -175,10 +176,11 @@ export default function CarehomeRegistration() {
             />
             <ErrorMessage name="image" component="div" className="error" />
 
-            <label className="terms">
-              <Field type="checkbox" name="terms" />
-              I agree to the Terms & Conditions
-            </label>
+            <div className="checkbox-container">
+              <Field type="checkbox" name="terms" id="terms" />
+              <label htmlFor="terms">I agree to the Terms & Conditions</label>
+            </div>
+
             <ErrorMessage name="terms" component="div" className="error" />
 
             <button type="submit" style={{ marginTop: "20px" }}>Register</button>
