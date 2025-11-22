@@ -286,42 +286,50 @@ async function createEvent(req, res) {
 
 async function createFundraiser(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
-  const { fundraiser_name, deadline, goal_amount, description, id_carehome, tag } =
-    req.body;
+  const { fundraiser_name, deadline, goal_amount, description, id_carehome, tag } = req.body;
 
-    console.log(ngoID);
-    console.log(fundraiser_name);
-    console.log(deadline);
-    console.log(goal_amount);
+  console.log("Creating fundraiser for NGO:", ngoID);
+
   try {
     if (!ngoID || !fundraiser_name || !deadline || !goal_amount) {
-      return res.status(400).send("Missing required fields");
+      
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
+    
     let imagePath = req.file.path
-      .split(path.sep)       
-      .slice(-3)             
+      .split(path.sep)
+      .slice(-3)
       .join("/");
-    const newFundraiser = new CreatedFundraiser({     
+
+    const newFundraiser = new CreatedFundraiser({
       carehomeId: id_carehome,
       fundraiser_name,
       ngoId: ngoID,
       goal_amount: Number(goal_amount),
       description,
-      amount_raised_so_far: 0,     
+      amount_raised_so_far: 0,
       deadline: new Date(deadline),
       has_report: false,
-      tag: tag || "General", 
+      tag: tag || "General",
       imagePath: imagePath
     });
 
     await newFundraiser.save();
-
     console.log("New Fundraiser Created:", newFundraiser);
-    res.redirect(`/NGO-dashboard/${ngoID}`);
+
+   
+    // OLD: res.redirect(`/NGO-dashboard/${ngoID}`);
+    // Send JSON. React will handle the redirect using navigate()
+    res.status(200).json({ 
+        message: "Fundraiser created successfully", 
+        fundraiserId: newFundraiser._id 
+    });
+
   } catch (error) {
     console.error("Error in createFundraiser controller:", error);
-    res.status(500).send("Failed to create fundraiser");
+    
+    res.status(500).json({ message: "Failed to create fundraiser" });
   }
 }
 
@@ -428,20 +436,22 @@ async function render_donate_fundraiser(req, res) {
 }
 
 async function getNGO(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
+  // ensure the param name matches your route (':ngoID' or ':id')
+  const ngoID = parseInt(req.params.ngoID, 10); 
 
   try {
     console.log("Fetching data for NGO ID:", ngoID);
 
     const ngo = await NGO.findOne({ ngoId: ngoID });
-    console.log(ngo);
+    
     if (!ngo) {
-      return res.status(404).send("NGO not found");
+      // Changed to JSON error for React
+      return res.status(404).json({ message: "NGO not found" }); 
     }
 
     const name = ngo.Ngoname;
-    console.log("for profile card : " + name);
 
+    // --- YOUR EXISTING LOGIC (KEEP THIS AS IS) ---
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(
       today.getMonth() + 1
@@ -501,8 +511,11 @@ async function getNGO(req, res) {
       fundraisersCreated,
       careHomesBenefited,
     };
-
-    res.render("NGOs/ngo_dashboard", {
+    // ---------------------------------------------
+    console.log(stats.totalFundsRaised + "here are the stats");
+    console.log(name + "hi nitish i am here so did we get it??");
+    // NEW: Send the data object as JSON
+    res.json({
       name,
       ongoing_fund,
       completed_fund,
@@ -510,12 +523,15 @@ async function getNGO(req, res) {
       upcoming_eve,
       ngoID,
       stats,
-      user: req.session.user,
-      userRole: req.session.userRole,
+      user: req.session.user || null, 
+      userRole: req.session.userRole || null,
     });
+    console.log(res + "please");
+
   } catch (error) {
     console.error("Error in getNGO controller:", error);
-    res.status(500).send("An error occurred while loading the dashboard");
+    // Return JSON error, not text
+    res.status(500).json({ error: "An error occurred while loading the dashboard" });
   }
 }
 

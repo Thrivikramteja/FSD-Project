@@ -7,6 +7,8 @@ const upload = require("../app");
 
 const { isAuth } = require('../controllers/auth.controller');
 
+const { Carehome } = require("../models/carehome.model");
+
 router.get("/profile/NGO/:ngoID", isAuth, NGOController.getNGO);
 
 router.get('/registerNgo', NGOController.getRegister);
@@ -22,6 +24,21 @@ router.post('/registerUser/:ngoID', isAuth, NGOController.registerUser);
 router.get('/fundraisers', NGOController.getallFundraisers);
 
 router.get('/NGO-dashboard/:ngoID', isAuth, NGOController.getNGO);
+
+router.get('/api/ngo-dashboard/:ngoID', NGOController.getNGO);
+
+//
+router.get('/api/carehomes-list', async (req, res) => {
+  try {
+    
+    const carehomes = await Carehome.find({}, 'carehomeId care_home_name');
+    res.json(carehomes);
+  } catch (error) {
+    console.error("Error fetching carehomes list:", error);
+    res.status(500).json({ error: "Failed to fetch carehomes" });
+  }
+});
+//
 
 router.get('/NGO-dashboard/:ngoID/create-event', isAuth, NGOController.renderCreateEventForm);
 

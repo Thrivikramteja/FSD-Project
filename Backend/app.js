@@ -43,7 +43,8 @@ const adminRoutes = require('./routes/admin.routes.js');
 const app = express();
 
 app.use(session({
-  secret: process.env.SECRET_KEY,
+  // Add the || operator to provide a default key for development
+  secret: process.env.SECRET_KEY || "dev_secret_key_123", 
   resave: false,
   saveUninitialized: false,
   cookie: {

@@ -4,7 +4,8 @@ import DiscoverPage from "../pages/Discoverpage";
 import LoginPage from "../pages/Loginpage";
 import Signup from "../pages/Signuppage"
 // import DonorDashboard from "../pages/DonorDashboard";
-// import NgoDashboard from "../pages/NgoDashboard";
+import NGODashboard from "../pages/NGODashboard";
+import CreateFundraiser  from "../pages/CreateFundraiser";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
 // import AdminDashboard from "../pages/AdminDashboard";
 // import ProtectedRoute from "./ProtectedRoute";
@@ -18,6 +19,13 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<Signup />} />
 
+      <Route path="/NGO-dashboard/:ngoID" element={<NGODashboard />} />
+
+      <Route 
+        path="/NGO-dashboard/:ngoID/create-fundraiser" 
+        element={<CreateFundraiser />} 
+      />
+      
       {/* Protected Routes */}
       {/* <Route
         path="/donor-dashboard"
