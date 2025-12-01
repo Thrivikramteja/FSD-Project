@@ -62,13 +62,15 @@ export default function NGORegister() {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await fetch("/registerNgo", {
+      const response = await fetch("http://localhost:3000/registerNgo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
       });
+
+      console.log("received resp");
 
       if (response.ok) {
         setMessage("Registration successful! Redirecting...");

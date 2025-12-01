@@ -22,7 +22,7 @@ const Header = ({ navItems, userName, onLogout }) => {
             {userName ? (
               <>
                 <span>{userName}</span>
-                <button onClick={onLogout}>Logout</button>
+                <button onClick={() => navigate('/')}>Logout</button>
               </>
             ) : (
               <>

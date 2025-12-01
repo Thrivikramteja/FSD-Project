@@ -77,7 +77,9 @@ async function register(req, res) {
 
     await ngo.storeNGO();
     console.log("stored succesfully ");
-    res.redirect("/login");
+    return res.status(200).json({
+      message: "NGO Registration successful",
+    });
   } catch (error) {
     console.error("Error in register controller:", error);
     res.status(500).send("Failed to register NGO");

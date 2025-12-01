@@ -1,17 +1,6 @@
-body {
-  margin: 0;
-  padding: 0;
-  background-image: url("../../assets/signupBack.png");  
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  font-family: Arial, sans-serif;
-}
-
 .signup-wrapper {
   max-width: 450px;
-  margin: 40px auto;
+  margin: auto;
   padding: 25px;
   background: #ffffff;
   border-radius: 12px;

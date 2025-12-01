@@ -2,12 +2,12 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "../pages/Landingpage";
 import DiscoverPage from "../pages/Discoverpage";
 import LoginPage from "../pages/Loginpage";
-import Signup from "../pages/Signuppage"
-// import DonorDashboard from "../pages/DonorDashboard";
+import Signup from "../pages/Signuppage";
+import DonorDashboard from "../dashboards/userDashboard";
 // import NgoDashboard from "../pages/NgoDashboard";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
 // import AdminDashboard from "../pages/AdminDashboard";
-// import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -19,15 +19,16 @@ const AppRoutes = () => {
       <Route path="/signup" element={<Signup />} />
 
       {/* Protected Routes */}
-      {/* <Route
-        path="/donor-dashboard"
+      <Route
+        path="/donor-dashboard/:id"
         element={
-          <ProtectedRoute allowedRoles={["donor"]}>
+          <ProtectedRoute allowedRoles={["Donor"]}>
             <DonorDashboard />
           </ProtectedRoute>
         }
       />
-      <Route
+
+      {/* <Route
         path="/ngo-dashboard"
         element={
           <ProtectedRoute allowedRoles={["ngo"]}>
@@ -54,7 +55,7 @@ const AppRoutes = () => {
 
       {/* Fallback route */}
       {/* <Route path="*" element={<LandingPage />} /> */}
-    </Routes> 
+    </Routes>
   );
 };
 
