@@ -209,8 +209,7 @@ async function editNGOProfile(req, res) {
  return res.status(404).json({ message: "NGO not found" });
  }
 
- // ** FIX: Send a 200 OK JSON response instead of redirecting **
- // This allows the frontend fetch script to display the non-reload success message.
+
  res.status(200).json({ 
  success: true, 
  message: "NGO profile updated successfully.",
@@ -257,12 +256,12 @@ function renderCreateEventForm(req, res) {
 
 async function createEvent(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
-  const { event_location, event_name, deadline, event_time, description } =
-    req.body;
+  const { event_location, event_name, deadline, event_time, description } = req.body;
 
   try {
     if (!ngoID || !event_name || !deadline || !event_time) {
-      return res.status(400).send("Missing required fields");
+      
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
     const newEvent = new Event({
@@ -273,16 +272,21 @@ async function createEvent(req, res) {
       event_time,
       description,
       number_of_registrations: 0,
-      imagePath: req.file.path
+      imagePath: req.file.path 
     });
 
     await newEvent.save();
 
     console.log("New Event Created:", newEvent);
-    res.redirect(`/NGO-dashboard/${ngoID}`);
+    
+    
+    // NEW: React will read this message and handle the navigation
+    res.status(200).json({ message: "Event created successfully" });
+
   } catch (error) {
     console.error("Error in createEvent controller:", error);
-    res.status(500).send("Failed to create event");
+    
+    res.status(500).json({ message: "Failed to create event" });
   }
 }
 

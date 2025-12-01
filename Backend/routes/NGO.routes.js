@@ -42,7 +42,7 @@ router.get('/api/carehomes-list', async (req, res) => {
 
 router.get('/NGO-dashboard/:ngoID/create-event', isAuth, NGOController.renderCreateEventForm);
 
-router.post('/NGO-dashboard/:ngoID/create-event', isAuth, upload.single("image"), NGOController.createEvent);
+router.post('/NGO-dashboard/:ngoID/create-event', upload.single("image"), NGOController.createEvent);
 
 router.get('/NGO-dashboard/:ngoID/create-fundraiser', isAuth, NGOController.rendercreatefundraiser);
 

@@ -6,6 +6,7 @@ import Signup from "../pages/Signuppage"
 import DonorDashboard from "../dashboards/userDashboard";
 import NGODashboard from "../pages/NGODashboard";
 import CreateFundraiser  from "../pages/CreateFundraiser";
+import CreateEvent from "../pages/CreateEvent";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
 // import AdminDashboard from "../pages/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
@@ -24,6 +25,11 @@ const AppRoutes = () => {
       <Route 
         path="/NGO-dashboard/:ngoID/create-fundraiser" 
         element={<CreateFundraiser />} 
+      />
+
+      <Route 
+        path="/NGO-dashboard/:ngoID/create-event" 
+        element={<CreateEvent />} 
       />
       
       {/* Protected Routes */}
