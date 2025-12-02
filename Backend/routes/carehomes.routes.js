@@ -27,7 +27,7 @@ router.post('/donate_items_user', carehomesController.get_don_items);
 
 router.get('/registerCarehome', carehomesController.register);
 
-router.post('/registerCarehome', upload.single("image"), carehomesController.registerCarehome);
+router.post('/api/registerCarehome', upload.single("image"), carehomesController.registerCarehome);
 
 router.get('/carehomes', carehomesController.getallcarehomes);
 

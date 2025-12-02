@@ -457,7 +457,6 @@ async function getNGO(req, res) {
 
     const name = ngo.Ngoname;
 
-    // --- YOUR EXISTING LOGIC (KEEP THIS AS IS) ---
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(
       today.getMonth() + 1
@@ -517,10 +516,9 @@ async function getNGO(req, res) {
       fundraisersCreated,
       careHomesBenefited,
     };
-    // ---------------------------------------------
     console.log(stats.totalFundsRaised + "here are the stats");
     console.log(name + "hi nitish i am here so did we get it??");
-    // NEW: Send the data object as JSON
+
     res.json({
       name,
       ongoing_fund,
@@ -536,7 +534,6 @@ async function getNGO(req, res) {
 
   } catch (error) {
     console.error("Error in getNGO controller:", error);
-    // Return JSON error, not text
     res.status(500).json({ error: "An error occurred while loading the dashboard" });
   }
 }

@@ -56,7 +56,6 @@ function Loginpage() {
       if (response.ok) {
         console.log("Login successful:", data);
 
-        // ⭐ Correct way to set logged-in user
         login({
           ...data.user,
           role: data.role,      // ensure role is saved
