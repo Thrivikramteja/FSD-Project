@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-// 1. IMPORT YOUR CSS
 import '../styles/ngo_das.css'; 
 
-// 2. IMPORT COMPONENTS
 import Header from '../components/Ngoheader';
 import StatsSection from '../components/StatsSection';
 import TableSection from '../components/TableSection';
@@ -18,23 +16,19 @@ const NGODashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        
+      try { 
         const response = await fetch(`http://localhost:3000/api/ngo-dashboard/${ngoID}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          // CRITICAL: specificies that we want to send/receive cookies (sessions)
           credentials: 'include' 
         });
 
-        // Fetch doesn't throw errors for 404/500 automatically, so we check manually
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
 
-        // 4. PARSE THE JSON
         const result = await response.json();
         
         setData(result);

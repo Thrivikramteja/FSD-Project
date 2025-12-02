@@ -2,7 +2,7 @@ export const headerConfig = {
   landing: [
     { label: "Discover", path: "/discover" },
     { label: "Ways to Help", path: "/ways-to-help" },
-    { label: "Sign Up", path: "/signup" },
+    // { label: "Sign Up", path: "/signup" },
   ],
   donor: [
     { label: "My Donations" },

@@ -6,6 +6,7 @@ import Signup from "../pages/Signuppage"
 import DonorDashboard from "../dashboards/userDashboard";
 import NGODashboard from "../pages/NGODashboard";
 import CreateFundraiser  from "../pages/CreateFundraiser";
+import CreateEvent from "../pages/CreateEvent";
 import WaysToHelpPage from "../pages/WaysToHelpPage";
 import DonateItemsPage from "../pages/DonateItemsPage";
 import DonateMoneyPage from "../pages/DonateMoneyPage";
@@ -14,7 +15,13 @@ import CarehomeDashboard from "../pages/CarehomeDashboard";
 import CreateJob from "../pages/createJob";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
 // import AdminDashboard from "../pages/AdminDashboard";
+import AllCarehomes from "../pages/AllCarehomes"; 
+import AllNgos from "../pages/AllNgos";
+import AllEvents from "../pages/AllEvents";
+import AllFundraisers from "../pages/AllFundraisers";
 import ProtectedRoute from "./ProtectedRoute";
+import DonorRegistration from "../pages/DonorRegistration";
+import ViewCare from "../pages/ViewCare";
 
 const AppRoutes = () => {
   return (
@@ -29,11 +36,24 @@ const AppRoutes = () => {
       <Route path="/donate-funds" element={<DonateMoneyPage />} />
       <Route path="/jobs" element={<ListJobPage />} />
 
+       <Route path="/carehomes" element={<AllCarehomes />} />
+      <Route path="/all-ngos" element={<AllNgos />} />
+      <Route path="/events" element={<AllEvents />} />
+      <Route path="/fundraisers" element={<AllFundraisers />} />
+      <Route path="/register-event/:ngoId/:eventName" element={<DonorRegistration />} />
+      <Route path="/carehomes/viewcare/:carehomeId" element={<ViewCare />} />
+      
+
       <Route path="/NGO-dashboard/:ngoID" element={<NGODashboard />} />
 
       <Route 
         path="/NGO-dashboard/:ngoID/create-fundraiser" 
         element={<CreateFundraiser />} 
+      />
+
+      <Route 
+        path="/NGO-dashboard/:ngoID/create-event" 
+        element={<CreateEvent />} 
       />
       
       {/* Protected Routes */}

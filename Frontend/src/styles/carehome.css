@@ -1,17 +1,22 @@
-body {
+/* Wrapper to replace 'body' styles so it doesn't affect other pages */
+.carehome-wrapper {
     font-family: Arial, sans-serif;
     background-color: #f8f8f8;
     margin: 0;
+    width: 100%;
+    min-height: 100vh; /* Ensures it covers the full screen height */
+    display: flex;
+    flex-direction: column;
 }
 
-.container {
+.carehome-container {
     display: flex;
     flex-direction: column;  
     align-items: center;
     width: 100%;
 }
 
-.card {
+.carehome-card {
     display: flex;
     background: white;
     border-radius: 10px;
@@ -25,74 +30,82 @@ body {
     flex-direction: column;
 }
 
-.card img {
-  width: 400px;       /* fixed width */
-  height: 250px;      /* fixed height */
-  object-fit: cover;  /* crops image to fill, maintains aspect ratio */
-  border-radius: 5px; /* optional: rounded corners */
+/* Scoped specifically to images inside the carehome card */
+.carehome-card img {
+    width: 400px;       /* fixed width */
+    height: 250px;      /* fixed height */
+    object-fit: cover;  /* crops image to fill */
+    border-radius: 5px; 
 }
 
-.logo {
+.carehome-logo {
     padding: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.logo img {
+.carehome-logo img {
     width: 100px;
 }
 
-.content {
+.carehome-content {
     flex-grow: 1;
     margin-bottom: 20px;
     text-align: center;
+    width: 100%;
 }
 
-h2 {
+/* Specific styling for text inside content to avoid global conflicts */
+.carehome-content h2 {
     margin: 0;
     font-size: 22px;
+    padding: 1rem;
 }
 
-ul {
+.carehome-content ul {
     padding: 0;
     list-style: none;
     font-size: 16px;
 }
 
-ul li {
+.carehome-content ul li {
     margin: 5px 0;
 }
 
-a {
+.carehome-content a {
     text-decoration: none;
     color: green;
     font-size: 16px;
 }
 
-p {
+.carehome-content p {
     font-size: 16px;
     color: #333;
     line-height: 1.5;
+    padding: 0.1rem;
 }
 
-.location {
+.carehome-location {
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-.location a {
+.carehome-location span {
     color: blue;
     font-size: 16px;
 }
 
-.buttons {
+.carehome-buttons {
     display: flex;
     justify-content: center;
+    width: 100%; 
     margin-top: 20px;
-    gap: 50px; /* Increased space between buttons */
+    gap: 20px;
+    padding: 0 20px;
 }
 
-.details-btn, .donate-btn {
+.carehome-details-btn, .carehome-donate-btn {
     padding: 12px 24px;
     border: none;
     border-radius: 5px;
@@ -100,31 +113,33 @@ p {
     font-size: 16px;
     color: white;
     transition: background 0.3s ease;
+    text-decoration: none; /* Required for Link components */
+    display: inline-block;
 }
 
-.details-btn {
-    background-color: #ff7f27; /* Orange color from image */
+.carehome-details-btn {
+    background-color: #ff7f27; /* Orange */
 }
 
-.details-btn:hover {
+.carehome-details-btn:hover {
     background-color: #e66910;
 }
 
-.donate-btn {
-    background-color: #d6251f; /* Red color from image */
+.carehome-donate-btn {
+    background-color: #d6251f; /* Red */
 }
 
-.donate-btn:hover {
+.carehome-donate-btn:hover {
     background-color: #b51e19;
 }
 
 /* Tablet (768px - 1024px) */
 @media screen and (max-width: 1024px) {
-    body {
+    .carehome-wrapper {
         font-size: 14px;
     }
 
-    .container {
+    .carehome-container {
         width: 90%;
         margin: auto;
     }
@@ -132,20 +147,23 @@ p {
 
 /* Mobile (up to 767px) */
 @media screen and (max-width: 767px) {
-    body {
+    .carehome-wrapper {
         font-size: 12px;
     }
 
-    .buttons {
+    .carehome-card img {
+        width: 100%; /* Make images responsive on mobile */
+        height: auto;
+    }
+
+    .carehome-buttons {
         flex-direction: column;
-        gap: 20px; /* Adds more space between buttons in mobile view */
+        gap: 20px; 
+        align-items: center;
+    }
+
+    .carehome-details-btn, .carehome-donate-btn {
+        width: 100%;
+        text-align: center;
     }
 }
-.buttons {
-    display: flex;
-    justify-content: space-evenly; /* Moves buttons to opposite sides */
-    width: 100%; /* Ensures buttons take full width of container */
-    margin-top: 20px;
-    padding: 0 20px; /* Adds padding for spacing */
-}
-

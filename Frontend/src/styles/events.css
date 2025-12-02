@@ -1,34 +1,23 @@
-body {
+/* Wrapper for the whole page (replaces body) */
+.event-wrapper {
   font-family: "Poppins", sans-serif;
   background-color: #f9f9f9;
-  margin: 0;
+  min-height: 100vh;
+  padding-bottom: 2rem;
 }
 
-.nonprofit-section {
-  text-align: center;
-  max-width: 800px;
-  margin: auto;
-}
-
-h2 {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-/* p {
-  color: #606060;
-  font-size: 14px;
-  margin-top: 5px;
-} */
-
-.container {
+/* Main Grid Container */
+.event-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
   gap: 20px;
-  margin-top: 20px;
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
 }
 
-.drives {
+/* The Card (Merged .drives and .nonprofit-card) */
+.event-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -36,31 +25,25 @@ h2 {
   text-align: center;
   transition: all 0.3s ease-in-out;
   border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.drives:hover {
+.event-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-.drives img {
-  max-width: 100px;
-  height: auto;
-  margin-bottom: 15px;
-}
-
-h3 {
+.event-card h3 {
   font-size: 18px;
   font-weight: bold;
   margin: 10px 0;
+  color: #333;
 }
 
-.drives p {
-  font-size: 13px;
-  color: #808080;
-}
-
-.info {
+/* Info Section (Supporters count) */
+.event-info {
   display: flex;
   justify-content: space-around;
   background: #f8f8f8;
@@ -69,30 +52,53 @@ h3 {
   margin: 15px 0;
 }
 
-.info div {
+.event-info div {
   text-align: center;
 }
 
-.info h4 {
+.event-info h4 {
   margin: 0;
   font-size: 16px;
   color: #333;
   font-weight: bold;
 }
 
-.info p {
+.event-info p {
   font-size: 12px;
   color: #707070;
+  margin: 0;
 }
 
-.buttons {
+/* Buttons Section */
+.event-buttons {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   margin-top: 15px;
 }
 
-.details-btn,
-.select-btn {
+/* Register Button (Renamed .select-btn) */
+.event-select-btn {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 25px; /* Made slightly wider */
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  background: #dc2626; /* Red */
+  color: white;
+  border: 1px solid #dc2626;
+  width: 100%;
+}
+
+.event-select-btn:hover {
+  background: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+/* Details Button (Optional - keeping style just in case) */
+.event-details-btn {
   font-size: 14px;
   font-weight: 500;
   padding: 10px 15px;
@@ -100,56 +106,26 @@ h3 {
   border: none;
   cursor: pointer;
   transition: 0.3s;
-}
-
-.details-btn {
-  background: #f97316;
+  background: #f97316; /* Orange */
   color: white;
   border: 1px solid #f97316;
 }
 
-.details-btn:hover {
+.event-details-btn:hover {
   background: white;
   color: #f97316;
   border: 1px solid #f97316;
 }
 
-.select-btn {
-  background: #dc2626;
-  color: white;
-  border: 1px solid #dc2626;
-}
-
-.select-btn:hover {
-  background: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
-}
-
-.nonprofit-card {
-  background: white;
-  margin-bottom: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center;
-  transition: all 0.3s ease-in-out;
-  border: 1px solid #e5e7eb;
-}
-
-.nonprofit-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
+/* Responsive Media Queries */
 @media (max-width: 1024px) {
-  .nonprofit-container {
+  .event-container {
     grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
   }
 }
 
 @media (max-width: 768px) {
-  .nonprofit-container {
-    grid-template-columns: repeat(1, 1fr); /* 1 cards per row */
+  .event-container {
+    grid-template-columns: repeat(1, 1fr); /* 1 card per row */
   }
 }

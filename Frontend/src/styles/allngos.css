@@ -1,121 +1,103 @@
-body {
+/* Page Wrapper to isolate styles */
+.ngo-wrapper {
     font-family: Arial, sans-serif;
-    background-color: #fafafa;
-    margin: 20px;
-    color: #444;
-}
-
-.organization {
+    background-color: #f8f8f8; /* Light gray background */
+    min-height: 100vh;
     display: flex;
+    flex-direction: column;
+}
+
+.ngo-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.organization img {
-    width: 80px;
-    height: auto;
-    margin-right: 15px;
-}
-
-.org-details {
-    flex-grow: 1;
-}
-
-.org-details h2 {
-    font-size: 20px;
-    color: #222;
-}
-
-.org-details p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #555;
-}
-
-.rating {
-    font-size: 14px;
-    color: #28a745;
-}
-
-.badges {
-    margin-top: 5px;
-}
-
-.green-badge {
-    background: rgb(90, 227, 83);
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.badge {
-    background: #eaeaea;
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 5px;
-    margin-left: 5px;
-}
-
-.revenue {
-    text-align: right;
-    font-size: 14px;
-    color: #666;
-}
-
-.revenue strong {
+.ngo-title {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
     color: #333;
 }
 
-.cookie-banner {
-    background: #f8d7da;
-    padding: 10px;
-    text-align: center;
-    font-size: 14px;
-    margin-top: 20px;
+/* The NGO Card (Renamed from .organization) */
+.ngo-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    width: 90%;
+    border-left: 6px solid #28a745; /* Green border for "Trusted" look */
+    display: flex;
+    flex-wrap: wrap; /* Allows stacking on mobile */
+    justify-content: space-between;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease;
 }
 
-.cookie-banner a {
-    color: red;
-    text-decoration: none;
+.ngo-card:hover {
+    transform: translateY(-3px);
 }
 
-.accept-btn {
-    background: red;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    font-size: 14px;
-    border-radius: 5px;
-    cursor: pointer;
+/* Left Side: Details (Renamed from .org-details) */
+.ngo-details {
+    flex: 1;
+    min-width: 300px; /* Ensures it doesn't get too squished */
+    padding-right: 20px;
+    margin-bottom: 15px;
 }
 
-/* Tablet (768px - 1024px) */
-@media screen and (max-width: 1024px) {
-    body {
-        font-size: 14px;
+.ngo-details h2 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 1.6rem;
+}
+
+.ngo-details p {
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 5px 0;
+}
+
+/* Right Side: Revenue Stats (Renamed from .revenue) */
+.ngo-revenue {
+    flex: 1;
+    min-width: 250px;
+    background-color: #f1f8e9; /* Light green background */
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #c8e6c9;
+}
+
+.ngo-revenue p {
+    margin: 10px 0;
+    font-size: 0.95rem;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+}
+
+.ngo-revenue strong {
+    color: #2e7d32; /* Dark green text */
+}
+
+/* Responsive for Mobile */
+@media screen and (max-width: 768px) {
+    .ngo-card {
+        flex-direction: column;
     }
-
-    .container {
-        width: 90%;
-        margin: auto;
+    
+    .ngo-details {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
     }
-}
-
-/* Mobile (up to 767px) */
-@media screen and (max-width: 767px) {
-    body {
-        font-size: 12px;
-    }
-}
-
-h1{
-    text-align: center;
 }

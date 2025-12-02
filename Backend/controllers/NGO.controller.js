@@ -11,21 +11,55 @@ function getRegister(req, res) {
   res.render("NGOs/ngo_registration");
 }
 
+// async function get_allngo(req, res) {
+//   try {
+//     // Fetch all NGOs
+//     const NGOs = await NGO.get_all_ngos();
+
+//     // Enrich NGOs with additional data
+//     const enrichedNGOs = await Promise.all(
+//       NGOs.map(async (ngo) => {
+//         const totalFundsRaised = await NGO.get_rev(ngo.ngoId); // Get total funds raised
+//         const totalRegistrations = await NGO.tot_reg(ngo.ngoId); // Get total registrations
+//         const fundraisersCreated = await NGO.fund_created(ngo.ngoId); // Get fundraisers count
+//         const careHomesBenefited = await NGO.benifit_care(ngo.ngoId); // Get care homes count
+
+//         return {
+//           ...ngo.toObject(), // Convert Mongoose document to plain object
+//           totalFundsRaised: totalFundsRaised.length > 0 ? totalFundsRaised[0].total : 0,
+//           totalRegistrations: totalRegistrations.length > 0 ? totalRegistrations[0].total : 0,
+//           fundraisersCreated,
+//           careHomesBenefited,
+//         };
+//       })
+//     );
+
+//     // Render the EJS view with enriched NGO data
+//     res.render("NGOs/allngos", {
+//       ngos: enrichedNGOs,
+//       user: req.session.user,
+//       userRole: req.session.userRole,
+//     });
+//   } catch (err) {
+//     console.error("Error while fetching NGOs:", err);
+//     res.status(500).send("Failed to fetch NGOs");
+//   }
+// }
 async function get_allngo(req, res) {
   try {
     // Fetch all NGOs
     const NGOs = await NGO.get_all_ngos();
 
-    // Enrich NGOs with additional data
+    // Enrich NGOs with additional data (Funds, Registrations, etc.)
     const enrichedNGOs = await Promise.all(
       NGOs.map(async (ngo) => {
-        const totalFundsRaised = await NGO.get_rev(ngo.ngoId); // Get total funds raised
-        const totalRegistrations = await NGO.tot_reg(ngo.ngoId); // Get total registrations
-        const fundraisersCreated = await NGO.fund_created(ngo.ngoId); // Get fundraisers count
-        const careHomesBenefited = await NGO.benifit_care(ngo.ngoId); // Get care homes count
+        const totalFundsRaised = await NGO.get_rev(ngo.ngoId); 
+        const totalRegistrations = await NGO.tot_reg(ngo.ngoId); 
+        const fundraisersCreated = await NGO.fund_created(ngo.ngoId); 
+        const careHomesBenefited = await NGO.benifit_care(ngo.ngoId); 
 
         return {
-          ...ngo.toObject(), // Convert Mongoose document to plain object
+          ...ngo.toObject(), 
           totalFundsRaised: totalFundsRaised.length > 0 ? totalFundsRaised[0].total : 0,
           totalRegistrations: totalRegistrations.length > 0 ? totalRegistrations[0].total : 0,
           fundraisersCreated,
@@ -34,18 +68,18 @@ async function get_allngo(req, res) {
       })
     );
 
-    // Render the EJS view with enriched NGO data
-    res.render("NGOs/allngos", {
-      ngos: enrichedNGOs,
-      user: req.session.user,
-      userRole: req.session.userRole,
-    });
+    // ❌ OLD CODE (Delete this):
+    // res.render("NGOs/allngos", { ... });
+
+    // ✅ NEW CODE (Add this):
+    // Send the data directly to React
+    res.json(enrichedNGOs);
+
   } catch (err) {
     console.error("Error while fetching NGOs:", err);
-    res.status(500).send("Failed to fetch NGOs");
+    res.status(500).json({ message: "Failed to fetch NGOs" });
   }
 }
-
 
 async function register(req, res) {
   try {
@@ -108,19 +142,37 @@ async function getEditNGOProfile(req, res) {
   }
 }
 
+// async function getEvents(req, res) {
+//   try {
+//     const cur = new Date();
+//     cur.setHours(0, 0, 0, 0); 
+//     const events = await Event.find({ event_date: { $gte: cur } });
+//     res.render("NGOs/events", {
+//       upcoming_eve: events,
+//       user: req.session.user,
+//       userRole: req.session.userRole,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching upcoming events ", error);
+//     res.staus(500).send("Failed to load events ");
+//   }
+// }
+
 async function getEvents(req, res) {
   try {
     const cur = new Date();
     cur.setHours(0, 0, 0, 0); 
     const events = await Event.find({ event_date: { $gte: cur } });
-    res.render("NGOs/events", {
-      upcoming_eve: events,
-      user: req.session.user,
-      userRole: req.session.userRole,
-    });
+
+    // ❌ OLD EJS CODE (Delete this)
+    // res.render("NGOs/events", { upcoming_eve: events, ... });
+
+    // ✅ NEW REACT CODE (Add this)
+    res.json(events);
+
   } catch (error) {
     console.error("Error fetching upcoming events ", error);
-    res.staus(500).send("Failed to load events ");
+    res.status(500).json({ message: "Failed to load events" });
   }
 }
 
@@ -153,31 +205,58 @@ async function getFundraisers(req, res) {
   }
 }
 
+// async function getallFundraisers(req, res) {
+//   try {
+//     const today = new Date();
+//     const isoCurrentDate = `${today.getFullYear()}-${String(
+//       today.getMonth() + 1
+//     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+//     const fundraisers = await CreatedFundraiser.find({});
+
+//     const ongoing_fund = fundraisers.filter((fundraiser) => {
+//       const deadline =
+//         fundraiser.deadline instanceof Date
+//           ? fundraiser.deadline.toISOString().split("T")[0]
+//           : fundraiser.deadline;
+//       return deadline >= isoCurrentDate;
+//     });
+
+//     res.render("NGOs/fundraisers", {
+//       ongoing_fund,
+//       user: req.session.user,
+//       userRole: req.session.userRole,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching fundraisers:", error);
+//     res.status(500).send("Failed to load fundraisers");
+//   }
+// }
+
+
 async function getallFundraisers(req, res) {
   try {
     const today = new Date();
-    const isoCurrentDate = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
-    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    const isoCurrentDate = today.toISOString().split("T")[0];
 
     const fundraisers = await CreatedFundraiser.find({});
 
     const ongoing_fund = fundraisers.filter((fundraiser) => {
-      const deadline =
-        fundraiser.deadline instanceof Date
+      const deadline = fundraiser.deadline instanceof Date
           ? fundraiser.deadline.toISOString().split("T")[0]
           : fundraiser.deadline;
       return deadline >= isoCurrentDate;
     });
 
-    res.render("NGOs/fundraisers", {
-      ongoing_fund,
-      user: req.session.user,
-      userRole: req.session.userRole,
-    });
+    // ❌ OLD EJS CODE:
+    // res.render("NGOs/fundraisers", { ongoing_fund, ... });
+
+    // ✅ NEW REACT CODE:
+    res.json(ongoing_fund);
+
   } catch (error) {
     console.error("Error fetching fundraisers:", error);
-    res.status(500).send("Failed to load fundraisers");
+    res.status(500).json({ message: "Failed to load fundraisers" });
   }
 }
 
@@ -209,8 +288,7 @@ async function editNGOProfile(req, res) {
  return res.status(404).json({ message: "NGO not found" });
  }
 
- // ** FIX: Send a 200 OK JSON response instead of redirecting **
- // This allows the frontend fetch script to display the non-reload success message.
+
  res.status(200).json({ 
  success: true, 
  message: "NGO profile updated successfully.",
@@ -257,12 +335,12 @@ function renderCreateEventForm(req, res) {
 
 async function createEvent(req, res) {
   const ngoID = parseInt(req.params.ngoID, 10);
-  const { event_location, event_name, deadline, event_time, description } =
-    req.body;
+  const { event_location, event_name, deadline, event_time, description } = req.body;
 
   try {
     if (!ngoID || !event_name || !deadline || !event_time) {
-      return res.status(400).send("Missing required fields");
+      
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
     const newEvent = new Event({
@@ -273,16 +351,21 @@ async function createEvent(req, res) {
       event_time,
       description,
       number_of_registrations: 0,
-      imagePath: req.file.path
+      imagePath: req.file.path 
     });
 
     await newEvent.save();
 
     console.log("New Event Created:", newEvent);
-    res.redirect(`/NGO-dashboard/${ngoID}`);
+    
+    
+    // NEW: React will read this message and handle the navigation
+    res.status(200).json({ message: "Event created successfully" });
+
   } catch (error) {
     console.error("Error in createEvent controller:", error);
-    res.status(500).send("Failed to create event");
+    
+    res.status(500).json({ message: "Failed to create event" });
   }
 }
 
@@ -346,57 +429,116 @@ function getRegisterUser(req, res) {
   });
 }
 
+// async function registerUser(req, res) {
+//   try {
+//     const { event } = req.body;
+//     console.log(event + "1");
+//     const userId = req.session.user.userId;
+//     const ngoId = req.params.ngoID;
+//     console.log(ngoId);
+    
+//     const createdEvent = await Event.findOne({
+//       event_name: event,
+//       ngoId: ngoId,
+//     });
+//     console.log(createdEvent);
+    
+//     if (!createdEvent) {
+//       return res.status(404).json({ message: "Event not found." });
+//     }
+    
+//     const existingRegistration = await UserRegisteredEvent.findOne({
+//       userId,
+//       event_name: event,
+//       ngoId,
+//     });
+    
+//     if (existingRegistration) {
+//       return res
+//         .status(400)
+//         .json({ message: "You have already registered for this event." });
+//     }
+    
+//     const userRegisteredEvent = new UserRegisteredEvent({
+//       userId: userId,
+//       ngoId: ngoId,
+//       event_name: event,
+//       event_date: createdEvent.event_date,
+//       event_location: createdEvent.event_location,
+//       eventObjectId: createdEvent._id  // ADD THIS LINE - the MongoDB _id
+//     });
+    
+//     await userRegisteredEvent.save();
+//     console.log("User registration successful: ", userRegisteredEvent);
+    
+//     const newEventRegistration = await Event.findOneAndUpdate(
+//       { ngoId, event_name: event },
+//       { $inc: { number_of_registrations: 1 } },
+//       { new: true }
+//     );
+    
+//     console.log("Registration count updated successfully.");
+//     res.redirect("/");
+    
+//   } catch (error) {
+//     console.error("Error during registration: ", error);
+//     res.status(500).json({ message: "Internal server error." });
+//   }
+// }
 async function registerUser(req, res) {
   try {
-    const { event } = req.body;
-    console.log(event + "1");
-    const userId = req.session.user.userId;
+    const { event, name, email, number, age, address } = req.body; // Added extra fields destructuring
+    const userId = req.session.user ? req.session.user.userId : null;
     const ngoId = req.params.ngoID;
-    console.log(ngoId);
-    
+
+    // 1. Validation: User must be logged in
+    if (!userId) {
+      return res.status(401).json({ message: "Please login to register." });
+    }
+
     const createdEvent = await Event.findOne({
       event_name: event,
       ngoId: ngoId,
     });
-    console.log(createdEvent);
-    
+
     if (!createdEvent) {
       return res.status(404).json({ message: "Event not found." });
     }
-    
+
     const existingRegistration = await UserRegisteredEvent.findOne({
       userId,
       event_name: event,
       ngoId,
     });
-    
+
     if (existingRegistration) {
-      return res
-        .status(400)
-        .json({ message: "You have already registered for this event." });
+      return res.status(400).json({ message: "You have already registered for this event." });
     }
-    
+
     const userRegisteredEvent = new UserRegisteredEvent({
       userId: userId,
       ngoId: ngoId,
       event_name: event,
       event_date: createdEvent.event_date,
       event_location: createdEvent.event_location,
-      eventObjectId: createdEvent._id  // ADD THIS LINE - the MongoDB _id
+      eventObjectId: createdEvent._id,
+      // You might want to save the donor details (name/age/etc) here if your model supports it
     });
-    
+
     await userRegisteredEvent.save();
-    console.log("User registration successful: ", userRegisteredEvent);
-    
-    const newEventRegistration = await Event.findOneAndUpdate(
+
+    await Event.findOneAndUpdate(
       { ngoId, event_name: event },
       { $inc: { number_of_registrations: 1 } },
       { new: true }
     );
-    
-    console.log("Registration count updated successfully.");
-    res.redirect("/");
-    
+
+    // ❌ OLD CODE:
+    // res.redirect("/");
+
+    // ✅ NEW REACT CODE:
+    res.status(200).json({ message: "Registration successful!", success: true });
+
   } catch (error) {
     console.error("Error during registration: ", error);
     res.status(500).json({ message: "Internal server error." });
@@ -453,7 +595,6 @@ async function getNGO(req, res) {
 
     const name = ngo.Ngoname;
 
-    // --- YOUR EXISTING LOGIC (KEEP THIS AS IS) ---
     const today = new Date();
     const isoCurrentDate = `${today.getFullYear()}-${String(
       today.getMonth() + 1
@@ -513,10 +654,9 @@ async function getNGO(req, res) {
       fundraisersCreated,
       careHomesBenefited,
     };
-    // ---------------------------------------------
     console.log(stats.totalFundsRaised + "here are the stats");
     console.log(name + "hi nitish i am here so did we get it??");
-    // NEW: Send the data object as JSON
+
     res.json({
       name,
       ongoing_fund,
@@ -532,7 +672,6 @@ async function getNGO(req, res) {
 
   } catch (error) {
     console.error("Error in getNGO controller:", error);
-    // Return JSON error, not text
     res.status(500).json({ error: "An error occurred while loading the dashboard" });
   }
 }
