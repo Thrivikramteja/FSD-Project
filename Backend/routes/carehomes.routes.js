@@ -7,9 +7,11 @@ const { isAuth } = require("../controllers/auth.controller");
 
 const router = express.Router();
 
-router.get('/carehome-dashboard/get-job', isAuth, carehomesController.get_createjob);
+router.get('/api/carehome-dashboard/:carehomeId', carehomesController.getCarehome);
 
-router.post('/carehome-dashboard/post-job', isAuth, carehomesController.post_createjob);
+router.get('/carehome-dashboard/get-job', carehomesController.get_createjob);
+
+router.post('/carehome-dashboard/post-job', carehomesController.post_createjob);
 
 router.get('/carehome-dashboard/:carehomeId', isAuth, carehomesController.getCarehome);
 

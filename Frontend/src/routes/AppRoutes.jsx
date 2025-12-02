@@ -10,6 +10,8 @@ import WaysToHelpPage from "../pages/WaysToHelpPage";
 import DonateItemsPage from "../pages/DonateItemsPage";
 import DonateMoneyPage from "../pages/DonateMoneyPage";
 import ListJobPage from "../pages/ListJobPage";
+import CarehomeDashboard from "../pages/CarehomeDashboard";
+import CreateJob from "../pages/createJob";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
 // import AdminDashboard from "../pages/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
@@ -43,7 +45,11 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-
+      <Route 
+        path="/carehome-dashboard/:careid" 
+        element={<CarehomeDashboard />} 
+      />
+      <Route path="/carehome-dashboard/get-job" element={<CreateJob />} />
       {/* <Route
         path="/ngo-dashboard"
         element={

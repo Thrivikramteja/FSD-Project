@@ -180,40 +180,28 @@ async function registerCarehome(req, res) {
 }
 
 async function getCarehome(req, res) {
+  // Ensure this param matches your route (e.g., /api/carehome-dashboard/:carehomeId)
   const careid = parseInt(req.params.carehomeId, 10);
-  const userRole = req.params.userRole;
+  const userRole = req.session.userRole; // Usually better to get role from session
 
   try {
     console.log("Fetching data for Care Home ID:", careid);
 
+    // --- YOUR EXISTING DATA FETCHING LOGIC (Keep this) ---
     const ongoing_fund = await Carehome.ongoing_fund(careid);
-
     const completed_fund = await Carehome.completed_fund(careid);
-
     const recentDonations = await Carehome.recentDonations(careid);
-
     const getname = await Carehome.getname(careid);
-
     const wishlist = await Carehome.getWishlist(careid);
-
     const stats = await Carehome.get_carehome_stats(careid);
-
     const messages = await Carehome.getMessages(careid);
-
     const items = await donate_items.get_item_donations(careid);
-    console.log(items);
+    
+    // -----------------------------------------------------
 
-    // console.log("Fetched Data:");
-    // console.log("Ongoing Fundraisers:", ongoing_fund);
-    // console.log("Completed Fundraisers:", completed_fund);
-    // console.log("Recent Donations:", recentDonations);
-    // console.log("Care Home Name:", getname);
-    // console.log("Wishlist:", wishlist);
-    // console.log("stats:", stats);
-
-    // Render the EJS template with the fetched data
-    res.render("carehomes/carehome_dashboard", {
-      name: getname.care_home_name,
+    // !!! THE FIX: Send JSON instead of res.render !!!
+    res.json({
+      name: getname.care_home_name, // Extracting the string name just like EJS did
       ongoing_fund,
       completed_fund,
       recentDonations,
@@ -222,12 +210,15 @@ async function getCarehome(req, res) {
       stats,
       messages,
       items,
-      user: req.session.user,
-      userRole,
+      // Pass session info so React knows who is logged in
+      user: req.session.user || null, 
+      userRole: userRole || null,
     });
+
   } catch (error) {
-    console.error("Error in getcarehome controller:", error);
-    res.status(500).send("An error occurred while loading the dashboard");
+    console.error("Error in getCarehome controller:", error);
+    // Return JSON error so React doesn't crash
+    res.status(500).json({ error: "An error occurred while loading the dashboard" });
   }
 }
 
