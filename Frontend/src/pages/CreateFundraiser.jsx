@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Footer from '../components/fo';
+import Footer from '../components/footer';
 import '../styles/ngo_das.css'; 
 
 const CreateFundraiser = () => {

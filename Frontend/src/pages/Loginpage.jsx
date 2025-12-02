@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/login.module.css";
-import { useContext } from "react";
 import { AuthContext } from "../components/authContext";
 
 function Loginpage() {
-  const { setAuth } = useContext(AuthContext);
-
+  const { login } = useContext(AuthContext);   // ⬅ use login() instead of setAuth()
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     userRole: "Donor",
     email: "",
@@ -22,7 +21,8 @@ function Loginpage() {
   };
 
   const validateForm = () => {
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+    const emailPattern =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (!emailPattern.test(formData.email.trim())) {
       setError("Enter a valid email address.");
@@ -39,7 +39,7 @@ function Loginpage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // prevents page refresh
+    e.preventDefault();
 
     if (!validateForm()) return;
 
@@ -56,10 +56,10 @@ function Loginpage() {
       if (response.ok) {
         console.log("Login successful:", data);
 
-        setAuth({
-          isLoggedIn: true,
-          user: data.user,
-          role: data.role,
+        // ⭐ Correct way to set logged-in user
+        login({
+          ...data.user,
+          role: data.role,      // ensure role is saved
         });
 
         navigate(data.redirect);

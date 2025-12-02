@@ -5,8 +5,8 @@ export const headerConfig = {
     { label: "Sign Up", path: "/signup" },
   ],
   donor: [
-    { label: "My Donations", path: "/my-donations" },
-    { label: "Receipts", path: "/receipts" },
+    { label: "My Donations" },
+    { label: "Notifications" },
   ],
   ngo: [
     { label: "Create Fundraiser", path: "/create-fundraiser" },
