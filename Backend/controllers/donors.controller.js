@@ -13,10 +13,6 @@ const {
   user_message,
 } = require("../models/user.model");
 
-// function getDonor(req, res) {
-//   res.render('users/user_dashboard')
-// }
-
 async function getdonor(req, res) {
   const user_ID = parseInt(req.params.userId, 10);
   const userRole = req.params.userRole;
@@ -191,7 +187,7 @@ async function editDonorProfile(req, res) {
   }
 }
 
-exports.getUserActivity = async (req, res) => {
+async function getUserActivity (req, res) {
   try {
     const userId = Number(req.params.userId);
 
@@ -232,4 +228,5 @@ module.exports = {
   getEditDonorProfile,
   editDonorProfile,
   contributed_fund,
+  getUserActivity
 };
