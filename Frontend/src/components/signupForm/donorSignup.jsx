@@ -39,20 +39,27 @@ export default function DonorSignup() {
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
-            const response = await fetch("/signup", {
+            const response = await fetch("http://localhost:3000/api/signup", {
                 method: "POST",
+                credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(values),
             });
 
-            if (response.redirected) {
+            const data = await response.json();
+
+            if (data.success) {
                 setMessage("Signup successful! Redirecting...");
-                setTimeout(() => (window.location.href = response.url), 1000);
+
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 1000);
+
                 resetForm();
             } else {
-                const data = await response.text();
-                setMessage(data || "Failed to sign up");
+                setMessage(data.message || "Signup failed");
             }
+
         } catch (error) {
             console.error("Signup error:", error);
             setMessage("Server error. Please try again later.");
@@ -60,6 +67,8 @@ export default function DonorSignup() {
 
         setSubmitting(false);
     };
+
+
 
     return (
         <div className="container">
@@ -89,31 +98,31 @@ export default function DonorSignup() {
             >
                 <Form name="myForm">
 
-                    <label htmlFor="fullname">Name:</label>
+                    <label htmlFor="fullname">Name</label>
                     <Field type="text" id="fullname" name="fullname" placeholder="Enter your fullname" />
                     <ErrorMessage name="fullname" component="div" className="error" />
 
                     <br /><br />
 
-                    <label htmlFor="mail">Email:</label>
+                    <label htmlFor="mail">Email</label>
                     <Field type="email" id="mail" name="mail" placeholder="Enter your email" />
                     <ErrorMessage name="mail" component="div" className="error" />
 
                     <br /><br />
 
-                    <label htmlFor="phone">Phone:</label>
+                    <label htmlFor="phone">Phone</label>
                     <Field type="text" id="phone" name="phone" placeholder="Enter your phone number" />
                     <ErrorMessage name="phone" component="div" className="error" />
 
                     <br /><br />
 
-                    <label htmlFor="pass">Password:</label>
+                    <label htmlFor="pass">Password</label>
                     <Field type="password" id="pass" name="password" placeholder="Enter your password" />
                     <ErrorMessage name="password" component="div" className="error" />
 
                     <br /><br />
 
-                    <label htmlFor="repass">Confirm Password:</label>
+                    <label htmlFor="repass">Confirm Password</label>
                     <Field type="password" id="repass" name="repass" placeholder="Confirm your password" />
                     <ErrorMessage name="repass" component="div" className="error" />
 

@@ -1,26 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { checkSession } from "../api/authApi";
+import { AuthContext } from "../components/authContext";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const [loading, setLoading] = useState(true);
-  const [isAllowed, setIsAllowed] = useState(false);
+  const { auth } = useContext(AuthContext);
 
-  useEffect(() => {
-    checkSession().then((data) => {
-      if (!data.loggedIn) {
-        setIsAllowed(false);
-      } else if (allowedRoles && !allowedRoles.includes(data.role)) {
-        setIsAllowed(false);
-      } else {
-        setIsAllowed(true);
-      }
-      setLoading(false);
-    });
-  }, [allowedRoles]);
+  if (!auth.isLoggedIn) {
+    return <Navigate to="/login" />;
+  }
 
-  if (loading) return <div>Loading...</div>; 
-  if (!isAllowed) return <Navigate to="/login" />;
+  if (allowedRoles && !allowedRoles.includes(auth.role)) {
+    return <Navigate to="/" />;
+  }
 
   return children;
 };

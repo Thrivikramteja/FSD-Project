@@ -8,7 +8,7 @@ import NGODashboard from "../pages/NGODashboard";
 import CreateFundraiser  from "../pages/CreateFundraiser";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
 // import AdminDashboard from "../pages/AdminDashboard";
-// import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -27,15 +27,16 @@ const AppRoutes = () => {
       />
       
       {/* Protected Routes */}
-      {/* <Route
-        path="/donor-dashboard"
+      <Route
+        path="/donor-dashboard/:id"
         element={
-          <ProtectedRoute allowedRoles={["donor"]}>
+          <ProtectedRoute allowedRoles={["Donor"]}>
             <DonorDashboard />
           </ProtectedRoute>
         }
       />
-      <Route
+
+      {/* <Route
         path="/ngo-dashboard"
         element={
           <ProtectedRoute allowedRoles={["ngo"]}>
@@ -62,7 +63,7 @@ const AppRoutes = () => {
 
       {/* Fallback route */}
       {/* <Route path="*" element={<LandingPage />} /> */}
-    </Routes> 
+    </Routes>
   );
 };
 

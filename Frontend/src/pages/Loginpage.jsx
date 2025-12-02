@@ -1,25 +1,29 @@
-import { useState } from 'react';
-import styles from '../styles/login.module.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "../styles/login.module.css";
+import { useContext } from "react";
+import { AuthContext } from "../components/authContext";
 
 function Loginpage() {
+  const { setAuth } = useContext(AuthContext);
+
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     userRole: "Donor",
     email: "",
-    password: ""
+    password: "",
   });
 
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+
     if (!emailPattern.test(formData.email.trim())) {
       setError("Enter a valid email address.");
       return false;
@@ -35,7 +39,7 @@ function Loginpage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // prevents page refresh
 
     if (!validateForm()) return;
 
@@ -44,13 +48,21 @@ function Loginpage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        credentials: "include",
       });
 
       const data = await response.json();
 
       if (response.ok) {
         console.log("Login successful:", data);
-        // navigate("/dashboard"); // Example redirect
+
+        setAuth({
+          isLoggedIn: true,
+          user: data.user,
+          role: data.role,
+        });
+
+        navigate(data.redirect);
       } else {
         setError(data.message || "Login failed.");
       }
@@ -64,14 +76,15 @@ function Loginpage() {
     <div className={styles.loginPage}>
       <main className={styles.loginMain}>
         <form onSubmit={handleSubmit} className={styles.loginForm}>
-          <div className={styles.loginTitle}> 
+          <div className={styles.loginTitle}>
             <h1>Login</h1>
           </div>
 
           {error && <p className={styles.error}>{error}</p>}
 
           <p className={styles.loginAs}>
-            Login As:<br />
+            Login As:
+            <br />
             <select
               name="userRole"
               className={styles.roleSelect}
@@ -86,11 +99,11 @@ function Loginpage() {
           </p>
 
           <p>
-            <label className={styles.loginLabel} htmlFor="email">E-Mail</label><br />
+            <label className={styles.loginLabel}>E-Mail</label>
+            <br />
             <input
               className={styles.loginInput}
               type="email"
-              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
@@ -99,11 +112,11 @@ function Loginpage() {
           </p>
 
           <p>
-            <label className={styles.loginLabel} htmlFor="password">Password</label><br />
+            <label className={styles.loginLabel}>Password</label>
+            <br />
             <input
               className={styles.loginInput}
               type="password"
-              id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
@@ -111,10 +124,11 @@ function Loginpage() {
             />
           </p>
 
-          <button type="submit" className={styles.loginButton}>Login</button>
+          <button type="submit" className={styles.loginButton}>
+            Login
+          </button>
         </form>
       </main>
-
     </div>
   );
 }
