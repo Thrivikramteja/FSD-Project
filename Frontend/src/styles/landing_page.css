@@ -12,7 +12,6 @@ main {
   min-height: 50vh;
 }
 
-/* Carousel Styles */
 .carousel-container {
   width: 100vw;
   max-width: 100%;
@@ -184,7 +183,7 @@ li a {
 
 li a:hover {
   cursor: pointer;
-  background-color: rgb(221, 220, 220);
+  /* background-color: rgb(221, 220, 220); */
   transition: transform 0.1 s ease;
   border-radius: 4px;
 }

@@ -4,6 +4,7 @@ import Footer from "../components/footer";
 import { headerConfig } from "../config/headerConfig";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/authContext";
+import "./userDashboard.css"
 
 export default function DonorDashboard() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export default function DonorDashboard() {
 
   const [user, setUser] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [activity, setActivity] = useState(null); 
 
   const [formData, setFormData] = useState({
     name: "",
@@ -46,6 +48,19 @@ export default function DonorDashboard() {
     });
 
   }, [auth, id, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetch(`http://localhost:3000/api/activity/${user.userId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setActivity(data.data);
+          }
+        })
+        .catch((err) => console.error("Error fetching activity:", err));
+    }
+  }, [user]);
 
   if (!user) {
     return (
@@ -86,15 +101,80 @@ export default function DonorDashboard() {
 
       <div className="dashboard-container">
         <h1>Welcome, {auth.user.name} </h1>
-        
+
         <section className="dashboard-section">
-          <h2>My Donations</h2>
-          <p>No donations loaded yet.</p>
+          <h2>Events Participated</h2>
+          {activity?.events_participated?.length > 0 ? (
+            activity.events_participated.map((evt) => (
+              <div key={evt._id} className="activity-card">
+                <h4>{evt.event_name}</h4>
+                <p>Date: {new Date(evt.event_date).toDateString()}</p>
+                <p>Location: {evt.event_location}</p>
+              </div>
+            ))
+          ) : (
+            <p>No participated events.</p>
+          )}
         </section>
 
         <section className="dashboard-section">
-          <h2>Notifications</h2>
-          <p>No notifications yet.</p>
+          <h2>Upcoming Events</h2>
+          {activity?.events_upcoming?.length > 0 ? (
+            activity.events_upcoming.map((evt) => (
+              <div key={evt._id} className="activity-card">
+                <h4>{evt.event_name}</h4>
+                <p>Date: {new Date(evt.event_date).toDateString()}</p>
+                <p>Location: {evt.event_location}</p>
+              </div>
+            ))
+          ) : (
+            <p>No upcoming events.</p>
+          )}
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Contributed Fundraisers</h2>
+          {activity?.fundraisers_contributed?.length > 0 ? (
+            activity.fundraisers_contributed.map((f) => (
+              <div key={f._id} className="activity-card">
+                <h4>{f.fundraiser_name}</h4>
+                <p>Amount: ₹{f.amount_contributed}</p>
+                <p>Deadline: {new Date(f.deadline).toDateString()}</p>
+              </div>
+            ))
+          ) : (
+            <p>No fundraiser contributions.</p>
+          )}
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Money Donations</h2>
+          {activity?.donations_money?.length > 0 ? (
+            activity.donations_money.map((d) => (
+              <div key={d._id} className="activity-card">
+                <p>Amount: ₹{d.amount_donated}</p>
+                <p>Date: {new Date(d.donated_at).toDateString()}</p>
+              </div>
+            ))
+          ) : (
+            <p>No money donations yet.</p>
+          )}
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Item Donations</h2>
+          {activity?.donations_items?.length > 0 ? (
+            activity.donations_items.map((item) => (
+              <div key={item._id} className="activity-card">
+                <h4>{item.category}</h4>
+                <p>Description: {item.description || "No description"}</p>
+                <p>Delivery: {new Date(item.delivery).toDateString()}</p>
+                <p>Location: {item.location}</p>
+              </div>
+            ))
+          ) : (
+            <p>No item donations yet.</p>
+          )}
         </section>
 
         <section className="dashboard-section">
@@ -111,39 +191,19 @@ export default function DonorDashboard() {
 
           {showEditForm && (
             <form className="edit-profile-form" onSubmit={handleSave}>
-
               <label>Name</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-              />
+              <input type="text" name="name" value={formData.name} onChange={handleChange} />
 
               <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} />
 
               <label>Phone</label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-              />
+              <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
 
               <div className="edit-form-buttons">
                 <button type="submit">Save Changes</button>
-
-                <button type="button" onClick={() => setShowEditForm(false)}>
-                  Cancel
-                </button>
+                <button type="button" onClick={() => setShowEditForm(false)}>Cancel</button>
               </div>
-
             </form>
           )}
         </section>

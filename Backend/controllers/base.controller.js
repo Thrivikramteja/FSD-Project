@@ -4,11 +4,9 @@ async function getLandingPage(req, res) {
   const ongoing_fund = await NGO.ongoing_fund();
   const upcoming_eve = await Event.upcoming_eve();
 
-  res.render("landing-page", {
+  res.status(200).json({
     ongoing_fund,
-    upcoming_eve,
-    user: req.session.user,
-    userRole: req.session.userRole,
+    upcoming_eve
   });
 }
 
@@ -64,14 +62,13 @@ async function getNGO(req, res) {
       model.getname(ngoID, (err, data) => {
         if (err) {
           console.error("Error fetching name:", err);
-          resolve("Unknown NGO"); // Default name on error
+          resolve("Unknown NGO"); 
         } else {
           resolve(data);
         }
       });
     });
 
-    // Render the EJS template with the fetched data
     res.render("NGOs/ngo_dashboard", {
       name,
       ongoing_fund,
@@ -91,48 +88,4 @@ async function getNGO(req, res) {
 module.exports = {
   getNGO,
   getLandingPage,
-};
-
-// async function getdonor(req, res) {
-//   const user_ID = req.params.userId;
-
-//   try {
-//     console.log(`Fetching data for userId: ${user_ID}`); // Debug the userId being passed
-
-//     // Fetch data from model
-//     const name = await promisifyModelMethod(User.getname, user_ID);
-//     const participatedEvents = await promisifyModelMethod(
-//       User.participatedEvents,
-//       user_ID
-//     );
-//     const contributedFundraisers = await promisifyModelMethod(
-//       User.contributedFundraisers,
-//       user_ID
-//     );
-//     const ongoingfund = await promisifyModelMethod(User.ongoingfund, user_ID);
-//     const upcomingEvents = await promisifyModelMethod(
-//       User.upcomingEvents,
-//       user_ID
-//     );
-
-//     // Render the dashboard with data
-//     res.render("users/user_dashboard", {
-//       name: name || "Donor",
-//       participatedEvents: participatedEvents || [],
-//       contributedFundraisers: contributedFundraisers || [],
-//       ongoingfund: ongoingfund || [],
-//       upcomingEvents: upcomingEvents || [],
-//     });
-//   } catch (error) {
-//     console.error("Error occurred while fetching user dashboard data:", error);
-//     res
-//       .status(500)
-//       .send(
-//         "An error occurred while loading the dashboard. Please try again later."
-//       );
-//   }
-// }
-
-module.exports = {
-  getLandingPage: getLandingPage,
 };

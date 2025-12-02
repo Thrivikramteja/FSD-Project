@@ -1,7 +1,13 @@
 const path = require('path');
 
 const {
+  DonationMoney,
+  donate_items
+} = require("../models/carehome.model"); 
+
+const {
   User,
+  UserRegisteredEvent,
   CreatedFundraiser,
   UserContributedFundraiser,
   user_message,
@@ -184,6 +190,42 @@ async function editDonorProfile(req, res) {
     });
   }
 }
+
+exports.getUserActivity = async (req, res) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    const eventsParticipated = await UserRegisteredEvent.find({ userId })
+      .populate("eventObjectId"); 
+
+    const eventsUpcoming = eventsParticipated.filter(
+      evt => new Date(evt.event_date) > new Date()
+    );
+
+    const fundraisersContributed = await UserContributedFundraiser.find({ userId })
+      .populate("fundraiserObjectId"); 
+
+    const donationsMoney = await DonationMoney.find({ userId });
+
+    const donationsItems = await donate_items.find({ userId });
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        events_participated: eventsParticipated,
+        events_upcoming: eventsUpcoming,
+        fundraisers_contributed: fundraisersContributed,
+        donations_money: donationsMoney,
+        donations_items: donationsItems
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 module.exports = {
   getdonor,
