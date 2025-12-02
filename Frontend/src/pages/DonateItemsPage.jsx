@@ -25,7 +25,7 @@ const DonatePage = () => {
     const fetchCareHomes = useCallback(async () => {
         try {
             // NOTE: Replace this mock implementation with your actual backend endpoint (e.g., /api/carehomes)
-            const response = await fetch('/api/carehomes'); 
+            const response = await fetch('http://localhost:3000/api/carehomes'); 
             
             if (!response.ok) {
                 console.error(`Carehomes fetch failed with status: ${response.status}`);

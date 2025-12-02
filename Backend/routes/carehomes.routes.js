@@ -31,6 +31,8 @@ router.post('/registerCarehome', upload.single("image"), carehomesController.reg
 
 router.get('/carehomes', carehomesController.getallcarehomes);
 
+router.get('/api/carehomes', carehomesController.getCareHomesApi);
+
 router.get("/profile/Carehome/:carehomeId", isAuth, carehomesController.getCarehome);
 
 router.get("/carehomes/viewcare/:careid", carehomesController.view_details_care);
@@ -38,6 +40,7 @@ router.get("/carehomes/viewcare/:careid", carehomesController.view_details_care)
 router.post('/donate_item/action', carehomesController.accpet_item_doantions);
 
 router.get('/jobs/all', carehomesController.get_alljobs);
+router.get('/api/jobs/all', carehomesController.get_alljobs);
 
 router.get('/jobs', carehomesController.job_render);
 

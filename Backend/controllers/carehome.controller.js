@@ -7,6 +7,16 @@ const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
 const { CareHomeJob } = require('../models/carehome.model');
 
+async function getCareHomesApi(req, res) {
+  try {
+    const carehomes = await Carehome.getCareHomes();
+    res.json(carehomes);
+    // console.log(res.json(carehomes));
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch carehomes" });
+  }
+}
+
 async function donateMoney(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
@@ -538,5 +548,6 @@ module.exports = {
   post_createjob,
   get_alljobs,
   job_render,
-  apply_job
+  apply_job,
+  getCareHomesApi
 };

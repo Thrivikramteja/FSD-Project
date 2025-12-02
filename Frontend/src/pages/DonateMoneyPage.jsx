@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Header from '../components/header';
 import Footer from '../components/footer';
-// 🛑 CRITICAL IMPORT: Need the nav items config to prevent Header crash
 import { headerConfig } from "../config/headerConfig"; 
+import "../styles/help_pages.css";
 
 // Define the tip percentage and max amount outside the component
 const PLATFORM_TIP_PERCENT = 0.08; // 8%
@@ -18,28 +18,51 @@ const DonateMoneyPage = () => {
     const [amountError, setAmountError] = useState('');
 
     const [userDetails, setUserDetails] = useState({
-        // Assuming 'user' data will be fetched/passed as props in a real app
         name: 'Guest Donor',
-        phone: '', // Placeholder for user.mobile_number
-        email: 'guest@example.com', // Placeholder for user.email
+        phone: '', 
+        email: 'guest@example.com', 
         pan: '',
     });
     
-    // --- Data Fetching (Mock) ---
+    // --- Data Fetching (Live API call) ---
+    const fetchCareHomes = useCallback(async () => {
+        try {
+            // 🛑 FIX: Use explicit URL targeting Node.js server
+            const response = await fetch('http://localhost:3000/api/carehomes'); 
+            
+            if (!response.ok) {
+                console.error(`Carehomes fetch failed with status: ${response.status}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // Assuming the backend returns { carehomes: [...] } or direct array
+            let fetchedHomes = Array.isArray(data) ? data : (data.carehomes || []);
+            
+            // If the API returns successfully but has no data, use a minimal mock fallback
+            if (fetchedHomes.length === 0) {
+                fetchedHomes = [
+                    { carehomeId: 'ch-mock1', care_home_name: "Hope Haven (Fallback)", description: "No live data available." },
+                ];
+            }
+            
+            setCarehomes(fetchedHomes);
+
+        } catch (error) {
+            console.error('Error fetching care home list:', error);
+            // Fallback to mock data on error
+            setCarehomes([
+                { carehomeId: 'ch-mock1', care_home_name: "Hope Haven (Fallback)", description: "Network or Server Error. Using Mock Data." },
+            ]);
+        } finally {
+            setLoadingHomes(false);
+        }
+    }, []);
+
     useEffect(() => {
-        // Mock fetching care home data (similar to DonateItemsPage.jsx)
-        const fetchCareHomes = async () => {
-            const mockData = [
-                { carehomeId: 'ch101', care_home_name: "Hope Haven Senior Living", description: "Providing compassionate care for elderly residents since 2005" },
-                { carehomeId: 'ch102', care_home_name: "Sunset Gardens Retirement", description: "A peaceful retreat focused on health and well-being." },
-                { carehomeId: 'ch103', care_home_name: "Community Care Connect", description: "Supporting local community families and children." },
-            ];
-            await new Promise(resolve => setTimeout(resolve, 500)); 
-            setCarehomes(mockData);
-            setLoadingHomes(false);
-        };
         fetchCareHomes();
-    }, []);
+    }, [fetchCareHomes]);
 
     // --- Derived Calculations ---
     const tipAmount = useMemo(() => {
@@ -54,7 +77,7 @@ const DonateMoneyPage = () => {
         return carehomes.find(home => home.carehomeId === selectedHomeId) || { care_home_name: 'N/A', description: '' };
     }, [selectedHomeId, carehomes]);
 
-    // --- Handlers ---
+    // --- Handlers (No Change) ---
     
     const handleAmountChange = (e) => {
         let value = parseFloat(e.target.value);
@@ -62,7 +85,7 @@ const DonateMoneyPage = () => {
 
         if (value > MAX_DONATION_AMOUNT) {
             setAmountError(`Please enter an amount up to ₹${MAX_DONATION_AMOUNT.toLocaleString()}`);
-            setDonationAmount(0); // Optionally reset or cap the amount
+            setDonationAmount(0); 
         } else {
             setAmountError('');
             setDonationAmount(value);
@@ -85,7 +108,7 @@ const DonateMoneyPage = () => {
         if (selectedHomeId) {
             setHomeChosen(true);
         } else {
-            alert("Please select a care home first."); // Simple alert for selection, replace with custom modal if needed
+            console.error("Please select a care home first."); 
         }
     };
 
@@ -97,16 +120,7 @@ const DonateMoneyPage = () => {
             return;
         }
 
-        // --- Mock Payment Logic ---
-        console.log("Processing payment...");
-        console.log("Details:", { 
-            ...userDetails, 
-            homeId: selectedHomeId, 
-            donation: donationAmount, 
-            total: totalAmount 
-        });
-        
-        // In a real application, you would make an API call here (e.g., /api/process_payment)
+        // Using alert() temporarily for mock payment, replace with custom UI later
         alert(`Initiating payment of ₹${totalAmount.toFixed(2)} to ${selectedHome.care_home_name}`);
     };
     
@@ -115,22 +129,21 @@ const DonateMoneyPage = () => {
 
     return (
         <>
-            {/* 🛑 FIX: Pass navItems prop to prevent crash */}
             <Header navItems={headerConfig.landing} />
             
             <div className="min-h-screen pt-4 pb-12 bg-gray-50">
                 <div className="max-w-4xl mx-auto px-4">
                     
                     {/* --- 1. Choose Care Home Section --- */}
-                    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 mt-8 mb-6">
-                        <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
+                    <div className="choose-home bg-white p-6 rounded-xl shadow-md border border-gray-200 mt-8 mb-6">
+                        <div className="choose-home-row flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
                             <label htmlFor="some_home" className="flex-shrink-0 font-semibold text-gray-700">
                                 Choose a care home:
                             </label>
                             <select 
                                 name="carehomes" 
                                 id="some_home" 
-                                className="flex-grow w-full md:w-auto p-2 border border-gray-300 rounded-lg"
+                                className="flex-grow w-full md:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 value={selectedHomeId}
                                 onChange={(e) => setSelectedHomeId(e.target.value)}
                                 disabled={loadingHomes || homeChosen}
@@ -210,7 +223,7 @@ const DonateMoneyPage = () => {
                                             {formatCurrency(tipAmount)}
                                         </span>
                                     </div>
-                                    <p className="tip-note text-sm text-gray-500 mt-1">Tips help us scale the platform</p>
+                                    <p className="tip-note text-sm text-center text-gray-500 mt-1">Tips help us scale the platform</p>
                                 </div>
 
                                 {/* Your Details Block */}
