@@ -13,7 +13,6 @@ export default function DonorDashboard() {
   const [user, setUser] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
 
-  // Edit form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -40,7 +39,6 @@ export default function DonorDashboard() {
 
     setUser(loggedInUser);
 
-    // preload user info into form
     setFormData({
       name: loggedInUser.name,
       email: loggedInUser.email,
@@ -59,7 +57,6 @@ export default function DonorDashboard() {
     );
   }
 
-  // Handle form input
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -67,21 +64,17 @@ export default function DonorDashboard() {
     });
   };
 
-  // Save profile changes
   const handleSave = (e) => {
     e.preventDefault();
 
-    // Update user globally via AuthContext
     updateUser({
       name: formData.name,
       email: formData.email,
       phone: formData.phone
     });
 
-    // Hide form
     setShowEditForm(false);
 
-    // update local user state
     setUser((prev) => ({ ...prev, ...formData }));
 
     console.log("User updated:", formData);
@@ -92,20 +85,18 @@ export default function DonorDashboard() {
       <Header navItems={headerConfig.donor} userName={auth.user.name} />
 
       <div className="dashboard-container">
-        <h1>Welcome, {auth.user.name} 👋</h1>
+        <h1>Welcome, {auth.user.name} </h1>
         
         <section className="dashboard-section">
           <h2>My Donations</h2>
           <p>No donations loaded yet.</p>
         </section>
 
-        {/* ---------- NOTIFICATIONS SECTION (empty for now) ---------- */}
         <section className="dashboard-section">
           <h2>Notifications</h2>
           <p>No notifications yet.</p>
         </section>
 
-        {/* ---------- EDIT PROFILE SECTION ---------- */}
         <section className="dashboard-section">
           <h2>Edit Profile</h2>
 

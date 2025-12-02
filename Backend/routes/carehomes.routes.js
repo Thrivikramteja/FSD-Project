@@ -1,7 +1,8 @@
 const express = require("express");
 
 const carehomesController = require("../controllers/carehome.controller");
-const upload = require("../app");
+// const upload = require("../app");
+const upload = require("../multerConfig"); // ✅ Fixes crash
 
 const { isAuth } = require("../controllers/auth.controller");
 
@@ -27,7 +28,7 @@ router.post('/donate_items_user', carehomesController.get_don_items);
 
 router.get('/registerCarehome', carehomesController.register);
 
-router.post('/registerCarehome', upload.single("image"), carehomesController.registerCarehome);
+router.post('/api/registerCarehome', upload.single("image"), carehomesController.registerCarehome);
 
 router.get('/carehomes', carehomesController.getallcarehomes);
 

@@ -42,7 +42,7 @@ router.get('/api/carehomes-list', async (req, res) => {
 
 router.get('/NGO-dashboard/:ngoID/create-event', isAuth, NGOController.renderCreateEventForm);
 
-router.post('/NGO-dashboard/:ngoID/create-event', isAuth, upload.single("image"), NGOController.createEvent);
+router.post('/NGO-dashboard/:ngoID/create-event', upload.single("image"), NGOController.createEvent);
 
 router.get('/NGO-dashboard/:ngoID/create-fundraiser', isAuth, NGOController.rendercreatefundraiser);
 
@@ -54,6 +54,17 @@ router.post('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.editNGOProfile);
 
 router.get('/NGOs', NGOController.get_allngo);
 
+exports.get_allngo = async (req, res) => {
+    try {
+        const ngos = await NGO.find(); // Fetch data from DB
+        
+        // Send raw JSON data to React
+        res.json(ngos); 
+    } catch (error) {
+        console.log("Error fetching NGOs:", error);
+        res.status(500).json({ message: "Failed to fetch NGOs" });
+    }
+};
 router.get('/NGO-dashboard/:ngoID/edit-event', NGOController.renderEditEvent);
 
 router.post('/NGO-dashboard/:ngoID/edit-event', NGOController.editEvent);

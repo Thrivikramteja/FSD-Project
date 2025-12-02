@@ -1,29 +1,16 @@
-
- body {
+/* Wrapper replaces body */
+.view-care-wrapper {
     font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f8f9fa;
     color: #333;
-}
-
-.image_care {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-    width: 100%;
-}
-
-.image_care img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-height: 80vh;
 }
 
 /* Heading styles */
-.name_care {
+.view-care-title {
     text-align: center;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-style: italic;
@@ -32,15 +19,31 @@
     color: #2c3e50;
 }
 
-hr {
+.view-care-divider {
     border: 0;
     height: 1px;
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
     margin-bottom: 30px;
 }
 
+/* Image Section (Added support for images) */
+.view-care-image-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.view-care-image-container img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Description section */
-.description {
+.view-care-description {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
@@ -49,91 +52,66 @@ hr {
     font-size: large;
 }
 
-.description h3 {
+.view-care-description h3 {
     color: #3498db;
     margin-top: 0;
     text-transform: capitalize;
 }
 
-.description p {
+.view-care-description p {
     line-height: 1.6;
 }
 
-/* Stats and wishlist container */
-.stat_content {
+/* Stats Container */
+.view-care-stat-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Centered since there is no wishlist in EJS */
     gap: 30px;
 }
 
-/* Wishlist styles */
-.wishlist {
+/* Care stats card */
+.view-care-stats-card {
     flex: 1;
+    max-width: 800px; /* Limit width */
     background-color: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.wishlist h3 {
+.view-care-stats-card h3 {
     color: #3498db;
     margin-top: 0;
 }
 
-.wishlist ul {
-    padding-left: 20px;
-}
-
-.wish {
-    padding: 5px 0;
-}
-
-/* Care stats styles */
-.care_stats {
-    flex: 1;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.care_stats h3 {
-    color: #3498db;
-    margin-top: 0;
-}
-
-.care_stats ul {
+.view-care-stats-card ul {
     list-style-type: none;
     padding: 0;
 }
 
-.care_stats li {
+.view-care-stats-card li {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
+    padding: 12px 0;
     border-bottom: 1px solid #eee;
 }
 
-.care_stats li:last-child {
+.view-care-stats-card li:last-child {
     border-bottom: none;
 }
 
-.left {
+.view-care-label {
     font-weight: 500;
 }
 
-.right {
+.view-care-value {
     font-weight: bold;
     color: #2c3e50;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .stat_content {
+    .view-care-stat-content {
         flex-direction: column;
-    }
-    
-    .image_care {
-        margin-left: 0;
     }
 }
