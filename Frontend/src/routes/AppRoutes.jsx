@@ -2,9 +2,15 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "../pages/Landingpage";
 import DiscoverPage from "../pages/Discoverpage";
 import LoginPage from "../pages/Loginpage";
-import Signup from "../pages/Signuppage";
+import Signup from "../pages/Signuppage"
 import DonorDashboard from "../dashboards/userDashboard";
-// import NgoDashboard from "../pages/NgoDashboard";
+import NGODashboard from "../pages/NGODashboard";
+import CreateFundraiser  from "../pages/CreateFundraiser";
+import CreateEvent from "../pages/CreateEvent";
+import WaysToHelpPage from "../pages/WaysToHelpPage";
+import DonateItemsPage from "../pages/DonateItemsPage";
+import DonateMoneyPage from "../pages/DonateMoneyPage";
+import ListJobPage from "../pages/ListJobPage";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
 // import AdminDashboard from "../pages/AdminDashboard";
 import AllCarehomes from "../pages/AllCarehomes"; 
@@ -23,6 +29,10 @@ const AppRoutes = () => {
       <Route path="/discover" element={<DiscoverPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/ways-to-help" element={<WaysToHelpPage />} />
+      <Route path="/donate-items" element={<DonateItemsPage />} />
+      <Route path="/donate-funds" element={<DonateMoneyPage />} />
+      <Route path="/jobs" element={<ListJobPage />} />
 
        <Route path="/carehomes" element={<AllCarehomes />} />
       <Route path="/all-ngos" element={<AllNgos />} />
@@ -32,6 +42,18 @@ const AppRoutes = () => {
       <Route path="/carehomes/viewcare/:carehomeId" element={<ViewCare />} />
       
 
+      <Route path="/NGO-dashboard/:ngoID" element={<NGODashboard />} />
+
+      <Route 
+        path="/NGO-dashboard/:ngoID/create-fundraiser" 
+        element={<CreateFundraiser />} 
+      />
+
+      <Route 
+        path="/NGO-dashboard/:ngoID/create-event" 
+        element={<CreateEvent />} 
+      />
+      
       {/* Protected Routes */}
       <Route
         path="/donor-dashboard/:id"

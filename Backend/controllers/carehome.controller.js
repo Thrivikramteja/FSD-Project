@@ -172,7 +172,9 @@ async function registerCarehome(req, res) {
       console.log(error);
     }
 
-    res.redirect("/login");
+    return res.status(200).json({
+      message: "Carehome Registration successful",
+    });
   } catch (err) {
     console.error("Error during registration:", err);
     res.status(500).send("Something went wrong during registration.");
