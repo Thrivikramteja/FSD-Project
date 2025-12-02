@@ -37,6 +37,17 @@ router.post('/NGO-dashboard/:ngoID/edit', isAuth, NGOController.editNGOProfile);
 
 router.get('/NGOs', NGOController.get_allngo);
 
+exports.get_allngo = async (req, res) => {
+    try {
+        const ngos = await NGO.find(); // Fetch data from DB
+        
+        // Send raw JSON data to React
+        res.json(ngos); 
+    } catch (error) {
+        console.log("Error fetching NGOs:", error);
+        res.status(500).json({ message: "Failed to fetch NGOs" });
+    }
+};
 router.get('/NGO-dashboard/:ngoID/edit-event', NGOController.renderEditEvent);
 
 router.post('/NGO-dashboard/:ngoID/edit-event', NGOController.editEvent);

@@ -235,11 +235,12 @@ async function getallcarehomes(req, res) {
   try {
     const carehomes = await Carehome.getallcarehomes();
 
-    res.render("carehomes/carehomes", {
-      carehomes,
-      user: req.session.user,
-      userRole: req.session.userRole,
-    });
+    // res.render("carehomes/carehomes", {
+    //   carehomes,
+    //   user: req.session.user,
+    //   userRole: req.session.userRole,
+    // });
+    res.json(carehomes);
   } catch (error) {
     console.log("error while fetching the care homes ", error);
   }
@@ -265,29 +266,47 @@ async function getallcarehomes(req, res) {
 //   }
 // }
 
+// async function view_details_care(req, res) {
+//   try {
+//     const careId = parseInt(req.params.careid, 10);
+//     console.log("care id: " + careId);
+//     const carehome = await Carehome.get_care_data(careId);
+
+//     if (carehome) {
+//       // Convert wishlist from string to array
+//       carehome.wishlist = carehome.wishlist
+//         ? carehome.wishlist.split(",").map((item) => item.trim())
+//         : [];
+
+//       res.render("carehomes/view_care", {
+//         details: carehome,
+//         user: req.session.user,
+//         userRole: req.session.userRole,
+//       });
+//     } else {
+//       res.status(404).send("Carehome not found");
+//     }
+//   } catch (error) {
+//     console.error("Error in viewDetailsCare:", error);
+//     res.status(500).send("Failed to load carehome details");
+//   }
+// }
+
+// ✅ NEW REACT CODE
 async function view_details_care(req, res) {
   try {
     const careId = parseInt(req.params.careid, 10);
-    console.log("care id: " + careId);
-    const carehome = await Carehome.get_care_data(careId);
+    const carehome = await Carehome.get_care_data(careId); // Assuming this returns the object
 
     if (carehome) {
-      // Convert wishlist from string to array
-      carehome.wishlist = carehome.wishlist
-        ? carehome.wishlist.split(",").map((item) => item.trim())
-        : [];
-
-      res.render("carehomes/view_care", {
-        details: carehome,
-        user: req.session.user,
-        userRole: req.session.userRole,
-      });
+      // Return raw JSON data
+      res.json(carehome); 
     } else {
-      res.status(404).send("Carehome not found");
+      res.status(404).json({ message: "Carehome not found" });
     }
   } catch (error) {
     console.error("Error in viewDetailsCare:", error);
-    res.status(500).send("Failed to load carehome details");
+    res.status(500).json({ message: "Failed to load carehome details" });
   }
 }
 

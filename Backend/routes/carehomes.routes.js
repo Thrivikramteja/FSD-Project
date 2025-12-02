@@ -1,7 +1,8 @@
 const express = require("express");
 
 const carehomesController = require("../controllers/carehome.controller");
-const upload = require("../app");
+// const upload = require("../app");
+const upload = require("../multerConfig"); // ✅ Fixes crash
 
 const { isAuth } = require("../controllers/auth.controller");
 
