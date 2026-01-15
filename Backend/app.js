@@ -42,14 +42,21 @@ const adminRoutes = require('./routes/admin.routes.js');
 
 const app = express();
 
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 app.use(session({
   // Add the || operator to provide a default key for development
   secret: process.env.SECRET_KEY || "dev_secret_key_123", 
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24,
-    secure: false
+    secure: false,
+    httpOnly: true,
+    sameSite: 'lax'
   }
 }));
 
@@ -59,10 +66,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/uploads', express.static('uploads'));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 app.get("/api/check-session", (req, res) => {
   if (req.session.user) {

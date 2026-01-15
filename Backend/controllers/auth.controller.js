@@ -3,6 +3,8 @@ const { NGO } = require("../models/NGO.model");
 const { Carehome } = require("../models/carehome.model");
 const bcrypt = require("bcryptjs");
 
+const { generateOTP, sendOTPEmail } = require("../services/otpService");
+
 const isAuth = (req, res, next) => {
   if (req.session.isAuth) return next();
 
@@ -82,8 +84,58 @@ async function login(req, res) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ success: false, message: "Incorrect password" });
 
+
+    const otp = generateOTP();
+    const expires = new Date(Date.now() + 5 * 60000); // Code expires in 5 mins
+
+    user.otpCode = otp;
+    user.otpExpires = expires;
+    await user.save();
+
+    try {
+      await sendOTPEmail(user.email, otp);
+      
+      // We do NOT set req.session here. We wait for OTP verification.
+      return res.status(200).json({
+        success: true,
+        twoFactorRequired: true,
+        email: user.email,
+        role: userRole,
+        message: "OTP sent to your email"
+      });
+    } catch (mailErr) {
+      console.error("Mail Error:", mailErr);
+      return res.status(500).json({ success: false, message: "Failed to send OTP email" });
+    }
+
+
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+async function verifyOTP(req, res) {
+  const { email, otp, userRole } = req.body;
+
+  try {
+    let user = null;
+    if (userRole === "NGO") user = await NGO.getNGO(email);
+    else if (userRole === "Donor") user = await User.getUserByEmail(email);
+    else if (userRole === "Carehome") user = await Carehome.getCarehome(email);
+
+    if (!user || user.otpCode !== otp || user.otpExpires < Date.now()) {
+      return res.status(401).json({ success: false, message: "Invalid or expired OTP" });
+    }
+
+    // OTP is correct - clear it from DB
+    user.otpCode = null;
+    user.otpExpires = null;
+    await user.save();
+
     const plainUser = user.toObject();
 
+    // NOW we set the session
     req.session.isAuth = true;
     req.session.userRole = userRole;
     req.session.user = plainUser;
@@ -101,19 +153,78 @@ async function login(req, res) {
         break;
     }
 
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-      role: userRole,
-      user: plainUser,
-      redirect: dashboardUrl,
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: "Session save error" });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        role: userRole,
+        user: plainUser,
+        redirect: dashboardUrl,
+      });
     });
 
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("Verification error:", err);
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
+
+
+//new feature : forgot password
+
+// Function to handle "Forgot Password" by sending a login OTP
+async function forgotPassword(req, res) {
+  const { email, userRole } = req.body;
+
+  try {
+    let user = null;
+
+    // 1. Identify the user across your three models
+    if (userRole === "NGO") {
+      user = await NGO.getNGO(email);
+    } else if (userRole === "Donor") {
+      user = await User.getUserByEmail(email);
+    } else if (userRole === "Carehome") {
+      user = await Carehome.getCarehome(email);
+    }
+
+    // 2. If user doesn't exist, send the "sign up newly" error
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "No account found with this email. Please enter a correct email or sign up newly."
+      });
+    }
+
+    const otp = generateOTP();
+    const expires = new Date(Date.now() + 10 * 60000); // 10 min window for recovery
+
+    user.otpCode = otp;
+    user.otpExpires = expires;
+    await user.save();
+
+
+    try {
+      await sendOTPEmail(user.email, otp); //already existing service
+      return res.status(200).json({
+        success: true,
+        message: "A secure login code has been sent to your email."
+      });
+    } catch (mailErr) {
+      console.error("Forgot Pass Mail Error:", mailErr);
+      return res.status(500).json({ success: false, message: "Failed to send recovery email." });
+    }
+
+  } catch (err) {
+    console.error("Forgot Password Controller Error:", err);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
 
 function checkSession(req, res) {
   console.log("in Check session");
@@ -152,4 +263,6 @@ module.exports = {
   checkSession,
   logout,
   isAuth,
+  verifyOTP,
+  forgotPassword
 };

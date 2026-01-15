@@ -1,0 +1,130 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(5, 33, 28, 0.7); /* Deep Green Transparent */
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-top: 6px solid #10b981; /* Emerald Green Accent */
+}
+
+.iconContainer {
+    width: 64px;
+    height: 64px;
+    background-color: #ecfdf5;
+    color: #059669;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.emailText {
+    color: #047857;
+    font-weight: 600;
+}
+
+.otpGrid {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.otpInput {
+    width: 50px;
+    height: 60px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #065f46;
+    background-color: #f9fafb;
+    text-align: center;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.otpInput:focus {
+    border-color: #10b981;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 14px;
+    background-color: #059669;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+}
+
+.submitBtn:hover {
+    background-color: #047857;
+}
+
+.submitBtn:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.errorBanner {
+    padding: 12px;
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    border: 1px solid #fee2e2;
+}
+
+.resendText {
+    margin-top: 24px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.resendBtn {
+    background: none;
+    border: none;
+    color: #10b981;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}

@@ -25,6 +25,8 @@ const donorSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  otpCode: { type: String, default: null },
+  otpExpires: { type: Date, default: null },
 });
 
 donorSchema.plugin(AutoIncrement, { inc_field: "userId" });

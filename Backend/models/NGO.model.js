@@ -23,6 +23,8 @@ const ngoSchema = new mongoose.Schema({
   account_number: String,
   ifsc: String,
   ngoId: { type: Number, unique: true }, // This will be auto-incremented
+  otpCode: { type: String, default: null },
+  otpExpires: { type: Date, default: null },
 });
 
 // Add auto-increment plugin only for ngoId

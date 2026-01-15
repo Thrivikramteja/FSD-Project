@@ -22,8 +22,10 @@ const carehomeSchema = new mongoose.Schema({
   terms: String,
   imagePath: {
     type: String,
-    required: true,
+    required: false,
   },
+  otpCode: { type: String, default: null },
+  otpExpires: { type: Date, default: null },
 });
 
 carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
@@ -270,9 +272,47 @@ const careHomeJobSchema = new mongoose.Schema({
 });
 
 
+//new feature : application for jobs
+//when a user applies for job it get stores in this schema
+const applicationSchema = new mongoose.Schema({
+  // Reference to the specific Job posted
+  jobId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'CareHomeJob', 
+    required: true 
+  },
+  
+  // Reference to the User (Document reference)
+  // Even if your friend is using a custom 'id', MongoDB's _id is the anchor.
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
+  },
+
+  // Reference to the CareHome Document
+  carehomeId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Carehome',
+    required: true
+  },
+
+  status: { 
+    type: String, 
+    enum: ['Pending', 'Accepted', 'Rejected'], 
+    default: 'Pending' 
+  },
+
+  appliedAt: { 
+    type: Date, 
+    default: Date.now 
+  }
+});
+
+const JobApplication = mongoose.model("JobApplication", applicationSchema);
 const Carehome = mongoose.model("Carehome", carehomeSchema);
 const DonationMoney = mongoose.model("DonationMoney", donationMoneySchema);
 const donate_items = mongoose.model("donate_items", donationitemschema);
 const CareHomeJob = mongoose.model("CareHomeJob", careHomeJobSchema);
 
-module.exports = { Carehome, DonationMoney, donate_items, CareHomeJob };
+module.exports = { Carehome, DonationMoney, donate_items, CareHomeJob , JobApplication };

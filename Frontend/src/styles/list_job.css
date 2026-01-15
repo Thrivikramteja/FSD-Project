@@ -6,7 +6,7 @@
   background-color: #e8f5e9;
   min-height: 100vh;
   padding-bottom: 40px;
-
+  padding-top: 1px;
   /* Header Section */
   .header-section {
     background-color: #26a69a;
