@@ -1,259 +1,146 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import '../styles/carehome_dashboard.css'; 
-
-// Import Header
 import CareHeader from '../components/CareHeader';
 import Footer from '../components/footer';
+import styles from '../styles/CarehomeDashboard.module.css'; 
 
-
-const WishlistSidebar = ({ wishlist }) => {
-  let items = [];
-  if (Array.isArray(wishlist)) {
-    items = wishlist;
-  } else if (typeof wishlist === 'string' && wishlist.trim() !== '') {
-    items = wishlist.split(',').map(item => item.trim());
-  }
-
-  return (
-    <aside className="wishlist">
-      <h2>Wishlist of Needs</h2>
-      <ul>
-        {items.length > 0 ? (
-          items.map((item, index) => <li key={index}>{item}</li>)
-        ) : (
-          <li>No items in wishlist. Please go to the edit page to update.</li>
-        )}
-      </ul>
-    </aside>
-  );
-};
-
-// ==========================================
-// SUB-COMPONENT 2: Stats Section (With Toggle)
-// ==========================================
-const CareStats = ({ stats, activeFundraisers }) => {
-  const [showStats, setShowStats] = useState(false);
-
-  return (
-    <>
-      <button 
-        className="btn toggle-btn" 
-        onClick={() => setShowStats(!showStats)}
-      >
-        {showStats ? "Hide Dashboard Stats" : "Show Dashboard Stats"}
-      </button>
-
-      {showStats && (
-        <section className="dashboard-stats" id="dashboard-stats" style={{ display: 'block' }}>
-          <div className="stats-row">
-            <div className="stat-card">
-              <h3>Active Fundraisers</h3>
-              <p className="stat-value">{activeFundraisers}</p>
-            </div>
-            {stats && stats.map((stat, index) => (
-              <div className="stat-card" key={index}>
-                <h3>{stat.title}</h3>
-                <p className="stat-value">{stat.value}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </>
-  );
-};
-
-// ==========================================
-// SUB-COMPONENT 3: Fundraisers (View More/Less)
-// ==========================================
-const FundraiserList = ({ fundraisers }) => {
-  const [showAll, setShowAll] = useState(false);
-  
-  // Show only 1 if collapsed, all if expanded
-  const visibleFundraisers = showAll ? fundraisers : fundraisers.slice(0, 1);
-
-  return (
-    <section className="fundraisers">
-      <h2>Current Associated Fundraisers</h2>
-      <div className="fundraiser-list">
-        {fundraisers.length > 0 ? (
-          visibleFundraisers.map((fundraiser, index) => (
-            <div className="fundraiser-card" key={index}>
-              <h3>{fundraiser.fundraiser_name}</h3>
-              <p>Raised: ₹{fundraiser.amount_raised_so_far} / ₹{fundraiser.goal_amount}</p>
-              <div className="progress-bar">
-                <div 
-                  className="progress" 
-                  style={{ width: `${(fundraiser.amount_raised_so_far / fundraiser.goal_amount) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No active fundraisers.</p>
-        )}
-      </div>
-
-      {fundraisers.length > 1 && (
-        <div className="button-container">
-          <button className="btn" onClick={() => setShowAll(!showAll)}>
-            {showAll ? "View Less" : "View More"}
-          </button>
-        </div>
-      )}
-    </section>
-  );
-};
-
-// ==========================================
-// SUB-COMPONENT 4: Item Decisions (Accept/Reject)
-// ==========================================
-const DonationDecisions = ({ messages }) => {
-  
-  const handleDecision = async (messageId, action, e) => {
-    e.preventDefault(); // Prevent form reload
-    // In the future, you will fetch() your backend here
-    console.log(`Sending decision: ${action} for message ${messageId}`);
-    alert(`You clicked ${action}. (Backend logic needed)`);
-  };
-
-  return (
-    <section className="message-section">
-      <h2>Decide Item Donations</h2>
-      <div className="message-list">
-        {messages && messages.length > 0 ? (
-          messages.map((msg, index) => (
-            <div className="message-item" key={index}>
-              <p><strong>Category:</strong> {msg.category}</p>
-              <p><strong>Location:</strong> {msg.location}</p>
-              <p><strong>Delivery Date:</strong> {new Date(msg.delivery_date).toLocaleDateString()}</p>
-              <p><strong>Description:</strong> {msg.description}</p>
-              
-              <div className="button-group">
-                <button 
-                  className="btn accept" 
-                  onClick={(e) => handleDecision(msg._id, 'accept', e)}
-                >
-                  Accept
-                </button>
-                <button 
-                  className="btn reject" 
-                  onClick={(e) => handleDecision(msg._id, 'reject', e)}
-                >
-                  Reject
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No recent item messages available.</p>
-        )}
-      </div>
-    </section>
-  );
-};
-
-// ==========================================
-// MAIN PAGE COMPONENT
-// ==========================================
 const CarehomeDashboard = () => {
-  const { careid } = useParams(); 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const { careid } = useParams(); 
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // You need to update your backend to return JSON for this route!
-        const response = await fetch(`http://localhost:3000/api/carehome-dashboard/${careid}`, {
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          setData(result);
-        } else {
-            console.error("Failed to fetch data");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/api/carehome-dashboard/${careid}`, {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    setData(result);
+                }
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [careid]);
 
-    fetchData();
-  }, [careid]);
+    if (loading) return <div className={styles.loader}>Loading Premium Dashboard...</div>;
+    if (!data) return <div className={styles.error}>No dashboard data found.</div>;
 
-  if (loading) return <div>Loading...</div>;
-  if (!data) return <div>No data found.</div>;
+    return (
+        <div className={styles.pageWrapper}>
+            <CareHeader careid={careid} />
 
-  return (
-    <div className="carehome-dashboard-page">
-      <CareHeader careid={careid} />
+            <header className={styles.dashboardHeader}>
+                <h1 className={styles.mainTitle}>{data.name}</h1>
+                <p className={styles.subtitle}>Management Console</p>
+            </header>
 
-      <h1>{data.name}</h1>
+            <div className={styles.container}>
+                {/* --- SIDEBAR: WISHLIST --- */}
+                <aside className={styles.wishlistSidebar}>
+                    <h2>Wishlist of Needs</h2>
+                    <div className={styles.wishlistContent}>
+                        {data.wishlist ? (
+                            <ul>
+                                {data.wishlist.split(',').map((item, index) => (
+                                    <li key={index}>{item.trim()}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className={styles.emptyText}>No items listed.</p>
+                        )}
+                    </div>
+                </aside>
 
-      <div className="container">
-        
-        {/* 1. Sidebar */}
-        <WishlistSidebar wishlist={data.wishlist} />
+                {/* --- MAIN CONTENT --- */}
+                <main className={styles.dashboardMain}>
+                    
+                    {/* STATS SECTION */}
+                    <section className={styles.statsGrid}>
+                        <div className={styles.statCard}>
+                            <h3>Active Fundraisers</h3>
+                            <div className={styles.statValue}>{data.ongoing_fund?.length || 0}</div>
+                        </div>
+                        {data.stats?.map((stat, index) => (
+                            <div className={styles.statCard} key={index}>
+                                <h3>{stat.title}</h3>
+                                <div className={styles.statValue}>{stat.value}</div>
+                            </div>
+                        ))}
+                    </section>
 
-        {/* 2. Main Content */}
-        <main className="dashboard">
-          <h1>{data.name}</h1>
+                    {/* NEW FEATURE: JOB APPLICANTS SECTION */}
+                    <section className={styles.glassSection}>
+                        <h2 className={styles.sectionTitle}>
+                            <span className={styles.icon}>💼</span> New Job Applicants
+                        </h2>
+                        <div className={styles.applicantGrid}>
+                            {/* This would be mapped from your new application data */}
+                            <div className={styles.applicantCard}>
+                                <div className={styles.applicantHeader}>
+                                    <h4>Karthik S.</h4>
+                                    <span className={styles.statusBadge}>Pending Review</span>
+                                </div>
+                                <p><strong>Exp:</strong> 2 Years</p>
+                                <p className={styles.whyMe}>"I have a passion for elderly care and local community support..."</p>
+                                <div className={styles.btnGroup}>
+                                    <button className={styles.acceptBtn}>Accept</button>
+                                    <button className={styles.rejectBtn}>Reject</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
 
-          {/* Stats */}
-          <CareStats 
-            stats={data.stats} 
-            activeFundraisers={data.ongoing_fund ? data.ongoing_fund.length : 0} 
-          />
+                    {/* FUNDRAISERS */}
+                    <section className={styles.glassSection}>
+                        <h2 className={styles.sectionTitle}>Active Fundraisers</h2>
+                        <div className={styles.cardGrid}>
+                            {data.ongoing_fund?.map((fund, index) => (
+                                <div className={styles.fundraiserCard} key={index}>
+                                    <h3>{fund.fundraiser_name}</h3>
+                                    <div className={styles.fundInfo}>
+                                        <span>Raised: ₹{fund.amount_raised_so_far}</span>
+                                        <span>Goal: ₹{fund.goal_amount}</span>
+                                    </div>
+                                    <div className={styles.progressBar}>
+                                        <div 
+                                            className={styles.progressFill} 
+                                            style={{ width: `${(fund.amount_raised_so_far / fund.goal_amount) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
 
-          {/* Fundraisers */}
-          <FundraiserList fundraisers={data.ongoing_fund || []} />
-
-          {/* Recent Donations (Simple list, no separate component needed) */}
-          <section className="donations-section">
-            <h2>Recent Donations from Users</h2>
-            <div id="donations-list">
-              {data.recentDonations && data.recentDonations.length > 0 ? (
-                data.recentDonations.slice(0, 3).map((donation, index) => (
-                  <div className="donation" key={index}>
-                    <strong>{donation.donor_name}</strong> donated ₹{donation.amount}
-                  </div>
-                ))
-              ) : (
-                <p>No recent donations available.</p>
-              )}
+                    {/* ITEM DONATION DECISIONS */}
+                    <section className={styles.glassSection}>
+                        <h2 className={styles.sectionTitle}>Item Donation Requests</h2>
+                        <div className={styles.messageList}>
+                            {data.messages?.map((msg, index) => (
+                                <div className={styles.messageItem} key={index}>
+                                    <div className={styles.msgDetails}>
+                                        <strong>{msg.category}</strong> - {msg.location}
+                                        <p>{msg.description}</p>
+                                    </div>
+                                    <div className={styles.btnGroupSmall}>
+                                        <button className={styles.acceptBtn}>Approve</button>
+                                        <button className={styles.rejectBtn}>Decline</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </main>
             </div>
-          </section>
-
-          {/* Accept/Reject Items */}
-          <DonationDecisions messages={data.messages || []} />
-
-          {/* Item History */}
-          <section className="donation-items-container">
-            <h2 className="donation-header">Donation Items History</h2>
-            {data.items && data.items.length > 0 ? (
-              data.items.map((item, index) => (
-                <div className="donation-item" key={index}>
-                  <h5 className="donation-category">Category: {item.category}</h5>
-                  <p className="donation-detail"><strong>Location:</strong> {item.location}</p>
-                  <p className="donation-detail"><strong>Delivery Date:</strong> {new Date(item.delivery).toLocaleDateString()}</p>
-                </div>
-              ))
-            ) : (
-              <p className="no-items">No items available.</p>
-            )}
-          </section>
-
-        </main>
-      </div>
-
-      <Footer />
-    </div>
-  );
+            <Footer />
+        </div>
+    );
 };
 
 export default CarehomeDashboard;

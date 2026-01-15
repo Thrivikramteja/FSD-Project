@@ -1,0 +1,190 @@
+.pageWrapper {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboardHeader {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 30px;
+}
+
+.mainTitle {
+    font-size: 2.5rem;
+    color: #064e3b;
+    margin: 0;
+    font-weight: 800;
+}
+
+.subtitle {
+    color: #10b981;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* SIDEBAR */
+.wishlistSidebar {
+    background: white;
+    padding: 30px;
+    border-radius: 24px;
+    height: fit-content;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.wishlistSidebar h2 {
+    font-size: 1.1rem;
+    color: #064e3b;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.wishlistContent ul {
+    list-style: none;
+    padding: 0;
+}
+
+.wishlistContent li {
+    padding: 12px;
+    background: #f0fdf4;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    color: #065f46;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* DASHBOARD MAIN */
+.dashboardMain {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.statCard {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 25px;
+    border-radius: 20px;
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+}
+
+.statCard h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.statValue {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-top: 10px;
+}
+
+/* GLASS SECTION */
+.glassSection {
+    background: white;
+    padding: 30px;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.sectionTitle {
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+}
+
+/* APPLICANT CARDS */
+.applicantCard {
+    border: 1px solid #f1f5f9;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 16px;
+    max-width: 400px;
+}
+
+.statusBadge {
+    background: #fef9c3;
+    color: #854d0e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.whyMe {
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 15px 0;
+}
+
+/* BUTTONS */
+.btnGroup {
+    display: flex;
+    gap: 10px;
+}
+
+.acceptBtn {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+}
+
+.rejectBtn {
+    background: #fee2e2;
+    color: #991b1b;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.acceptBtn:hover { background: #059669; }
+
+/* PROGRESS BAR */
+.progressBar {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: #10b981;
+}
