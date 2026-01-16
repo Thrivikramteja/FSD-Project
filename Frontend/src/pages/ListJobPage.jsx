@@ -1,24 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../components/authContext';
 
 import Footer from '../components/footer';
 import PremiumTitle from '../components/PremiumTitle'; 
 import styles from '../styles/ListJob.module.css'; 
+import ApplyModal from '../pages/ApplyModal'; 
 
 const ListJobPage = () => {
   const navigate = useNavigate();
   
-  // 1. STATE MANAGEMENT
+  // FIX: Access 'auth' first, then derive user and role
+  const { auth } = useContext(AuthContext); 
+  const user = auth?.user;
+  const userRole = auth?.role;
+
+  console.log(user + " " + userRole);
+
   const [allJobs, setAllJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Filter States
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTypes, setSelectedTypes] = useState([]);
 
-  // 2. FETCH JOBS ON LOAD
+  const [selectedJob, setSelectedJob] = useState(null); 
+  const [isApplying, setIsApplying] = useState(false);
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -38,24 +47,6 @@ const ListJobPage = () => {
 
     fetchJobs();
   }, []);
-
-  // 3. FILTER & SEARCH LOGIC
-  const handleSearch = () => {
-    applyFilters();
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleSearch();
-  };
-
-  const handleCheckboxChange = (e) => {
-    const value = e.target.value;
-    if (e.target.checked) {
-      setSelectedTypes([...selectedTypes, value]);
-    } else {
-      setSelectedTypes(selectedTypes.filter(type => type !== value));
-    }
-  };
 
   const applyFilters = () => {
     let result = allJobs;
@@ -79,26 +70,54 @@ const ListJobPage = () => {
     setShowFilterDropdown(false); 
   };
 
-  const handleApply = async (jobId) => {
-    const DUMMY_USER_ID = "656a1b2c9d8e7f0012345678"; 
+  const handleSearch = () => applyFilters();
+  const handleKeyPress = (e) => { if (e.key === 'Enter') handleSearch(); };
 
+  const handleCheckboxChange = (e) => {
+    const value = e.target.value;
+    if (e.target.checked) {
+      setSelectedTypes([...selectedTypes, value]);
+    } else {
+      setSelectedTypes(selectedTypes.filter(type => type !== value));
+    }
+  };
+
+  const handleApplyClick = (job) => {
+    // FIX: Use userRole derived from auth context
+    if (!auth.isLoggedIn || userRole !== "Donor") {
+      alert("Only registered Donors can apply for jobs. Please log in as a Donor.");
+      return;
+    }
+
+    setSelectedJob({ id: job._id, title: job.title  , pay: job.pay});
+  };
+
+  const handleFinalSubmit = async (formData) => {
+    setIsApplying(true);
     try {
-      const response = await fetch(`http://localhost:3000/jobs/apply/${jobId}`, {
+      const response = await fetch(`http://localhost:3000/api/applications/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ applicantId: DUMMY_USER_ID }) 
+        body: JSON.stringify({ 
+          jobId: selectedJob.id,
+          ...formData 
+        }),
+        credentials: 'include'
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        alert("Success! " + result.message);
+        alert("Success! Your application has been sent to the Carehome.");
+        setSelectedJob(null); 
       } else {
         alert("Notice: " + result.message);
       }
     } catch (error) {
       console.error("Apply error:", error);
       alert("Failed to connect to server.");
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -106,7 +125,16 @@ const ListJobPage = () => {
     <div className={styles.pageWrapper}>
       <PremiumTitle />
 
-      {/* Search & Filter Section */}
+      {selectedJob && (
+        <ApplyModal 
+              jobTitle={selectedJob.title}
+              jobPay={selectedJob.pay} // Pass the pay here
+              onClose={() => setSelectedJob(null)}
+              onSubmit={handleFinalSubmit}
+              isLoading={isApplying}
+          />
+      )}
+
       <div className={styles.searchFilterContainer}>
         <div className={styles.filterSection}>
           <button 
@@ -153,7 +181,6 @@ const ListJobPage = () => {
         </div>
       </div>
 
-      {/* Main Job Grid */}
       <main className={styles.mainContent}>
         {loading ? (
           <div className={styles.loader}>Loading available opportunities...</div>
@@ -180,7 +207,7 @@ const ListJobPage = () => {
                 </p>
 
                 <div className={styles.cardFooter}>
-                  <button className={styles.applyBtn} onClick={() => handleApply(job._id)}>
+                  <button className={styles.applyBtn} onClick={() => handleApplyClick(job)}>
                     Apply Now
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                   </button>
