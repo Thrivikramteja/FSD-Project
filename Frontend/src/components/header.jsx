@@ -38,7 +38,7 @@ const Header = ({ navItems }) => {
       </div>
 
       <nav>
-        <ul className={styles["nav-items"]}>
+        {/* //<ul className={styles["nav-items"]}>
           {navItems.map((item) => (
             <li key={item.label}>
               {item.onClick ? (
@@ -49,7 +49,34 @@ const Header = ({ navItems }) => {
                 <span>{item.label}</span>
               )}
             </li>
-          ))}
+          ))} */}
+
+          <ul className={styles["nav-items"]}>
+            {navItems.map((item) => (
+             <li key={item.label} className={item.subItems ? styles.dropdown : ""}>
+               {item.onClick ? (
+        <button onClick={item.onClick}>{item.label}</button>
+      ) : item.subItems ? (
+        <>
+          {/* Main Discover Link */}
+          <a href={item.path} className={styles.dropdownToggle}>{item.label}</a>
+          
+          {/* The Dropdown Menu */}
+          <ul className={styles.dropdownMenu}>
+            {item.subItems.map((sub) => (
+              <li key={sub.label}>
+                <a href={sub.path}>{sub.label}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : item.path ? (
+        <a href={item.path}>{item.label}</a>
+      ) : (
+        <span>{item.label}</span>
+      )}
+    </li>
+  ))}
 
           <li>
             {auth.isLoggedIn ? (

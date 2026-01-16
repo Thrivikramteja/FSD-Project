@@ -1,6 +1,17 @@
 export const headerConfig = {
   landing: [
-    { label: "Discover", path: "/discover" },
+    // { label: "Discover", path: "/discover" },
+    // { label: "Ways to Help", path: "/ways-to-help" },
+    { 
+      label: "Discover", 
+      path: "/discover",
+      subItems: [
+        { label: "Care Homes", path: "/carehomes" },
+        { label: "All NGOs", path: "/all-ngos" },
+        { label: "Events", path: "/events" },
+        { label: "Fundraisers", path: "/fundraisers" }
+      ]
+    },
     { label: "Ways to Help", path: "/ways-to-help" },
   ],
   donor: [

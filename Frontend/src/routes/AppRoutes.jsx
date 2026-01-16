@@ -36,7 +36,7 @@ const AppRoutes = () => {
       <Route path="/donate-funds" element={<DonateMoneyPage />} />
       <Route path="/jobs" element={<ListJobPage />} />
 
-       <Route path="/carehomes" element={<AllCarehomes />} />
+      <Route path="/carehomes" element={<AllCarehomes />} />
       <Route path="/all-ngos" element={<AllNgos />} />
       <Route path="/events" element={<AllEvents />} />
       <Route path="/fundraisers" element={<AllFundraisers />} />

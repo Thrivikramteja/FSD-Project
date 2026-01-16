@@ -65,7 +65,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/uploads', express.static('uploads'));
+// app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 app.get("/api/check-session", (req, res) => {
   if (req.session.user) {
