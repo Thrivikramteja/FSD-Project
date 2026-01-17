@@ -4,7 +4,7 @@ import styles from "../styles/login.module.css";
 import { AuthContext } from "../components/authContext";
 
 function Loginpage() {
-  const { login } = useContext(AuthContext);   // ⬅ use login() instead of setAuth()
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -21,8 +21,7 @@ function Loginpage() {
   };
 
   const validateForm = () => {
-    const emailPattern =
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (!emailPattern.test(formData.email.trim())) {
       setError("Enter a valid email address.");
@@ -46,9 +45,11 @@ function Loginpage() {
     try {
       const response = await fetch("http://localhost:3000/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include", 
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(formData),
-        credentials: "include",
       });
 
       const data = await response.json();
@@ -57,8 +58,8 @@ function Loginpage() {
         console.log("Login successful:", data);
 
         login({
-          ...data.user,
-          role: data.role,      // ensure role is saved
+          user: data.user,
+          role: data.role, 
         });
 
         navigate(data.redirect);

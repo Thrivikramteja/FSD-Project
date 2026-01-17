@@ -84,9 +84,10 @@ export default function CarehomeRegistration() {
 
 
       if (response.ok) {
-        setMessage("Registration successful! Redirecting...");
-        setTimeout(() => (window.location.href = "/login"), 1000);
-        resetForm();
+        setMessage(response.message);
+        window.location.href = "/login"
+        // setTimeout(() => (), 1000);
+        // resetForm();
       } else {
         setMessage("Registration failed. Please try again.");
       }

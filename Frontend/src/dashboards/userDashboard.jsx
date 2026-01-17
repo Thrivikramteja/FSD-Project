@@ -4,7 +4,7 @@ import Footer from "../components/footer";
 import { headerConfig } from "../config/headerConfig";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/authContext";
-import "./userDashboard.css"
+import "./userDashboard.css";
 
 export default function DonorDashboard() {
   const { id } = useParams();
@@ -13,16 +13,16 @@ export default function DonorDashboard() {
 
   const [user, setUser] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
-  const [activity, setActivity] = useState(null); 
+  const [activity, setActivity] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: ""
+    phone: "",
   });
 
   useEffect(() => {
-    if (!auth.isLoggedIn) {
+    if (!auth.user) {
       navigate("/login");
       return;
     }
@@ -44,9 +44,8 @@ export default function DonorDashboard() {
     setFormData({
       name: loggedInUser.name,
       email: loggedInUser.email,
-      phone: loggedInUser.phone || ""
+      phone: loggedInUser.phone || "",
     });
-
   }, [auth, id, navigate]);
 
   useEffect(() => {
@@ -75,7 +74,7 @@ export default function DonorDashboard() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -85,7 +84,7 @@ export default function DonorDashboard() {
     updateUser({
       name: formData.name,
       email: formData.email,
-      phone: formData.phone
+      phone: formData.phone,
     });
 
     setShowEditForm(false);
@@ -192,17 +191,34 @@ export default function DonorDashboard() {
           {showEditForm && (
             <form className="edit-profile-form" onSubmit={handleSave}>
               <label>Name</label>
-              <input type="text" name="name" value={formData.name} onChange={handleChange} />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+              />
 
               <label>Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
 
               <label>Phone</label>
-              <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+              />
 
               <div className="edit-form-buttons">
                 <button type="submit">Save Changes</button>
-                <button type="button" onClick={() => setShowEditForm(false)}>Cancel</button>
+                <button type="button" onClick={() => setShowEditForm(false)}>
+                  Cancel
+                </button>
               </div>
             </form>
           )}

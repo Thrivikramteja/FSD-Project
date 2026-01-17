@@ -1,52 +1,40 @@
 const express = require("express");
-
-const carehomesController = require("../controllers/carehome.controller");
-// const upload = require("../app");
-const upload = require("../multerConfig"); // ✅ Fixes crash
-
-const { isAuth } = require("../controllers/auth.controller");
-
 const router = express.Router();
 
-router.get('/api/carehome-dashboard/:carehomeId', carehomesController.getCarehome);
+const carehomesController = require("../controllers/carehome.controller");
+const upload = require("../multerConfig");
 
-router.get('/carehome-dashboard/get-job', carehomesController.get_createjob);
+const authenticate = require("../middlewares/auth.middleware");
+const authorizeRoles = require("../middlewares/role.middleware");
 
-router.post('/carehome-dashboard/post-job', carehomesController.post_createjob);
+router.get(
+  "/api/carehome-dashboard/:carehomeId",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.getCarehome
+);
 
-router.get('/carehome-dashboard/:carehomeId', isAuth, carehomesController.getCarehome);
+router.put(
+  "/api/carehome/:carehomeId",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.editCarehomeProfile
+);
 
-router.get('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.getEditCarehomeProfile);
+router.post(
+  "/api/carehome/:carehomeId/donate-money",
+  authenticate,
+  authorizeRoles("Donor"),
+  carehomesController.insertMoney
+);
 
-router.post('/carehome-dashboard/:carehomeId/edit', isAuth, carehomesController.editCarehomeProfile);
+router.get("/api/carehomes", carehomesController.getCareHomesApi);
+router.get("/api/jobs", carehomesController.get_alljobs);
 
-router.get('/donate_money', isAuth, carehomesController.donateMoney);
-
-router.post('/donate_money/:carehomeId', isAuth, carehomesController.insertMoney);
-
-router.get('/donate_items', isAuth, carehomesController.donateItems);
-
-router.post('/donate_items_user', carehomesController.get_don_items);
-
-router.get('/registerCarehome', carehomesController.register);
-
-router.post('/api/registerCarehome', upload.single("image"), carehomesController.registerCarehome);
-
-router.get('/carehomes', carehomesController.getallcarehomes);
-
-router.get('/api/carehomes', carehomesController.getCareHomesApi);
-
-router.get("/profile/Carehome/:carehomeId", isAuth, carehomesController.getCarehome);
-
-router.get("/carehomes/viewcare/:careid", carehomesController.view_details_care);
-
-router.post('/donate_item/action', carehomesController.accpet_item_doantions);
-
-router.get('/jobs/all', carehomesController.get_alljobs);
-router.get('/api/jobs/all', carehomesController.get_alljobs);
-
-router.get('/jobs', carehomesController.job_render);
-
-router.get('/jobs/apply/:jobId', carehomesController.apply_job);
+router.post(
+  "/api/registerCarehome",
+  upload.single("image"),
+  carehomesController.registerCarehome
+);
 
 module.exports = router;

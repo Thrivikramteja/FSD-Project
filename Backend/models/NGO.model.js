@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose); // Added mongoose-sequence
 
@@ -66,7 +66,7 @@ const eventSchema = new mongoose.Schema({
 // NGO Schema Methods
 ngoSchema.methods.storeNGO = async function storeNGO() {
   try {
-    this.password = await bcrypt.hash(this.password, 12);
+    this.password = await bcrypt.hash(this.password, 10);
     return await this.save();
   } catch (err) {
     throw err;

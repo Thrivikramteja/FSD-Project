@@ -1,11 +1,15 @@
 const express = require("express");
-
 const router = express.Router();
 
-const admin_con = require('../controllers/admin.controller');
+const admin_con = require("../controllers/admin.controller");
+const authenticate = require("../middlewares/auth.middleware");
+const authorizeRoles = require("../middlewares/role.middleware");
 
-const {isAuth} = require('../controllers/auth.controller');
-
-router.get('/admin-dashboard', isAuth, admin_con.Getadmin);
+router.get(
+  "/api/admin/dashboard",
+  authenticate,
+  authorizeRoles("Admin"),
+  admin_con.Getadmin
+);
 
 module.exports = router;
