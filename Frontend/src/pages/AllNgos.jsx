@@ -125,7 +125,7 @@ const AllNgos = () => {
     const fetchNgos = async () => {
       try {
         // Fetching from Backend (Port 3000)
-        const response = await fetch("http://localhost:3000/NGOs");
+        const response = await fetch("http://localhost:3000/api/NGOs");
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);

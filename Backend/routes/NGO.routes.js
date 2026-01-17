@@ -11,6 +11,8 @@ const { Carehome } = require("../models/carehome.model");
 
 router.post("/api/ngo/register", NGOController.register);
 
+router.get('/fundraisers', NGOController.getallFundraisers);
+
 router.get(
   "/api/ngo-dashboard/:ngoID",
   authenticate,
@@ -51,5 +53,10 @@ router.get("/api/carehomes-list", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch carehomes" });
   }
 });
+
+
+router.get('/events', NGOController.getEvents);
+
+
 
 module.exports = router;
