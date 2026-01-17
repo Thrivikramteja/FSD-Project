@@ -62,7 +62,7 @@ export default function NGORegister() {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await fetch("http://localhost:3000/registerNgo", {
+      const response = await fetch("http://localhost:3000/api/ngo/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,26 +1,45 @@
 const express = require("express");
+const router = express.Router();
 
 const donorsController = require("../controllers/donors.controller");
 
 const applicationcontroller = require('../controllers/application.controller');
 
 const { isAuth } = require("../controllers/auth.controller");
+const authenticate = require("../middlewares/auth.middleware");
+const authorizeRoles = require("../middlewares/role.middleware");
 
-const router = express.Router();
+router.get(
+  "/api/donor/dashboard/:userId",
+  authenticate,
+  authorizeRoles("Donor"),
+  donorsController.getdonor
+);
 
-router.get("/user-dashboard/:userId", isAuth, donorsController.getdonor);
+router.put(
+  "/api/donor/:userId",
+  authenticate,
+  authorizeRoles("Donor"),
+  donorsController.editDonorProfile
+);
 
-router.get("/profile/Donor/:userId", isAuth, donorsController.getdonor);
+router.post(
+  "/api/donate/:ngoId/:fundraiser_name",
+  authenticate,
+  authorizeRoles("Donor"),
+  donorsController.contributed_fund
+);
 
-router.get("/user-dashboard/:userId/edit", isAuth, donorsController.getEditDonorProfile);
-
-router.post("/user-dashboard/:userId/edit", isAuth, donorsController.editDonorProfile);
-
-router.post("/donate_money/:ngoId/:fundraiser_name", isAuth, donorsController.contributed_fund);
-
-router.get("/api/activity/:userId", donorsController.getUserActivity);
-
+<<<<<<< HEAD
 router.post("/api/applications/apply",applicationcontroller.applyToJob);
 
+=======
+router.get(
+  "/api/activity/:userId",
+  authenticate,
+  authorizeRoles("Donor"),
+  donorsController.getUserActivity
+);
+>>>>>>> react
 
 module.exports = router;

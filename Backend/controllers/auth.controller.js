@@ -1,3 +1,6 @@
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 const { User } = require("../models/user.model");
 const { NGO } = require("../models/NGO.model");
 const { Carehome } = require("../models/carehome.model");
@@ -30,7 +33,7 @@ async function signup(req, res) {
     const user = new User({
       name: fullname,
       email: mail,
-      password,
+      password: password,
       mobile_number: phone,
       receive_notifications: checkbox === true || checkbox === "on",
     });
@@ -41,7 +44,6 @@ async function signup(req, res) {
       success: true,
       message: "User registered successfully",
     });
-
   } catch (error) {
     console.error("Signup error:", error);
     return res.status(500).json({
@@ -64,26 +66,47 @@ async function login(req, res) {
     } else if (userRole === "Carehome") {
       user = await Carehome.getCarehome(email);
     } else if (userRole === "Admin") {
-      if (email === "fsd@gmail.com" && password === "123") {
+      if (email === "fsd@gmail.com" && password === "123456") {
+        const token = jwt.sign({ role: "Admin" }, process.env.JWT_SECRET, {
+          expiresIn: "1d",
+        });
+
+        res.cookie("token", token, {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: false,
+        });
+
         return res.status(200).json({
           success: true,
-          message: "Admin login successful",
           role: "Admin",
-          redirect: "/admin-dashboard"
+          redirect: "/admin-dashboard",
         });
       }
-      return res.status(401).json({ success: false, message: "Invalid admin credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid admin credentials" });
     } else {
-      return res.status(400).json({ success: false, message: "Invalid user role" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user role" });
     }
 
     if (!user) {
-      return res.status(404).json({ success: false, message: `${userRole} does not exist` });
+      return res.status(404).json({
+        success: false,
+        message: `${userRole} does not exist`,
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ success: false, message: "Incorrect password" });
 
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Incorrect password",
+      });
+    }
 
     const otp = generateOTP();
     const expires = new Date(Date.now() + 5 * 60000); // Code expires in 5 mins
@@ -94,24 +117,26 @@ async function login(req, res) {
 
     try {
       await sendOTPEmail(user.email, otp);
-      
+
       // We do NOT set req.session here. We wait for OTP verification.
       return res.status(200).json({
         success: true,
         twoFactorRequired: true,
         email: user.email,
         role: userRole,
-        message: "OTP sent to your email"
+        message: "OTP sent to your email",
       });
     } catch (mailErr) {
       console.error("Mail Error:", mailErr);
-      return res.status(500).json({ success: false, message: "Failed to send OTP email" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to send OTP email" });
     }
-
-
   } catch (err) {
     console.error("Login error:", err);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 }
 
@@ -125,7 +150,9 @@ async function verifyOTP(req, res) {
     else if (userRole === "Carehome") user = await Carehome.getCarehome(email);
 
     if (!user || user.otpCode !== otp || user.otpExpires < Date.now()) {
-      return res.status(401).json({ success: false, message: "Invalid or expired OTP" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid or expired OTP" });
     }
 
     // OTP is correct - clear it from DB
@@ -135,12 +162,35 @@ async function verifyOTP(req, res) {
 
     const plainUser = user.toObject();
 
+    const userId =
+      userRole === "NGO"
+        ? plainUser.ngoId
+        : userRole === "Carehome"
+        ? plainUser.carehomeId
+        : plainUser.userId;
+
+    const token = jwt.sign(
+      { id: userId, role: userRole },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    });
     // NOW we set the session
     req.session.isAuth = true;
     req.session.userRole = userRole;
     req.session.user = plainUser;
 
     let dashboardUrl = "";
+    if (userRole === "NGO") dashboardUrl = `/NGO-dashboard/${plainUser.ngoId}`;
+    if (userRole === "Donor")
+      dashboardUrl = `/donor-dashboard/${plainUser.userId}`;
+    if (userRole === "Carehome")
+      dashboardUrl = `/carehome-dashboard/${plainUser.carehomeId}`;
     switch (userRole) {
       case "NGO":
         dashboardUrl = `/NGO-dashboard/${plainUser.ngoId}`;
@@ -155,24 +205,25 @@ async function verifyOTP(req, res) {
 
     req.session.save((err) => {
       if (err) {
-        return res.status(500).json({ success: false, message: "Session save error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Session save error" });
       }
 
       return res.status(200).json({
         success: true,
-        message: "Login successful",
         role: userRole,
-        user: plainUser,
+        user: user,
         redirect: dashboardUrl,
       });
     });
-
   } catch (err) {
     console.error("Verification error:", err);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 }
-
 
 //new feature : forgot password
 
@@ -196,7 +247,8 @@ async function forgotPassword(req, res) {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "No account found with this email. Please enter a correct email or sign up newly."
+        message:
+          "No account found with this email. Please enter a correct email or sign up newly.",
       });
     }
 
@@ -207,62 +259,48 @@ async function forgotPassword(req, res) {
     user.otpExpires = expires;
     await user.save();
 
-
     try {
       await sendOTPEmail(user.email, otp); //already existing service
       return res.status(200).json({
         success: true,
-        message: "A secure login code has been sent to your email."
+        message: "A secure login code has been sent to your email.",
       });
     } catch (mailErr) {
       console.error("Forgot Pass Mail Error:", mailErr);
-      return res.status(500).json({ success: false, message: "Failed to send recovery email." });
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to send recovery email." });
     }
-
   } catch (err) {
-    console.error("Forgot Password Controller Error:", err);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    console.error("Login error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 }
 
-
-function checkSession(req, res) {
-  console.log("in Check session");
-  if (!req.session.isAuth || !req.session.user) {
-    return res.json({ loggedIn: false });
-  }
-
-  console.log(req.session.userRole);
-  return res.json({
-    loggedIn: true,
-    role: req.session.userRole,
-    user: req.session.user
+function checkAuth(req, res) {
+  return res.status(200).json({
+    user: req.user,
+    role: req.user.role,
   });
 }
 
-
 function logout(req, res) {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Error logging out",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Logged out successfully",
-    });
+  res.clearCookie("token");
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
   });
 }
 
 module.exports = {
   signup,
   login,
-  checkSession,
+  checkAuth,
   logout,
   isAuth,
   verifyOTP,
-  forgotPassword
+  forgotPassword,
 };

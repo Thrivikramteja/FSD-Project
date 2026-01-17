@@ -1,57 +1,62 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { checkSession } from "../api/authApi";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const storedAuth = JSON.parse(localStorage.getItem("auth"));
+  const [auth, setAuth] = useState({
+    user: null,
+    role: null,
+    loading: true
+  });
 
-  const [auth, setAuth] = useState(
-    storedAuth || {
-      isLoggedIn: false,
-      user: null,
-      role: null,
-    }
-  );
+  useEffect(() => {
+    const initAuth = async () => {
+      console.log("init auth");
+      try {
+        const data = await checkSession();
+        
+        setAuth({
+          user: data.user,
+          role: data.role,
+          loading: false
+        });
 
-  const login = (userData) => {
-    const authData = {
-      isLoggedIn: true,
-      user: userData,
-      role: userData.role,
+      } catch {
+        setAuth({
+          user: null,
+          role: null,
+          loading: false
+        });
+      }
     };
 
-    setAuth(authData);
-    localStorage.setItem("auth", JSON.stringify(authData));
+    initAuth();
+  }, []);
+
+  const login = ({ user, role }) => {
+    setAuth({ user, role, loading: false });
+    console.log("from log");
+    console.log(auth);
   };
 
-  const logout = () => {
-    setAuth({
-      isLoggedIn: false,
-      user: null,
-      role: null,
+  const logout = async () => {
+    await fetch("http://localhost:3000/api/auth/logout", {
+      credentials: "include"
     });
 
-    localStorage.removeItem("auth");
-  };
-
-  const updateUser = (updatedFields) => {
-    setAuth((prev) => {
-      const updatedAuth = {
-        ...prev,
-        user: {
-          ...prev.user,
-          ...updatedFields,
-        },
-      };
-
-      localStorage.setItem("auth", JSON.stringify(updatedAuth));
-      return updatedAuth;
+    setAuth({
+      user: null,
+      role: null,
+      loading: false
     });
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
+
+
