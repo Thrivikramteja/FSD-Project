@@ -125,17 +125,11 @@ function Loginpage() {
 
       const data = await response.json();
 
-      console.log("Full Data from server:", data);
-
       if (response.ok) {
-        // Since verifyOTP in backend sets the session, we just log in and redirect
-        login({ ...data.user, role: data.role });
-        const id =
-          data.user.userId ||
-          data.user.ngoId ||
-          data.user.carehomeId ||
-          data.user._id;
-        navigate(`/${data.role.toLowerCase()}-dashboard/${id}`);
+        login({ user: data.user, role: data.role });
+        if (data.redirect) {
+          navigate(data.redirect);
+        }
       } else {
         setError(data.message || "Invalid OTP");
       }

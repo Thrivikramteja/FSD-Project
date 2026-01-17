@@ -36,8 +36,6 @@ export function AuthProvider({ children }) {
 
   const login = ({ user, role }) => {
     setAuth({ user, role, loading: false });
-    console.log("from log");
-    console.log(auth);
   };
 
   const logout = async () => {

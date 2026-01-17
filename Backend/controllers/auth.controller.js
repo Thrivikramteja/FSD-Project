@@ -147,6 +147,7 @@ async function verifyOTP(req, res) {
 
     const plainUser = user.toObject();
 
+    // Correctly extracting the role-specific ID
     const userId =
       userRole === "NGO"
         ? plainUser.ngoId

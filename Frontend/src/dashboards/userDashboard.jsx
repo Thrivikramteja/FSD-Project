@@ -21,6 +21,34 @@ export default function DonorDashboard() {
     phone: "",
   });
 
+  // useEffect(() => {
+  //   if (auth.loading) return;
+
+  //   if (!auth.user) {
+  //     navigate("/login");
+  //     return;
+  //   }
+
+  //   if (auth.role !== "Donor") {
+  //     navigate("/");
+  //     return;
+  //   }
+
+  //   const loggedInUser = auth.user;
+
+  //   if (loggedInUser.userId.toString() !== id.toString()) {
+  //     navigate(`/donor-dashboard/${loggedInUser.userId}`);
+  //     return;
+  //   }
+
+  //   setUser(loggedInUser);
+  //   setFormData({
+  //     name: loggedInUser.name,
+  //     email: loggedInUser.email,
+  //     phone: loggedInUser.phone || "",
+  //   });
+  // }, [auth, id, navigate]);
+
   useEffect(() => {
     if (auth.loading) return;
 
@@ -29,15 +57,11 @@ export default function DonorDashboard() {
       return;
     }
 
-    if (auth.role !== "Donor") {
-      navigate("/");
-      return;
-    }
-
     const loggedInUser = auth.user;
+    const currentId = loggedInUser._id || loggedInUser.userId;
 
-    if (loggedInUser.userId.toString() !== id.toString()) {
-      navigate(`/donor-dashboard/${loggedInUser.userId}`);
+    if (currentId.toString() !== id.toString()) {
+      navigate(`/donor-dashboard/${currentId}`);
       return;
     }
 
@@ -216,10 +240,7 @@ export default function DonorDashboard() {
 
               <div className="edit-form-buttons">
                 <button type="submit">Save Changes</button>
-                <button
-                  type="button"
-                  onClick={() => setShowEditForm(false)}
-                >
+                <button type="button" onClick={() => setShowEditForm(false)}>
                   Cancel
                 </button>
               </div>
