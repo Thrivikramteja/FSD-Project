@@ -22,6 +22,8 @@ export default function DonorDashboard() {
   });
 
   useEffect(() => {
+    if (auth.loading) return;
+
     if (!auth.user) {
       navigate("/login");
       return;
@@ -40,7 +42,6 @@ export default function DonorDashboard() {
     }
 
     setUser(loggedInUser);
-
     setFormData({
       name: loggedInUser.name,
       email: loggedInUser.email,
@@ -49,19 +50,21 @@ export default function DonorDashboard() {
   }, [auth, id, navigate]);
 
   useEffect(() => {
-    if (user) {
-      fetch(`http://localhost:3000/api/activity/${user.userId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setActivity(data.data);
-          }
-        })
-        .catch((err) => console.error("Error fetching activity:", err));
-    }
+    if (!user) return;
+
+    fetch(`http://localhost:3000/api/activity/${user.userId}`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setActivity(data.data);
+        }
+      })
+      .catch(() => {});
   }, [user]);
 
-  if (!user) {
+  if (auth.loading || !user) {
     return (
       <>
         <Header navItems={headerConfig.donor} />
@@ -87,11 +90,8 @@ export default function DonorDashboard() {
       phone: formData.phone,
     });
 
-    setShowEditForm(false);
-
     setUser((prev) => ({ ...prev, ...formData }));
-
-    console.log("User updated:", formData);
+    setShowEditForm(false);
   };
 
   return (
@@ -99,7 +99,7 @@ export default function DonorDashboard() {
       <Header navItems={headerConfig.donor} userName={auth.user.name} />
 
       <div className="dashboard-container">
-        <h1>Welcome, {auth.user.name} </h1>
+        <h1>Welcome, {auth.user.name}</h1>
 
         <section className="dashboard-section">
           <h2>Events Participated</h2>
@@ -216,7 +216,10 @@ export default function DonorDashboard() {
 
               <div className="edit-form-buttons">
                 <button type="submit">Save Changes</button>
-                <button type="button" onClick={() => setShowEditForm(false)}>
+                <button
+                  type="button"
+                  onClick={() => setShowEditForm(false)}
+                >
                   Cancel
                 </button>
               </div>

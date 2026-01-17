@@ -2,8 +2,8 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/login.module.css";
 import { AuthContext } from "../components/authContext";
-import OtpVerification from "./OtpVerification"; 
-import ForgotPassword from "./ForgotPassword"; 
+import OtpVerification from "./OtpVerification";
+import ForgotPassword from "./ForgotPassword";
 
 function Loginpage() {
   const { login } = useContext(AuthContext);
@@ -18,7 +18,7 @@ function Loginpage() {
   const [error, setError] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [tempAuthData, setTempAuthData] = useState(null); 
+  const [tempAuthData, setTempAuthData] = useState(null);
   const [showForgot, setShowForgot] = useState(false);
 
   const handleChange = (e) => {
@@ -48,7 +48,7 @@ function Loginpage() {
     try {
       const response = await fetch("http://localhost:3000/api/login", {
         method: "POST",
-        credentials: "include", 
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,7 +60,7 @@ function Loginpage() {
       if (response.ok) {
         if (data.twoFactorRequired) {
           setTempAuthData({ email: data.email, role: formData.userRole });
-          setShowOtp(true); 
+          setShowOtp(true);
         } else {
           login({ ...data.user, role: data.role });
           navigate(data.redirect);
@@ -78,20 +78,25 @@ function Loginpage() {
     setIsVerifying(true);
     setError("");
     try {
-      const response = await fetch("http://localhost:3000/api/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, userRole: role }),
-      });
-      
+      const response = await fetch(
+        "http://localhost:3000/api/forgot-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, userRole: role }),
+        }
+      );
+
       const data = await response.json();
-      
+
       if (response.ok) {
         setTempAuthData({ email, role });
         setShowForgot(false);
         setShowOtp(true); // Trigger the same OTP component
       } else {
-        setError(data.message || "User not found. Check email or sign up newly.");
+        setError(
+          data.message || "User not found. Check email or sign up newly."
+        );
       }
     } catch (err) {
       console.log(err);
@@ -105,7 +110,7 @@ function Loginpage() {
   const handleVerifyOtp = async (otpCode) => {
     setIsVerifying(true);
     setError("");
-    
+
     try {
       const response = await fetch(`http://localhost:3000/api/verify-otp`, {
         method: "POST",
@@ -113,17 +118,24 @@ function Loginpage() {
         body: JSON.stringify({
           email: tempAuthData.email,
           otp: otpCode,
-          userRole: tempAuthData.role
+          userRole: tempAuthData.role,
         }),
         credentials: "include",
       });
 
       const data = await response.json();
 
+      console.log("Full Data from server:", data);
+
       if (response.ok) {
         // Since verifyOTP in backend sets the session, we just log in and redirect
         login({ ...data.user, role: data.role });
-        navigate(data.redirect || `/carehome-dashboard/${data.user.carehomeId}`);
+        const id =
+          data.user.userId ||
+          data.user.ngoId ||
+          data.user.carehomeId ||
+          data.user._id;
+        navigate(`/${data.role.toLowerCase()}-dashboard/${id}`);
       } else {
         setError(data.message || "Invalid OTP");
       }
@@ -138,9 +150,8 @@ function Loginpage() {
   return (
     <div className={styles.loginPage}>
       <main className={styles.loginMain}>
-        
         {showForgot && (
-          <ForgotPassword 
+          <ForgotPassword
             onClose={() => setShowForgot(false)}
             onEmailSubmit={handleForgotRequest}
             isLoading={isVerifying}
@@ -149,7 +160,7 @@ function Loginpage() {
         )}
 
         {showOtp && (
-          <OtpVerification 
+          <OtpVerification
             email={tempAuthData?.email}
             onVerifySuccess={handleVerifyOtp}
             isLoading={isVerifying}
@@ -163,12 +174,19 @@ function Loginpage() {
             <h1>Login</h1>
           </div>
 
-          {error && !showOtp && !showForgot && <p className={styles.error}>{error}</p>}
+          {error && !showOtp && !showForgot && (
+            <p className={styles.error}>{error}</p>
+          )}
 
           <p className={styles.loginAs}>
             Login As:
             <br />
-            <select name="userRole" className={styles.roleSelect} value={formData.userRole} onChange={handleChange}>
+            <select
+              name="userRole"
+              className={styles.roleSelect}
+              value={formData.userRole}
+              onChange={handleChange}
+            >
               <option value="Donor">Donor</option>
               <option value="NGO">NGO</option>
               <option value="Carehome">Carehome</option>
@@ -179,19 +197,45 @@ function Loginpage() {
           <p>
             <label className={styles.loginLabel}>E-Mail</label>
             <br />
-            <input className={styles.loginInput} type="email" name="email" value={formData.email} onChange={handleChange} required />
+            <input
+              className={styles.loginInput}
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
           </p>
 
           <p>
             <label className={styles.loginLabel}>Password</label>
             <br />
-            <input className={styles.loginInput} type="password" name="password" value={formData.password} onChange={handleChange} required />
+            <input
+              className={styles.loginInput}
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
           </p>
 
-          <p style={{ textAlign: 'right', marginTop: '-10px', marginBottom: '15px' }}>
-            <span 
-              onClick={() => setShowForgot(true)} 
-              style={{ color: '#10b981', cursor: 'pointer', fontSize: '13px', fontWeight: '600', textDecoration: 'underline' }}
+          <p
+            style={{
+              textAlign: "right",
+              marginTop: "-10px",
+              marginBottom: "15px",
+            }}
+          >
+            <span
+              onClick={() => setShowForgot(true)}
+              style={{
+                color: "#10b981",
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: "600",
+                textDecoration: "underline",
+              }}
             >
               Forgot Password?
             </span>
