@@ -10,8 +10,6 @@ router.post("/api/login", authController.login);
 
 router.post("/api/verify-otp", authController.verifyOTP);
 
-router.get("/api/check-session", authController.checkSession);
-
 router.post("/api/forgot-password",authController.forgotPassword);
 
 router.post("/api/logout", authController.logout);

@@ -5,7 +5,6 @@ const donorsController = require("../controllers/donors.controller");
 
 const applicationcontroller = require('../controllers/application.controller');
 
-const { isAuth } = require("../controllers/auth.controller");
 const authenticate = require("../middlewares/auth.middleware");
 const authorizeRoles = require("../middlewares/role.middleware");
 
@@ -30,16 +29,13 @@ router.post(
   donorsController.contributed_fund
 );
 
-<<<<<<< HEAD
 router.post("/api/applications/apply",applicationcontroller.applyToJob);
 
-=======
 router.get(
   "/api/activity/:userId",
   authenticate,
   authorizeRoles("Donor"),
   donorsController.getUserActivity
 );
->>>>>>> react
 
 module.exports = router;
