@@ -31,7 +31,7 @@ const ListJobPage = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('http://localhost:3000/jobs/all', {
+        const response = await fetch('http://localhost:3000/api/jobs', {
             credentials: 'include' 
         });
         const data = await response.json();
@@ -83,8 +83,8 @@ const ListJobPage = () => {
   };
 
   const handleApplyClick = (job) => {
-    // FIX: Use userRole derived from auth context
-    if (!auth.isLoggedIn || userRole !== "Donor") {
+    // Check if user is authenticated and has Donor role
+    if (!auth.user || userRole !== "Donor") {
       alert("Only registered Donors can apply for jobs. Please log in as a Donor.");
       return;
     }
