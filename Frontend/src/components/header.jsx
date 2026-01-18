@@ -79,7 +79,7 @@ const Header = ({ navItems }) => {
   ))}
 
           <li>
-            {auth.isLoggedIn ? (
+            {auth.user ? (
               <>
                 {/* Show DASHBOARD button only on landing page */}
                 {isLandingPage && (

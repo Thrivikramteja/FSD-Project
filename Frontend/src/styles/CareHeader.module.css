@@ -1,0 +1,78 @@
+/* CareHeader.module.css */
+
+.navbar {
+    background-color: #064e3b; /* Deep Emerald */
+    padding: 15px 0;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.navContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: -1px;
+}
+
+.logoAccent {
+    color: #10b981; /* Mint Green */
+}
+
+.headerRight {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.navItem {
+    color: #ecfdf5;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+
+.navItem:hover {
+    color: #10b981;
+}
+
+.logoutBtn {
+    background-color: #059669; /* Slightly lighter green */
+    color: white;
+    padding: 8px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logoutBtn:hover {
+    background-color: #ef4444; /* Turns red only on hover for logout */
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .navContainer {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .headerRight {
+        gap: 15px;
+    }
+}
