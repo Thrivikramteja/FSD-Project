@@ -1,0 +1,196 @@
+.pageWrapper {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #334155;
+}
+
+.mainContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.dashboardHeader h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 30px;
+}
+
+.dashboardLayout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 30px;
+  align-items: start;
+}
+
+/* Sections */
+.contentSection {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+/* Data Cards */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.dataCard {
+  background: #fdfdfd;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
+}
+
+.dataCard:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.dataCard h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.dataCard p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 4px 0;
+}
+
+.highlightText {
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Sidebar & Profile */
+.stickyProfile {
+  position: sticky;
+  top: 100px;
+}
+
+.profileCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.profileCard h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.profileView p {
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.profileView strong {
+  color: #475569;
+}
+
+.editBtn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Edit Form */
+.editForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.editForm label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #475569;
+}
+
+.editForm input {
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+}
+
+.saveBtn {
+  flex: 1;
+  padding: 10px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 10px;
+  background: #94a3b8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.noData {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.loadingContainer {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 1024px) {
+  .dashboardLayout {
+    grid-template-columns: 1fr;
+  }
+  .stickyProfile {
+    position: static;
+  }
+}

@@ -57,7 +57,7 @@ async function login(req, res) {
     } else if (userRole === "Admin") {
       if (email === "fsd@gmail.com" && password === "123456") {
         const token = jwt.sign(
-          { role: "Admin" },
+          { role: "Admin", email: email },
           process.env.JWT_SECRET,
           { expiresIn: "1d" }
         );
@@ -147,7 +147,6 @@ async function verifyOTP(req, res) {
 
     const plainUser = user.toObject();
 
-    // Correctly extracting the role-specific ID
     const userId =
       userRole === "NGO"
         ? plainUser.ngoId
@@ -155,8 +154,14 @@ async function verifyOTP(req, res) {
         ? plainUser.carehomeId
         : plainUser.userId;
 
+    // Added name and email to the token so the frontend/middleware can access them easily
     const token = jwt.sign(
-      { id: userId, role: userRole },
+      { 
+        id: userId, 
+        role: userRole,
+        name: plainUser.name,
+        email: plainUser.email 
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -208,8 +213,7 @@ async function forgotPassword(req, res) {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message:
-          "No account found with this email. Please enter a correct email or sign up newly.",
+        message: "No account found with this email. Please enter a correct email or sign up newly.",
       });
     }
 
@@ -233,12 +237,33 @@ async function forgotPassword(req, res) {
   }
 }
 
-function checkAuth(req, res) {
-  return res.status(200).json({
-    success: true,
-    user: req.user, 
-    role: req.user.role,
-  });
+// Updated checkAuth to perform a quick DB lookup to ensure data freshness
+async function checkAuth(req, res) {
+  try {
+    const { id, role } = req.user;
+    let fullUser = null;
+
+    if (role === "NGO") {
+        fullUser = await NGO.findOne({ ngoId: id }).lean();
+    } else if (role === "Donor") {
+        fullUser = await User.findOne({ userId: id }).lean();
+    } else if (role === "Carehome") {
+        fullUser = await Carehome.findOne({ carehomeId: id }).lean();
+    }
+
+    if (!fullUser && role !== "Admin") {
+        return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: fullUser || { email: req.user.email }, 
+      role: role,
+    });
+  } catch (error) {
+    console.error("CheckAuth Error:", error);
+    return res.status(500).json({ success: false, message: "Server error during authentication" });
+  }
 }
 
 function logout(req, res) {

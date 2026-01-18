@@ -1,16 +1,16 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { useContext } from "react";
+import React, { useContext } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { AuthContext } from "../components/authContext";
-import styles from "./Header.module.css";
+import styles from "../styles/CareHeader.module.css"; 
 
-const Header = ({ navItems }) => {
+const Header = ({ navItems = [] }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth, logout } = useContext(AuthContext);
 
   const isLandingPage = location.pathname === "/";
 
-  // Choose dashboard URL based on role
+  // --- LOGIC PRESERVED: Role-based Dashboard Pathing ---
   let dashboardPath = "/";
   if (auth.user) {
     switch (auth.role) {
@@ -32,92 +32,91 @@ const Header = ({ navItems }) => {
   }
 
   return (
-    <header className={styles.header}>
-      <div className={styles["app-name"]} onClick={() => navigate("/")}>
-        CareConnect
-      </div>
+    <header className={styles.navbar}>
+      <div className={styles.navContainer}>
+        {/* APP NAME / LOGO */}
+        <div className={styles.logo} onClick={() => navigate("/")}>
+          Care<span className={styles.logoAccent}>Connect</span>
+        </div>
 
-      <nav>
-        {/* //<ul className={styles["nav-items"]}>
-          {navItems.map((item) => (
-            <li key={item.label}>
-              {item.onClick ? (
-                <button onClick={item.onClick}>{item.label}</button>
-              ) : item.path ? (
-                <a href={item.path}>{item.label}</a>
-              ) : (
-                <span>{item.label}</span>
-              )}
-            </li>
-          ))} */}
-
-          <ul className={styles["nav-items"]}>
+        <nav>
+          <ul className={styles.headerRight}>
+            {/* --- LOGIC PRESERVED: Dynamic navItems & Dropdowns --- */}
             {navItems.map((item) => (
-             <li key={item.label} className={item.subItems ? styles.dropdown : ""}>
-               {item.onClick ? (
-        <button onClick={item.onClick}>{item.label}</button>
-      ) : item.subItems ? (
-        <>
-          {/* Main Discover Link */}
-          <a href={item.path} className={styles.dropdownToggle}>{item.label}</a>
-          
-          {/* The Dropdown Menu */}
-          <ul className={styles.dropdownMenu}>
-            {item.subItems.map((sub) => (
-              <li key={sub.label}>
-                <a href={sub.path}>{sub.label}</a>
+              <li key={item.label} className={item.subItems ? styles.dropdown : ""}>
+                {item.onClick ? (
+                  <button className={styles.navButton} onClick={item.onClick}>
+                    {item.label}
+                  </button>
+                ) : item.subItems ? (
+                  <>
+                    <a href={item.path} className={styles.navItem}>
+                      {item.label} <span className={styles.arrow}>▾</span>
+                    </a>
+                    <ul className={styles.dropdownMenu}>
+                      {item.subItems.map((sub) => (
+                        <li key={sub.label}>
+                          <a href={sub.path}>{sub.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : item.path ? (
+                  <a href={item.path} className={styles.navItem}>{item.label}</a>
+                ) : (
+                  <span className={styles.navItem}>{item.label}</span>
+                )}
               </li>
             ))}
-          </ul>
-        </>
-      ) : item.path ? (
-        <a href={item.path}>{item.label}</a>
-      ) : (
-        <span>{item.label}</span>
-      )}
-    </li>
-  ))}
 
-          <li>
+            {/* --- LOGIC PRESERVED: Auth Conditional Rendering --- */}
             {auth.user ? (
               <>
-                {/* Show DASHBOARD button only on landing page */}
+                {/* Dashboard button only on landing page */}
                 {isLandingPage && (
-                  <button style={{paddingRight: "24px"}} onClick={() => navigate(dashboardPath)}>
-                    Dashboard
-                  </button>
+                  <li>
+                    <button className={styles.navButton} onClick={() => navigate(dashboardPath)}>
+                      Dashboard
+                    </button>
+                  </li>
                 )}
 
-                <span>{auth.user?.name}</span>
-                <button
-                  onClick={() => {
-                    logout();
-                    navigate("/");
-                  }}
-                >
-                  Logout
-                </button>
+                <li className={styles.userName}>{auth.user?.name}</li>
+                
+                <li>
+                  <button
+                    className={styles.logoutBtn}
+                    onClick={() => {
+                      logout();
+                      navigate("/");
+                    }}
+                  >
+                    Logout
+                  </button>
+                </li>
               </>
             ) : (
               <>
-
-                {/* Sign Up ONLY on landing page */}
+                {/* Sign Up only on landing page */}
                 {isLandingPage && (
-                  <button style={{paddingRight: "24px"}} onClick={() => navigate("/signup")}>
-                    Sign Up
-                  </button>
+                  <li>
+                    <button className={styles.navButton} onClick={() => navigate("/signup")}>
+                      Sign Up
+                    </button>
+                  </li>
                 )}
-
-                <button onClick={() => navigate("/login")}>Login</button>
+                <li>
+                  <button className={styles.loginBtn} onClick={() => navigate("/login")}>
+                    Login
+                  </button>
+                </li>
               </>
             )}
-          </li>
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      </div>
     </header>
   );
 };
 
 export default Header;
-
-

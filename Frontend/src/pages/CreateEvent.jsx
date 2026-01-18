@@ -59,7 +59,7 @@ const CreateEvent = () => {
     dataToSend.append('type', 'event');   
 
     try {
-      const response = await fetch(`http://localhost:3000/NGO-dashboard/${ngoID}/create-event`, {
+      const response = await fetch(`http://localhost:3000/api/ngo/${ngoID}/create-event`, {
         method: 'POST',
         body: dataToSend,
         credentials: 'include'

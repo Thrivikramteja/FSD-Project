@@ -86,24 +86,16 @@ async function contributed_fund(req, res) {
     const fundraiser_name = req.params.fundraiser_name;
     const amount_contributed = req.body.your_amount;
 
-    if (!req.session.user || !req.session.user.userId) {
-      console.log("User not authenticated or session data missing");
-      return res.redirect("/login?error=Please log in to contribute");
+    // --- CHANGE: Use req.user (from JWT) instead of req.session ---
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Authentication required" });
     }
 
-    const userId = req.session.user.userId;
-    console.log("Session ID for user: " + userId);
+    const userId = req.user.id; 
+    console.log("JWT User ID contributing: " + userId);
 
     const deadline = await get_deadline(ngoId, fundraiser_name);
-    console.log("Deadline for the fundraiser:", deadline);
-
-    const currentDate = new Date();
-
-
-    const fundraiser = await CreatedFundraiser.findOne({
-      ngoId,
-      fundraiser_name
-    });
+    const fundraiser = await CreatedFundraiser.findOne({ ngoId, fundraiser_name });
 
     if (!fundraiser) {
       return res.status(404).json({ message: "Fundraiser not found" });
@@ -114,14 +106,12 @@ async function contributed_fund(req, res) {
       ngoId: ngoId,
       fundraiser_name: fundraiser_name,
       amount_contributed: amount_contributed,
-      contributed_at: currentDate,
+      contributed_at: new Date(),
       deadline: deadline,
       fundraiserObjectId: fundraiser._id
     });
 
     await newContribution.save();
-    console.log("save successful to user id " + userId);
-
 
     await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
@@ -129,13 +119,11 @@ async function contributed_fund(req, res) {
       { new: true }
     );
 
-    console.log("successfully updated in ngo side");
+    res.status(200).json({ success: true, message: "Contribution recorded successfully" });
 
   } catch (error) {
     console.error("Error in contributed_fund:", error);
-    res.status(500).json({
-      message: "An error occurred while processing the contribution.",
-    });
+    res.status(500).json({ message: "An error occurred while processing the contribution." });
   }
 }
 

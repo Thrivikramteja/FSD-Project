@@ -180,17 +180,21 @@
 
 
 
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Header from '../components/header';
 import Footer from '../components/footer';
+import { AuthContext } from '../components/authContext';
 // IMPORT the central config
 import { headerConfig } from "../config/headerConfig"; 
 
 import '../styles/fundraisers.css'; 
 
 const AllFundraisers = () => {
+  const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
+  
   const [fundraisers, setFundraisers] = useState([]); 
   const [filteredFundraisers, setFilteredFundraisers] = useState([]); 
   const [loading, setLoading] = useState(true);
@@ -249,6 +253,23 @@ const AllFundraisers = () => {
   const getImageUrl = (path) => {
     if (!path) return '/assets/default-fundraiser.jpg';
     return `http://localhost:3000/${path.replace(/\\/g, "/")}`;
+  };
+
+  const handleDonateClick = (fund) => {
+    
+    if (!auth.user) {
+      alert("Please login first to donate");
+      return;
+    }
+
+    
+    if (auth.role !== 'Donor') {
+      alert("Please login as a donor or create a donor account to donate");
+      return;
+    }
+
+    // Redirect to donate page
+    navigate(`/donate_fundraiser/${fund.ngoId}/${fund.fundraiser_name}`);
   };
 
   return (
@@ -320,12 +341,13 @@ const AllFundraisers = () => {
             </div>
 
             <div style={{ marginTop: '15px' }}>
-              <Link 
-                to={`/donate_fundraiser/${fund.ngoId}/${fund.fundraiser_name}`}
+              <button 
+                type="button"
+                onClick={() => handleDonateClick(fund)}
                 className="fund-donate-btn"
               >
                 Donate
-              </Link>
+              </button>
             </div>
           </div>
         ))}

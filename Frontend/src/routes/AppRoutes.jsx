@@ -19,6 +19,7 @@ import AllCarehomes from "../pages/AllCarehomes";
 import AllNgos from "../pages/AllNgos";
 import AllEvents from "../pages/AllEvents";
 import AllFundraisers from "../pages/AllFundraisers";
+import DonateFundraiser from "../pages/DonateFundraiser";
 import ProtectedRoute from "./ProtectedRoute";
 import DonorRegistration from "../pages/DonorRegistration";
 import ViewCare from "../pages/ViewCare";
@@ -40,6 +41,7 @@ const AppRoutes = () => {
       <Route path="/all-ngos" element={<AllNgos />} />
       <Route path="/events" element={<AllEvents />} />
       <Route path="/fundraisers" element={<AllFundraisers />} />
+      <Route path="/donate_fundraiser/:ngoId/:name_fund" element={<DonateFundraiser />} />
       <Route
         path="/register-event/:ngoId/:eventName"
         element={<DonorRegistration />}

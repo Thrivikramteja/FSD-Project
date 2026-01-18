@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import Footer from '../components/footer';
+import { AuthContext } from '../components/authContext';
 import '../styles/donor_reg.css'; 
 
 const DonorRegistration = () => {
   const { ngoId, eventName } = useParams();
   const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -17,6 +19,31 @@ const DonorRegistration = () => {
     terms: false
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Check role and pre-fill form data
+  useEffect(() => {
+    if (!auth.loading) {
+      // Check if user is authenticated and has Donor role
+      if (!auth.user || auth.role !== 'Donor') {
+        setError('You must be logged in as a Donor to register for this event.');
+        setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+        return;
+      }
+
+      // Pre-fill form with user data
+      if (auth.user) {
+        setFormData(prev => ({
+          ...prev,
+          name: auth.user.name || '',
+          email: auth.user.email || '',
+          number: auth.user.mobile_number || '',
+          age: auth.user.age || '',
+          address: auth.user.address || ''
+        }));
+      }
+    }
+  }, [auth, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -35,6 +62,7 @@ const DonorRegistration = () => {
       const response = await fetch(`http://localhost:3000/registerUser/${ngoId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Send cookies for authentication
         body: JSON.stringify({
           ...formData,
           event: decodeURIComponent(eventName), // Ensure event name is clean
@@ -70,11 +98,26 @@ const DonorRegistration = () => {
 
       <div className="donor-reg-wrapper">
         <div className="donor-reg-container">
-          <h2 className="donor-reg-title">
-            Register for: {eventName ? decodeURIComponent(eventName) : "Event"}
-          </h2>
+          {error && (
+            <div className="error-message" style={{ 
+              color: 'red', 
+              padding: '10px', 
+              marginBottom: '20px', 
+              backgroundColor: '#ffe6e6', 
+              borderRadius: '4px',
+              textAlign: 'center'
+            }}>
+              {error}
+            </div>
+          )}
+          
+          {!error && (
+            <>
+              <h2 className="donor-reg-title">
+                Register for: {eventName ? decodeURIComponent(eventName) : "Event"}
+              </h2>
 
-          <form className="donor-reg-form" onSubmit={handleSubmit}>
+              <form className="donor-reg-form" onSubmit={handleSubmit}>
             <input 
               type="text" name="name" placeholder="Full Name" required 
               className="donor-reg-input"
@@ -114,10 +157,12 @@ const DonorRegistration = () => {
               I agree to the Terms and Conditions
             </label>
 
-            <button type="submit" className="donor-reg-btn" disabled={loading}>
-              {loading ? "Registering..." : "Register"}
-            </button>
-          </form>
+              <button type="submit" className="donor-reg-btn" disabled={loading}>
+                {loading ? "Registering..." : "Register"}
+              </button>
+            </form>
+            </>
+          )}
         </div>
       </div>
 

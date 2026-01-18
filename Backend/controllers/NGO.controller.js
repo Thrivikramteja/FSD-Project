@@ -216,16 +216,24 @@ function renderCreateEventForm(req, res) {
 }
 
 async function createEvent(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
+  
+  const ngoID = req.params.ngoID;
 
-  if (req.user.role !== "NGO" || req.user.id !== ngoID) {
-    return res.status(403).json({ message: "Forbidden" });
+  if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
+    return res.status(403).json({ 
+      success: false, 
+      message: "Forbidden: You do not have permission to create an event for this NGO" 
+    });
   }
 
-  const { event_location, event_name, deadline, event_time, description } =
-    req.body;
+  const { event_location, event_name, deadline, event_time, description } = req.body;
 
   try {
+    // 2. Data Validation
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Event image is required" });
+    }
+
     const newEvent = new Event({
       ngoId: ngoID,
       event_name,
@@ -234,14 +242,23 @@ async function createEvent(req, res) {
       event_time,
       description,
       number_of_registrations: 0,
-      imagePath: req.file.path,
+      imagePath: req.file.path, // Populated by Multer
     });
 
+    // 3. Database Persistence
     await newEvent.save();
 
-    res.status(200).json({ message: "Event created successfully" });
+    res.status(200).json({ 
+      success: true, 
+      message: "Event created successfully!" 
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Failed to create event" });
+    console.error("Event Creation Error:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to create event. Please try again later." 
+    });
   }
 }
 

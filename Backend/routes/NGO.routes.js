@@ -21,7 +21,7 @@ router.get(
 );
 
 router.post(
-  "/api/ngo/:ngoID/events",
+  "/api/ngo/:ngoID/create-event",
   authenticate,
   authorizeRoles("NGO"),
   upload.single("image"),
@@ -57,6 +57,7 @@ router.get("/api/carehomes-list", async (req, res) => {
 
 router.get('/events', NGOController.getEvents);
 
+router.post('/registerUser/:ngoID',authenticate,authorizeRoles("Donor"), NGOController.registerUser);
 
 
 module.exports = router;
