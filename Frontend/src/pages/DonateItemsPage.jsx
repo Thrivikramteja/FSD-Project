@@ -72,15 +72,17 @@ const DonatePage = () => {
         setMessage({ type: '', text: '' }); 
 
         try {
-            const response = await fetch(ENDPOINT_URL, {
+            const response = await fetch(`http://localhost:3000${ENDPOINT_URL}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
+                credentials: 'include',
             });
 
             if (response.ok) {
                 setMessage({ type: 'success', text: 'Donation request sent! Awaiting confirmation.' });
                 // Reset form data on success
+                alert('Donation request sent! Awaiting confirmation.')
                 setFormData({ carehomes: '', category: '', description: '', address: '', date: '' });
             } else {
                 const errorData = await response.json().catch(() => ({ message: 'Server failed to save request.' }));

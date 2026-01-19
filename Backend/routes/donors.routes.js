@@ -29,7 +29,8 @@ router.post(
   donorsController.contributed_fund
 );
 
-router.post("/api/applications/apply",applicationcontroller.applyToJob);
+router.post("/api/applications/apply",  authenticate,
+  authorizeRoles("Donor"),applicationcontroller.applyToJob);
 
 router.get(
   "/api/activity/:userId",

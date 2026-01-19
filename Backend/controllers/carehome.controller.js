@@ -83,9 +83,13 @@ async function donateItems(req, res) {
 
 async function get_don_items(req, res) {
   try {
-    if (req.user.role !== "Donor") {
-      return res.status(403).json({ message: "Only donors can donate items" });
-    }
+      if (!req.user || req.user.role !== "Donor")
+         {
+            return res.status(403).json({ 
+              success: false, 
+              message: "Access Denied: Only registered donors can submit item donation requests." 
+            });
+          }
 
     const carehomeId = parseInt(req.body.carehomes, 10);
     const category = req.body.category;
@@ -196,48 +200,52 @@ async function getCarehome(req, res) {
 }
 
 async function accpet_item_doantions(req, res) {
-  if (
-    req.user.role !== "Carehome" ||
-    req.user.id !== Number(req.body.carehomeId)
-  ) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
+  try {
+    // Safety Check: Identity & Role
+    if (req.user.role !== "Carehome" || String(req.user.id) !== String(req.body.carehomeId)) {
+        return res.status(403).json({ success: false, message: "Forbidden: Identity mismatch" });
+    }
 
-  const whether = req.body.action;
-  const { carehomeId, category, delivery_date, location, description, userId } =
-    req.body;
+    const { action, carehomeId, category, delivery_date, location, description, userId } = req.body;
 
-  if (whether === "accept") {
-    await new donate_items({
-      userId,
-      carehomeId,
-      category,
-      delivery: delivery_date,
-      description,
-      location,
-      donated_at: Date.now(),
+    // 1. Move to permanent records if accepted
+    if (action === "accept") {
+        await new donate_items({
+            userId,
+            carehomeId,
+            category,
+            delivery: delivery_date,
+            description,
+            location,
+            donated_at: Date.now(),
+        }).save();
+    }
+
+    // 2. Remove the request from the "Inbox"
+    await donate_items_mes.findOneAndDelete({
+        userId,
+        carehomeId,
+        category,
+        location,
+    });
+
+    // 3. Notify the donor
+    await new user_message({
+        carehomeId,
+        userId,
+        message: action === "accept" ? "Your donation request was approved!" : "Your donation request was declined.",
+        category,
+        delivery: delivery_date,
+        when_date: Date.now(),
     }).save();
+
+    res.json({ success: true, message: `Request ${action}ed successfully.` });
+
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Internal server error" });
   }
-
-  await donate_items_mes.findOneAndDelete({
-    userId,
-    carehomeId,
-    category,
-    location,
-  });
-
-  await new user_message({
-    carehomeId,
-    userId,
-    message: whether,
-    category,
-    delivery: delivery_date,
-    when_date: Date.now(),
-  }).save();
-
-  res.json({ success: true });
 }
-
 async function editCarehomeProfile(req, res) {
   const careId = parseInt(req.params.carehomeId, 10);
 
@@ -294,30 +302,54 @@ async function editCarehomeProfile(req, res) {
 }
 
 async function post_createjob(req, res) {
-  if (req.user.role !== "Carehome") {
-    return res.status(403).json({ message: "Forbidden" });
+  try {
+
+    if (!req.user || req.user.role !== "Carehome") {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Access Denied: Only Carehomes can post job listings." 
+      });
+    }
+
+    const { title, description, location, pay, type, startDate, endDate } = req.body;
+
+
+    if (!title || !description || !pay) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Title, description, and pay are required fields." 
+      });
+    }
+
+    const job = new CareHomeJob({
+      postedBy: String(req.user.id), 
+      title,
+      description,
+      location,
+      pay,
+      type,
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null,
+    });
+
+    // 4. Save to Database
+    await job.save();
+
+    // 5. Success Response
+    // Providing a redirectUrl helps the React frontend know where to go next
+    return res.status(201).json({
+      success: true,
+      message: "Job listing published successfully!",
+      redirectUrl: `/carehome-dashboard/${req.user.id}`,
+    });
+
+  } catch (error) {
+    console.error("Create Job Error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "An internal server error occurred while creating the job." 
+    });
   }
-
-  const { title, description, location, pay, type, startDate, endDate } =
-    req.body;
-
-  const job = new CareHomeJob({
-    postedBy: req.user.id,
-    title,
-    description,
-    location,
-    pay,
-    type,
-    startDate: startDate ? new Date(startDate) : null,
-    endDate: endDate ? new Date(endDate) : null,
-  });
-
-  await job.save();
-
-  res.json({
-    success: true,
-    redirectUrl: `/carehome-dashboard/${req.user.id}`,
-  });
 }
 
 async function get_alljobs(req, res) {

@@ -188,3 +188,25 @@
     height: 100%;
     background: #10b981;
 }
+
+
+.goalReachedMessage {
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #f0fdf4;
+    border: 1px solid #10b981; 
+    border-radius: 8px;
+    text-align: center;
+}
+
+.goalReachedMessage p {
+    margin: 4px 0;
+    font-size: 0.85rem;
+    color: #065f46; 
+}
+
+.goalReachedMessage strong {
+    color: #10b981;
+    display: block;
+    margin-bottom: 2px;
+}

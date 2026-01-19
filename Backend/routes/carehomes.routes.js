@@ -37,4 +37,12 @@ router.post(
   carehomesController.registerCarehome
 );
 
+router.post('/carehome-dashboard/post-job', carehomesController.post_createjob);
+
+router.post('/donate_items_user',  authenticate,
+  authorizeRoles("Donor"), carehomesController.get_don_items);
+
+ router.post('/donate_item/action',authenticate,
+  authorizeRoles("Carehome"), carehomesController.accpet_item_doantions);
+
 module.exports = router;

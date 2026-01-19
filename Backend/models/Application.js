@@ -9,11 +9,8 @@ const applicationSchema = new mongoose.Schema({
   },
   
   // Reference to the Donor
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
-  },
+// models/Application.js
+  userId: { type: Number, required: true },
 
   // Reference to the Carehome
   carehomeId: { 
