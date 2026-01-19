@@ -13,6 +13,10 @@ const {
   user_message,
 } = require("../models/user.model");
 
+
+const Application = require("../models/Application");
+const { CareHomeJob, Carehome } = require("../models/carehome.model");
+
 async function getdonor(req, res) {
   const user_ID = parseInt(req.params.userId, 10);
   const userRole = req.params.userRole;
@@ -180,10 +184,13 @@ async function getUserActivity (req, res) {
     const userId = Number(req.params.userId);
 
     const eventsParticipated = await UserRegisteredEvent.find({ userId })
-      .populate("eventObjectId"); 
+      .populate("eventObjectId");
 
     const eventsUpcoming = eventsParticipated.filter(
       evt => new Date(evt.event_date) > new Date()
+    );
+    const already = eventsParticipated.filter(
+      evt => new Date(evt.event_date) < new Date
     );
 
     const fundraisersContributed = await UserContributedFundraiser.find({ userId })
@@ -196,7 +203,7 @@ async function getUserActivity (req, res) {
     return res.status(200).json({
       success: true,
       data: {
-        events_participated: eventsParticipated,
+        events_participated: already,
         events_upcoming: eventsUpcoming,
         fundraisers_contributed: fundraisersContributed,
         donations_money: donationsMoney,
@@ -252,6 +259,34 @@ async function getTickerData(req, res) {
 
 
 
+async function getUserApplications(req, res) {
+  try {
+    const userId = req.user.id; 
+
+    const applications = await Application.find({ userId: userId })
+      .populate({
+       
+        path: 'jobId', 
+        model: 'CareHomeJob', 
+        select: 'title type pay'
+      })
+      .populate({
+        path: 'carehomeId',
+        model: 'Carehome', 
+        select: 'name location'
+      })
+      .sort({ appliedAt: -1 })
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      applications: applications
+    });
+  } catch (error) {
+    console.error("Error fetching user applications:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
 
 module.exports = {
   getdonor,
@@ -260,4 +295,5 @@ module.exports = {
   contributed_fund,
   getUserActivity,
   getTickerData,
+  getUserApplications
 };

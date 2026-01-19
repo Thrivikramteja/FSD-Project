@@ -45,4 +45,8 @@ router.post('/donate_items_user',  authenticate,
  router.post('/donate_item/action',authenticate,
   authorizeRoles("Carehome"), carehomesController.accpet_item_doantions);
 
+  router.get('/api/carehome/my-jobs',authenticate,
+  authorizeRoles("Carehome"),carehomesController.getCareHome_Jobs);
+
+  router.get('/api/carehome/jobs/:jobId/applicants', authenticate, authorizeRoles("Carehome"),  carehomesController.getJobApplicants);
 module.exports = router;

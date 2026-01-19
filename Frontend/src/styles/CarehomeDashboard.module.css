@@ -210,3 +210,47 @@
     display: block;
     margin-bottom: 2px;
 }
+
+
+.jobPortalCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.jobPortalCard:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.jobMeta {
+    font-size: 0.85rem;
+    color: #10b981;
+    margin: 10px 0 20px 0;
+    font-weight: 600;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.backBtn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.backBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

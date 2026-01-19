@@ -5,6 +5,8 @@ const { Carehome } = require("../models/carehome.model");
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
 const { CareHomeJob } = require("../models/carehome.model");
+const Application = require("../models/Application");
+const { User } = require("../models/user.model");
 
 async function getCareHomesApi(req, res) {
   try {
@@ -367,6 +369,79 @@ async function get_alljobs(req, res) {
   }
 }
 
+// Helper to resolve numeric IDs to MongoDB ObjectIds
+async function getMongoIdFromNumericId(numericId) {
+  const carehome = await Carehome.findOne({ carehomeId: numericId }); 
+  return carehome ? carehome._id : null;
+}
+
+
+async function getCareHome_Jobs(req, res) {
+  try {
+    // 1. Verify Authentication
+    if (!req.user || req.user.role !== "Carehome") {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+
+    // 2. Resolve numeric JWT ID to MongoDB ObjectId
+    const mongoId = await getMongoIdFromNumericId(req.user.id);
+    
+    if (!mongoId) {
+      return res.status(404).json({ success: false, message: "Carehome record not found" });
+    }
+
+    // 3. Fetch jobs using the resolved ObjectId
+    const jobs = await CareHomeJob.find({ postedBy: mongoId })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      jobs: jobs
+    });
+  } catch (error) {
+    console.error("Error in getCareHomeJobs:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
+async function getJobApplicants(req, res) {
+  try {
+    const { jobId } = req.params; 
+
+
+    const mongoId = await getMongoIdFromNumericId(req.user.id);
+    
+    if (!mongoId) {
+      return res.status(404).json({ success: false, message: "Carehome not found" });
+    }
+
+    const applications = await Application.find({ 
+      jobId: jobId, 
+      carehomeId: mongoId 
+    }).lean();
+
+
+    const detailedApplicants = await Promise.all(
+      applications.map(async (app) => {
+        const user = await User.findOne({ userId: app.userId }).select('name email').lean();
+        return {
+          ...app,
+          userName: user ? user.name : "Unknown User",
+          userEmail: user ? user.email : "N/A"
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      applicants: detailedApplicants
+    });
+  } catch (error) {
+    console.error("Error fetching job applicants:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
 module.exports = {
   donateMoney,
   register,
@@ -380,4 +455,6 @@ module.exports = {
   editCarehomeProfile,
   post_createjob,
   get_alljobs,
+  getCareHome_Jobs,
+  getJobApplicants,
 };

@@ -41,4 +41,6 @@ router.get(
 
 router.get('/ticker-data', donorsController.getTickerData);
 
+router.get('/my-applications', authenticate,authorizeRoles("Donor"), donorsController.getUserApplications);
+
 module.exports = router;
