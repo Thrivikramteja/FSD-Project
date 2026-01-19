@@ -39,4 +39,6 @@ router.get(
   donorsController.getUserActivity
 );
 
+router.get('/ticker-data', donorsController.getTickerData);
+
 module.exports = router;

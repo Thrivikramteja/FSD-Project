@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLandingData } from "../store/entitiesSlice";
 import { useNavigate } from "react-router-dom";
@@ -7,25 +7,45 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import Carousel from "../components/carousel";
 import FAQ from "../components/faq";
+import DonationTicker from '../pages/DonationTicker';
 
 import '../styles/landing_page.css'
-
 import { headerConfig } from "../config/headerConfig";
 
 export default function LandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [tickerData, setTickerData] = useState([]);
 
   const ngos = useSelector((state) => state.entities.ngos);
   const events = useSelector((state) => state.entities.events);
 
   useEffect(() => {
+    // 1. Existing Redux dispatch for NGOs and Events
     dispatch(fetchLandingData());
+
+    // 2. Local fetch for the live donation ticker
+    const fetchTicker = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/ticker-data");
+        const json = await response.json();
+        if (json.success) {
+          setTickerData(json.data);
+        }
+      } catch (err) {
+        console.error("Ticker fetch failed:", err);
+      }
+    };
+
+    fetchTicker();
   }, [dispatch]);
 
   return (
     <div>
       <Header navItems={headerConfig.landing} />
+      
+      {/* Live Ticker placed between Header and Carousel */}
+      
       <Carousel />
 
       <main>
@@ -65,8 +85,7 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
-
-        
+            <DonationTicker donations={tickerData} />
         <FAQ />
       </main>
 

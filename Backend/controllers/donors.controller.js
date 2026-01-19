@@ -210,11 +210,54 @@ async function getUserActivity (req, res) {
   }
 };
 
+async function getTickerData(req, res) {
+  try {
+    // 1. Fetch 4 most recent direct money donations
+    // We populate the user name based on the numeric userId
+    const recentMoney = await DonationMoney.find()
+      .sort({ donated_at: -1 })
+      .limit(4)
+      .lean();
+
+    // 2. Fetch 4 most recent fundraiser contributions
+    const recentFundraiser = await UserContributedFundraiser.find()
+      .sort({ contributed_at: -1 })
+      .limit(4)
+      .lean();
+
+    // 3. Combine and Format for Ticker
+    // We need to fetch names because the schemas only store numeric userIds
+    const combineData = async (list, type) => {
+      return Promise.all(list.map(async (item) => {
+        const user = await User.findOne({ userId: item.userId }).lean();
+        return {
+          name: user ? user.name : "Anonymous",
+          amount: type === 'money' ? item.amount_donated : item.amount_contributed,
+          date: type === 'money' ? item.donated_at : item.contributed_at
+        };
+      }));
+    };
+
+    const moneyFormatted = await combineData(recentMoney, 'money');
+    const fundraiserFormatted = await combineData(recentFundraiser, 'fundraiser');
+
+    const tickerData = [...moneyFormatted, ...fundraiserFormatted].sort((a, b) => b.date - a.date);
+
+    res.status(200).json({ success: true, data: tickerData });
+  } catch (error) {
+    console.error("Ticker Data Error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch ticker data" });
+  }
+}
+
+
+
 
 module.exports = {
   getdonor,
   getEditDonorProfile,
   editDonorProfile,
   contributed_fund,
-  getUserActivity
+  getUserActivity,
+  getTickerData,
 };
