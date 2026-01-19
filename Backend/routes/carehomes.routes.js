@@ -30,6 +30,8 @@ router.post(
 
 router.get("/api/carehomes", carehomesController.getCareHomesApi);
 router.get("/api/jobs", carehomesController.get_alljobs);
+// Add this to carehomes.routes.js
+router.get("/api/carehomes/viewcare/:carehomeId", carehomesController.getCarehomePublic);
 
 router.post(
   "/api/registerCarehome",

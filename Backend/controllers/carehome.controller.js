@@ -131,10 +131,12 @@ async function get_don_items(req, res) {
 async function registerCarehome(req, res) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+  // const imagePath = req.file.path.replace(/\\/g, "/");
   const imagePath = req.file.path
     .split(path.sep)
-    .slice(-3)
+    .slice(-2) // Change -3 to -2 to get "Carehomes/filename.jpg"
     .join("/");
+    
 
   try {
     const carehome = new Carehome({
@@ -369,6 +371,26 @@ async function get_alljobs(req, res) {
   }
 }
 
+// Add this to carehome.controller.js
+async function getCarehomePublic(req, res) {
+  try {
+    const careId = parseInt(req.params.carehomeId, 10);
+    // Find by the numeric carehomeId
+    const carehome = await Carehome.findOne({ carehomeId: careId });
+
+    if (!carehome) {
+      return res.status(404).json({ error: "Care home not found" });
+    }
+
+    res.json(carehome);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+// Remember to add getCarehomePublic to the module.exports at the end of the file!
+
 // Helper to resolve numeric IDs to MongoDB ObjectIds
 async function getMongoIdFromNumericId(numericId) {
   const carehome = await Carehome.findOne({ carehomeId: numericId }); 
@@ -457,4 +479,5 @@ module.exports = {
   get_alljobs,
   getCareHome_Jobs,
   getJobApplicants,
+  getCarehomePublic,
 };

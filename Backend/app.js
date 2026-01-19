@@ -40,7 +40,8 @@ const donorRoutes = require("./routes/donors.routes.js");
 const NGORoutes = require("./routes/NGO.routes.js");
 const adminRoutes = require("./routes/admin.routes.js");
 
-app.use("/uploads", express.static("uploads"));
+// Change this in app.js
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

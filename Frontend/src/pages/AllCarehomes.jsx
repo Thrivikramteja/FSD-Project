@@ -201,26 +201,25 @@ const AllCarehomes = () => {
     fetchCareHomes();
   }, []);
 
-  // 👇 CORRECTED HELPER FUNCTION FOR IMAGES
-  const getImageUrl = (path) => {
-    if (!path) return '/assets/default-carehome.jpg';
+const getImageUrl = (path) => {
+  if (!path || path === "undefined") return '/assets/default-carehome.jpg';
 
-    // 1. Convert backslashes to forward slashes for URL compatibility
-    let cleanPath = path.replace(/\\/g, "/");
+  // 1. Normalize slashes for Windows
+  let cleanPath = path.replace(/\\/g, "/");
 
-    // 2. Remove 'public/' prefix if your Multer saves it into the string
-    // Because your backend serves 'public/uploads' as '/uploads'
-    if (cleanPath.startsWith("public/")) {
-      cleanPath = cleanPath.replace("public/", "");
+  // 2. If the path in DB is "public/uploads/image.jpg", 
+  // we want it to become "uploads/image.jpg"
+  if (cleanPath.startsWith("public/")) {
+    cleanPath = cleanPath.replace("public/", "");
+  }
+
+  // 3. Ensure it starts with a single slash for the URL
+ if (!cleanPath.startsWith("uploads/")) {
+        cleanPath = "uploads/" + cleanPath;
     }
 
-    // 3. Ensure no leading slash to avoid 'http://localhost:3000//uploads'
-    if (cleanPath.startsWith("/")) {
-      cleanPath = cleanPath.substring(1);
-    }
-
-    return `http://localhost:3000/${cleanPath}`;
-  };
+  return `http://localhost:3000${cleanPath}`;
+};
 
   return (
     <div className="carehome-wrapper">
