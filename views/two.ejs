@@ -3,9 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Submitted Details</title>
+    <style>
+        
+    </style>
 </head>
 <body>
-    <P>Message 2</P>
+    <h1>Submitted Details</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Name</th>
+                <th>Roll Number</th>
+                <th>Expectations</th>
+                <th>File Uploaded</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (submissions && submissions.length > 0) { %>
+                <% submissions.forEach((submission, index) => { %>
+                    <tr>
+                        <td><%= submission.courseName %></td>
+                        <td><%= submission.name %></td>
+                        <td><%= submission.roll %></td>
+                        <td><%= submission.expectations %></td>
+                        <td><%= submission.file %></td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #999;">No submissions yet</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
 </body>
 </html>
