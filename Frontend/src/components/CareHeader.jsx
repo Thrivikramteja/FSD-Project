@@ -1,19 +1,39 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import styles from '../styles/CareHeader.module.css'; // Using a separate module for the header
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../components/authContext";
+import styles from "../styles/CareHeader.module.css";
 
 const CareHeader = ({ careid }) => {
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST", credentials: "include" });
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+
+    // Update context + clear storage
+    logout();
+
+    // Redirect to login
+    navigate("/login");
+  };
+
   return (
     <header className={styles.navbar}>
       <div className={styles.navContainer}>
         <Link to="/" className={styles.logo}>
           Care<span className={styles.logoAccent}>Connect</span>
         </Link>
-        
         <nav className={styles.navLinks}>
           <ul className={styles.headerRight}>
             <li>
-              <Link to={`/carehome-dashboard/${careid}/edit`} className={styles.navItem}>
+              <Link
+                to={`/carehome-dashboard/${careid}/edit`}
+                className={styles.navItem}
+              >
                 Edit Profile
               </Link>
             </li>
@@ -23,9 +43,9 @@ const CareHeader = ({ careid }) => {
               </Link>
             </li>
             <li>
-              <Link to="/logout" className={styles.logoutBtn}>
+              <button onClick={handleLogout} className={styles.logoutBtn}>
                 Logout
-              </Link>
+              </button>
             </li>
           </ul>
         </nav>
