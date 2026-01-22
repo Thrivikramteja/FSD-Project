@@ -61,7 +61,7 @@
 
 
 
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
@@ -69,8 +69,43 @@ export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     user: null,
     role: null,
-    loading: false,
+    loading: true,
   });
+
+  // Check session on app load/refresh
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/me", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setAuth({
+            user: data.user,
+            role: data.role,
+            loading: false,
+          });
+        } else {
+          setAuth({
+            user: null,
+            role: null,
+            loading: false,
+          });
+        }
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+        setAuth({
+          user: null,
+          role: null,
+          loading: false,
+        });
+      }
+    };
+
+    initAuth();
+  }, []);
 
   const login = (userData) => {
     setAuth({
@@ -93,6 +128,8 @@ export const AuthProvider = ({ children }) => {
       role: null,
       loading: false
     });
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
   };
 
   return (

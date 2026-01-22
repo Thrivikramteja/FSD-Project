@@ -305,9 +305,14 @@ async function editCarehomeProfile(req, res) {
   }
 }
 
+// Helper to resolve numeric Carehome ID to MongoDB ObjectId
+async function getMongoIdFromNumericId(numericId) {
+  const carehome = await Carehome.findOne({ carehomeId: numericId }); 
+  return carehome ? carehome._id : null;
+}
+
 async function post_createjob(req, res) {
   try {
-
     if (!req.user || req.user.role !== "Carehome") {
       return res.status(403).json({ 
         success: false, 
@@ -317,7 +322,6 @@ async function post_createjob(req, res) {
 
     const { title, description, location, pay, type, startDate, endDate } = req.body;
 
-
     if (!title || !description || !pay) {
       return res.status(400).json({ 
         success: false, 
@@ -325,8 +329,19 @@ async function post_createjob(req, res) {
       });
     }
 
+    // 1. RESOLVE THE PROMISE HERE FIRST
+    const mongoId = await getMongoIdFromNumericId(req.user.id);
+
+    if (!mongoId) {
+      return res.status(404).json({
+        success: false,
+        message: "Carehome record not found."
+      });
+    }
+
+    // 2. PASS THE RESOLVED mongoId TO THE SCHEMA
     const job = new CareHomeJob({
-      postedBy: String(req.user.id), 
+      postedBy: mongoId, 
       title,
       description,
       location,
@@ -336,11 +351,8 @@ async function post_createjob(req, res) {
       endDate: endDate ? new Date(endDate) : null,
     });
 
-    // 4. Save to Database
     await job.save();
 
-    // 5. Success Response
-    // Providing a redirectUrl helps the React frontend know where to go next
     return res.status(201).json({
       success: true,
       message: "Job listing published successfully!",
