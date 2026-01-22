@@ -14,6 +14,7 @@ export default function DonorDashboard() {
   const [user, setUser] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [activity, setActivity] = useState(null);
+  const [applications, setApplications] = useState([]); // New state for jobs
 
   const [formData, setFormData] = useState({
     name: "",
@@ -48,6 +49,7 @@ export default function DonorDashboard() {
   useEffect(() => {
     if (!user) return;
 
+    // Fetch general activity
     fetch(`http://localhost:3000/api/activity/${user.userId}`, {
       credentials: "include",
     })
@@ -55,6 +57,18 @@ export default function DonorDashboard() {
       .then((data) => {
         if (data.success) {
           setActivity(data.data);
+        }
+      })
+      .catch(() => {});
+
+    // NEW: Fetch job applications
+    fetch(`http://localhost:3000/my-applications`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setApplications(data.applications);
         }
       })
       .catch(() => {});
@@ -96,9 +110,29 @@ export default function DonorDashboard() {
         </header>
 
         <div className={styles.dashboardLayout}>
-          {/* Main Activity Area */}
           <div className={styles.activityColumn}>
             
+            {/* NEW: Job Applications Section */}
+            <section className={styles.contentSection}>
+              <h2 className={styles.sectionTitle}>My Job Applications</h2>
+              <div className={styles.cardGrid}>
+                {applications.length > 0 ? (
+                  applications.map((app) => (
+                    <div key={app._id} className={styles.dataCard}>
+                      <div className={styles.appHeader}>
+                        <h4>{app.jobId?.title || "Deleted Position"}</h4>
+                        <span className={`${styles.statusBadge} ${styles[app.status.toLowerCase()]}`}>
+                          {app.status}
+                        </span>
+                      </div>
+                      <p><strong>Carehome:</strong> {app.carehomeName}</p>
+                      <p>Applied: {new Date(app.appliedAt).toLocaleDateString()}</p>
+                    </div>
+                  ))
+                ) : <p className={styles.noData}>No job applications yet.</p>}
+              </div>
+            </section>
+
             {/* Events Participated */}
             <section className={styles.contentSection}>
               <h2 className={styles.sectionTitle}>Events Participated</h2>
@@ -180,7 +214,6 @@ export default function DonorDashboard() {
             </section>
           </div>
 
-          {/* Sidebar Area: Profile Management */}
           <aside className={styles.sidebarColumn}>
             <section className={styles.stickyProfile}>
               <div className={styles.profileCard}>

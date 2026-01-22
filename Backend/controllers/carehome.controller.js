@@ -5,6 +5,8 @@ const { Carehome } = require("../models/carehome.model");
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
 const { CareHomeJob } = require("../models/carehome.model");
+const Application = require("../models/Application");
+const { User } = require("../models/user.model");
 
 async function getCareHomesApi(req, res) {
   try {
@@ -83,9 +85,13 @@ async function donateItems(req, res) {
 
 async function get_don_items(req, res) {
   try {
-    if (req.user.role !== "Donor") {
-      return res.status(403).json({ message: "Only donors can donate items" });
-    }
+      if (!req.user || req.user.role !== "Donor")
+         {
+            return res.status(403).json({ 
+              success: false, 
+              message: "Access Denied: Only registered donors can submit item donation requests." 
+            });
+          }
 
     const carehomeId = parseInt(req.body.carehomes, 10);
     const category = req.body.category;
@@ -125,10 +131,12 @@ async function get_don_items(req, res) {
 async function registerCarehome(req, res) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+  // const imagePath = req.file.path.replace(/\\/g, "/");
   const imagePath = req.file.path
     .split(path.sep)
-    .slice(-3)
+    .slice(-2) // Change -3 to -2 to get "Carehomes/filename.jpg"
     .join("/");
+    
 
   try {
     const carehome = new Carehome({
@@ -196,48 +204,52 @@ async function getCarehome(req, res) {
 }
 
 async function accpet_item_doantions(req, res) {
-  if (
-    req.user.role !== "Carehome" ||
-    req.user.id !== Number(req.body.carehomeId)
-  ) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
+  try {
+    // Safety Check: Identity & Role
+    if (req.user.role !== "Carehome" || String(req.user.id) !== String(req.body.carehomeId)) {
+        return res.status(403).json({ success: false, message: "Forbidden: Identity mismatch" });
+    }
 
-  const whether = req.body.action;
-  const { carehomeId, category, delivery_date, location, description, userId } =
-    req.body;
+    const { action, carehomeId, category, delivery_date, location, description, userId } = req.body;
 
-  if (whether === "accept") {
-    await new donate_items({
-      userId,
-      carehomeId,
-      category,
-      delivery: delivery_date,
-      description,
-      location,
-      donated_at: Date.now(),
+    // 1. Move to permanent records if accepted
+    if (action === "accept") {
+        await new donate_items({
+            userId,
+            carehomeId,
+            category,
+            delivery: delivery_date,
+            description,
+            location,
+            donated_at: Date.now(),
+        }).save();
+    }
+
+    // 2. Remove the request from the "Inbox"
+    await donate_items_mes.findOneAndDelete({
+        userId,
+        carehomeId,
+        category,
+        location,
+    });
+
+    // 3. Notify the donor
+    await new user_message({
+        carehomeId,
+        userId,
+        message: action === "accept" ? "Your donation request was approved!" : "Your donation request was declined.",
+        category,
+        delivery: delivery_date,
+        when_date: Date.now(),
     }).save();
+
+    res.json({ success: true, message: `Request ${action}ed successfully.` });
+
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Internal server error" });
   }
-
-  await donate_items_mes.findOneAndDelete({
-    userId,
-    carehomeId,
-    category,
-    location,
-  });
-
-  await new user_message({
-    carehomeId,
-    userId,
-    message: whether,
-    category,
-    delivery: delivery_date,
-    when_date: Date.now(),
-  }).save();
-
-  res.json({ success: true });
 }
-
 async function editCarehomeProfile(req, res) {
   const careId = parseInt(req.params.carehomeId, 10);
 
@@ -294,30 +306,54 @@ async function editCarehomeProfile(req, res) {
 }
 
 async function post_createjob(req, res) {
-  if (req.user.role !== "Carehome") {
-    return res.status(403).json({ message: "Forbidden" });
+  try {
+
+    if (!req.user || req.user.role !== "Carehome") {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Access Denied: Only Carehomes can post job listings." 
+      });
+    }
+
+    const { title, description, location, pay, type, startDate, endDate } = req.body;
+
+
+    if (!title || !description || !pay) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Title, description, and pay are required fields." 
+      });
+    }
+
+    const job = new CareHomeJob({
+      postedBy: String(req.user.id), 
+      title,
+      description,
+      location,
+      pay,
+      type,
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null,
+    });
+
+    // 4. Save to Database
+    await job.save();
+
+    // 5. Success Response
+    // Providing a redirectUrl helps the React frontend know where to go next
+    return res.status(201).json({
+      success: true,
+      message: "Job listing published successfully!",
+      redirectUrl: `/carehome-dashboard/${req.user.id}`,
+    });
+
+  } catch (error) {
+    console.error("Create Job Error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "An internal server error occurred while creating the job." 
+    });
   }
-
-  const { title, description, location, pay, type, startDate, endDate } =
-    req.body;
-
-  const job = new CareHomeJob({
-    postedBy: req.user.id,
-    title,
-    description,
-    location,
-    pay,
-    type,
-    startDate: startDate ? new Date(startDate) : null,
-    endDate: endDate ? new Date(endDate) : null,
-  });
-
-  await job.save();
-
-  res.json({
-    success: true,
-    redirectUrl: `/carehome-dashboard/${req.user.id}`,
-  });
 }
 
 async function get_alljobs(req, res) {
@@ -335,6 +371,99 @@ async function get_alljobs(req, res) {
   }
 }
 
+// Add this to carehome.controller.js
+async function getCarehomePublic(req, res) {
+  try {
+    const careId = parseInt(req.params.carehomeId, 10);
+    // Find by the numeric carehomeId
+    const carehome = await Carehome.findOne({ carehomeId: careId });
+
+    if (!carehome) {
+      return res.status(404).json({ error: "Care home not found" });
+    }
+
+    res.json(carehome);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+// Remember to add getCarehomePublic to the module.exports at the end of the file!
+
+// Helper to resolve numeric IDs to MongoDB ObjectIds
+async function getMongoIdFromNumericId(numericId) {
+  const carehome = await Carehome.findOne({ carehomeId: numericId }); 
+  return carehome ? carehome._id : null;
+}
+
+
+async function getCareHome_Jobs(req, res) {
+  try {
+    // 1. Verify Authentication
+    if (!req.user || req.user.role !== "Carehome") {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+
+    // 2. Resolve numeric JWT ID to MongoDB ObjectId
+    const mongoId = await getMongoIdFromNumericId(req.user.id);
+    
+    if (!mongoId) {
+      return res.status(404).json({ success: false, message: "Carehome record not found" });
+    }
+
+    // 3. Fetch jobs using the resolved ObjectId
+    const jobs = await CareHomeJob.find({ postedBy: mongoId })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      jobs: jobs
+    });
+  } catch (error) {
+    console.error("Error in getCareHomeJobs:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
+async function getJobApplicants(req, res) {
+  try {
+    const { jobId } = req.params; 
+
+
+    const mongoId = await getMongoIdFromNumericId(req.user.id);
+    
+    if (!mongoId) {
+      return res.status(404).json({ success: false, message: "Carehome not found" });
+    }
+
+    const applications = await Application.find({ 
+      jobId: jobId, 
+      carehomeId: mongoId 
+    }).lean();
+
+
+    const detailedApplicants = await Promise.all(
+      applications.map(async (app) => {
+        const user = await User.findOne({ userId: app.userId }).select('name email').lean();
+        return {
+          ...app,
+          userName: user ? user.name : "Unknown User",
+          userEmail: user ? user.email : "N/A"
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      applicants: detailedApplicants
+    });
+  } catch (error) {
+    console.error("Error fetching job applicants:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
 module.exports = {
   donateMoney,
   register,
@@ -348,4 +477,7 @@ module.exports = {
   editCarehomeProfile,
   post_createjob,
   get_alljobs,
+  getCareHome_Jobs,
+  getJobApplicants,
+  getCarehomePublic,
 };

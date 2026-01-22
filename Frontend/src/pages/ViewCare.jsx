@@ -17,51 +17,49 @@ const ViewCare = () => {
     { label: "Sign Up", path: "/signup" }
   ];
 
-  useEffect(() => {
-    const fetchCareDetails = async () => {
-      try {
-        // Fetch specific carehome by ID from Backend
-        const response = await fetch(`http://localhost:3000/carehomes/viewcare/${carehomeId}`);
-        
-        if (!response.ok) {
-          throw new Error("Care home not found");
-        }
-
-        const data = await response.json();
-        setDetails(data);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-        setLoading(false);
+useEffect(() => {
+  const fetchCareDetails = async () => {
+    try {
+      // FIX: Added /api/ to the path to match standard backend routing
+      // In ViewCare.jsx
+      const response = await fetch(`http://localhost:3000/api/carehomes/viewcare/${carehomeId}`);
+      
+      if (!response.ok) {
+        throw new Error("Care home not found");
       }
-    };
 
-    fetchCareDetails();
-  }, [carehomeId]);
-
-  // 👇 IMPROVED IMAGE URL FIXER
-  // This handles Windows paths (\) and removes "public/" if it exists in the DB
-  const getImageUrl = (path) => {
-    if (!path) return '/assets/default-carehome.jpg';
-
-    // 1. Convert Windows backslashes (\) to forward slashes (/)
-    let cleanPath = path.replace(/\\/g, "/");
-
-    // 2. Remove "public/" if it exists at the start
-    if (cleanPath.startsWith("public/")) {
-      cleanPath = cleanPath.substring(7); // Remove the first 7 chars ("public/")
+      const data = await response.json();
+      setDetails(data);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      setLoading(false);
     }
-
-    // 3. Ensure it doesn't start with a slash (to avoid double slashes)
-    if (cleanPath.startsWith("/")) {
-      cleanPath = cleanPath.substring(1);
-    }
-
-    // 4. Return the full Backend URL
-    return `http://localhost:3000/${cleanPath}`;
   };
 
+  if (carehomeId) fetchCareDetails(); // Only fetch if ID exists
+}, [carehomeId]);
+
+const getImageUrl = (path) => {
+  if (!path || path === "undefined") return '/assets/default-carehome.jpg';
+
+  // 1. Normalize slashes for Windows
+  let cleanPath = path.replace(/\\/g, "/");
+
+  // 2. If the path in DB is "public/uploads/image.jpg", 
+  // we want it to become "uploads/image.jpg"
+  if (cleanPath.startsWith("public/")) {
+    cleanPath = cleanPath.replace("public/", "");
+  }
+
+  // 3. Ensure it starts with a single slash for the URL
+  if (!cleanPath.startsWith("/")) {
+    cleanPath = "/" + cleanPath;
+  }
+
+  return `http://localhost:3000${cleanPath}`;
+};
   // Safe Calculation for Average Expense
   const calculateAvg = () => {
     if (!details || !details.num_residents || details.num_residents === 0) return "N/A";
