@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch("http://localhost:3000/api/auth/logout", {
+    await fetch("http://localhost:3000/api/logout", {
       method: "POST",
       credentials: "include"
     });
