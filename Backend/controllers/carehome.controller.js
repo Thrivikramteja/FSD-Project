@@ -35,34 +35,44 @@ async function donateMoney(req, res) {
 
 async function insertMoney(req, res) {
   try {
-    if (req.user.role !== "Donor") {
-      return res.status(403).json({ message: "Only donors can donate money" });
-    }
-
+ 
     const total = parseFloat(req.body.total);
-    const userId = req.user.id;
+    
+
+    const userId = req.user.id; 
+    
+
     const carehomeId = parseInt(req.params.carehomeId, 10);
 
-    if (!userId || !carehomeId || isNaN(total)) {
+
+    if (!userId || isNaN(carehomeId) || isNaN(total) || total <= 0) {
       return res.status(400).json({
-        message: "Missing or invalid data OR Login as user and try to donate money",
+        success: false,
+        message: "Invalid donation data. Please ensure you are logged in correctly.",
       });
     }
 
+
     await DonationMoney.saveDonation({
-      userId,
-      amount_donated: total,
-      carehomeId,
-      user: req.user,
+      userId: userId,           
+      amount_donated: total,    
+      carehomeId: carehomeId,  
+      user: req.user,         
       userRole: req.user.role,
     });
 
     res.status(200).json({
-      message: "Donation saved successfully",
+      success: true,
+      message: "Your donation has been saved successfully!",
       redirectUrl: "/",
     });
+
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Donation processing error:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Internal server error while processing your donation." 
+    });
   }
 }
 
