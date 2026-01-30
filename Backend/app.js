@@ -2,10 +2,19 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
+const rfs = require("rotating-file-stream");
 require("./data/database.js");
 require("dotenv").config();
 
+const accessLogStream = rfs.createStream("access.log", {
+  interval: "1d",
+  path: path.join(__dirname, "log"),
+});
+
 const app = express();
+
+app.use(morgan("combined", { stream: accessLogStream }));
 
 const baseRoutes = require("./routes/base.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
