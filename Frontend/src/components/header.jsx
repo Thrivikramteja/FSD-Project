@@ -34,14 +34,12 @@ const Header = ({ navItems = [] }) => {
   return (
     <header className={styles.navbar}>
       <div className={styles.navContainer}>
-        {/* APP NAME / LOGO */}
         <div className={styles.logo} onClick={() => navigate("/")}>
           Care<span className={styles.logoAccent}>Connect</span>
         </div>
 
         <nav>
           <ul className={styles.headerRight}>
-            {/* --- LOGIC PRESERVED: Dynamic navItems & Dropdowns --- */}
             {navItems.map((item) => (
               <li key={item.label} className={item.subItems ? styles.dropdown : ""}>
                 {item.onClick ? (

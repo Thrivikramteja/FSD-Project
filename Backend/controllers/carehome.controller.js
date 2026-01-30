@@ -47,8 +47,8 @@ async function insertMoney(req, res) {
 
     if (!userId || isNaN(carehomeId) || isNaN(total) || total <= 0) {
       return res.status(400).json({
-        success: false,
-        message: "Invalid donation data. Please ensure you are logged in correctly.",
+        message:
+          "Missing or invalid data OR Login as user and try to donate money",
       });
     }
 
@@ -95,13 +95,13 @@ async function donateItems(req, res) {
 
 async function get_don_items(req, res) {
   try {
-      if (!req.user || req.user.role !== "Donor")
-         {
-            return res.status(403).json({ 
-              success: false, 
-              message: "Access Denied: Only registered donors can submit item donation requests." 
-            });
-          }
+    if (!req.user || req.user.role !== "Donor") {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Access Denied: Only registered donors can submit item donation requests.",
+      });
+    }
 
     const carehomeId = parseInt(req.body.carehomes, 10);
     const category = req.body.category;
@@ -141,12 +141,10 @@ async function get_don_items(req, res) {
 async function registerCarehome(req, res) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-  // const imagePath = req.file.path.replace(/\\/g, "/");
-  const imagePath = req.file.path
-    .split(path.sep)
-    .slice(-2) // Change -3 to -2 to get "Carehomes/filename.jpg"
-    .join("/");
-    
+  let imagePath = null;
+  if (req.file) {
+    imagePath = `/uploads/Carehomes/${req.file.filename}`;
+  }
 
   try {
     const carehome = new Carehome({
@@ -216,48 +214,63 @@ async function getCarehome(req, res) {
 async function accpet_item_doantions(req, res) {
   try {
     // Safety Check: Identity & Role
-    if (req.user.role !== "Carehome" || String(req.user.id) !== String(req.body.carehomeId)) {
-        return res.status(403).json({ success: false, message: "Forbidden: Identity mismatch" });
+    if (
+      req.user.role !== "Carehome" ||
+      String(req.user.id) !== String(req.body.carehomeId)
+    ) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Forbidden: Identity mismatch" });
     }
 
-    const { action, carehomeId, category, delivery_date, location, description, userId } = req.body;
+    const {
+      action,
+      carehomeId,
+      category,
+      delivery_date,
+      location,
+      description,
+      userId,
+    } = req.body;
 
     // 1. Move to permanent records if accepted
     if (action === "accept") {
-        await new donate_items({
-            userId,
-            carehomeId,
-            category,
-            delivery: delivery_date,
-            description,
-            location,
-            donated_at: Date.now(),
-        }).save();
+      await new donate_items({
+        userId,
+        carehomeId,
+        category,
+        delivery: delivery_date,
+        description,
+        location,
+        donated_at: Date.now(),
+      }).save();
     }
 
     // 2. Remove the request from the "Inbox"
     await donate_items_mes.findOneAndDelete({
-        userId,
-        carehomeId,
-        category,
-        location,
+      userId,
+      carehomeId,
+      category,
+      location,
     });
 
     // 3. Notify the donor
     await new user_message({
-        carehomeId,
-        userId,
-        message: action === "accept" ? "Your donation request was approved!" : "Your donation request was declined.",
-        category,
-        delivery: delivery_date,
-        when_date: Date.now(),
+      carehomeId,
+      userId,
+      message:
+        action === "accept"
+          ? "Your donation request was approved!"
+          : "Your donation request was declined.",
+      category,
+      delivery: delivery_date,
+      when_date: Date.now(),
     }).save();
 
     res.json({ success: true, message: `Request ${action}ed successfully.` });
-
   } catch (err) {
-      console.error(err);
-      res.status(500).json({ success: false, message: "Internal server error" });
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
 async function editCarehomeProfile(req, res) {
@@ -299,7 +312,9 @@ async function editCarehomeProfile(req, res) {
     );
 
     if (!updatedCarehome) {
-      return res.status(404).json({ message: "Care Home not found for update." });
+      return res
+        .status(404)
+        .json({ message: "Care Home not found for update." });
     }
 
     res.status(200).json({
@@ -317,25 +332,26 @@ async function editCarehomeProfile(req, res) {
 
 // Helper to resolve numeric Carehome ID to MongoDB ObjectId
 async function getMongoIdFromNumericId(numericId) {
-  const carehome = await Carehome.findOne({ carehomeId: numericId }); 
+  const carehome = await Carehome.findOne({ carehomeId: numericId });
   return carehome ? carehome._id : null;
 }
 
 async function post_createjob(req, res) {
   try {
     if (!req.user || req.user.role !== "Carehome") {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Access Denied: Only Carehomes can post job listings." 
+      return res.status(403).json({
+        success: false,
+        message: "Access Denied: Only Carehomes can post job listings.",
       });
     }
 
-    const { title, description, location, pay, type, startDate, endDate } = req.body;
+    const { title, description, location, pay, type, startDate, endDate } =
+      req.body;
 
     if (!title || !description || !pay) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Title, description, and pay are required fields." 
+      return res.status(400).json({
+        success: false,
+        message: "Title, description, and pay are required fields.",
       });
     }
 
@@ -345,13 +361,13 @@ async function post_createjob(req, res) {
     if (!mongoId) {
       return res.status(404).json({
         success: false,
-        message: "Carehome record not found."
+        message: "Carehome record not found.",
       });
     }
 
     // 2. PASS THE RESOLVED mongoId TO THE SCHEMA
     const job = new CareHomeJob({
-      postedBy: mongoId, 
+      postedBy: mongoId,
       title,
       description,
       location,
@@ -368,12 +384,11 @@ async function post_createjob(req, res) {
       message: "Job listing published successfully!",
       redirectUrl: `/carehome-dashboard/${req.user.id}`,
     });
-
   } catch (error) {
     console.error("Create Job Error:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "An internal server error occurred while creating the job." 
+    return res.status(500).json({
+      success: false,
+      message: "An internal server error occurred while creating the job.",
     });
   }
 }
@@ -415,10 +430,9 @@ async function getCarehomePublic(req, res) {
 
 // Helper to resolve numeric IDs to MongoDB ObjectIds
 async function getMongoIdFromNumericId(numericId) {
-  const carehome = await Carehome.findOne({ carehomeId: numericId }); 
+  const carehome = await Carehome.findOne({ carehomeId: numericId });
   return carehome ? carehome._id : null;
 }
-
 
 async function getCareHome_Jobs(req, res) {
   try {
@@ -429,18 +443,21 @@ async function getCareHome_Jobs(req, res) {
 
     // 2. Resolve numeric JWT ID to MongoDB ObjectId
     const mongoId = await getMongoIdFromNumericId(req.user.id);
-    
+
     if (!mongoId) {
-      return res.status(404).json({ success: false, message: "Carehome record not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Carehome record not found" });
     }
 
     // 3. Fetch jobs using the resolved ObjectId
-    const jobs = await CareHomeJob.find({ postedBy: mongoId })
-      .sort({ createdAt: -1 });
+    const jobs = await CareHomeJob.find({ postedBy: mongoId }).sort({
+      createdAt: -1,
+    });
 
     res.status(200).json({
       success: true,
-      jobs: jobs
+      jobs: jobs,
     });
   } catch (error) {
     console.error("Error in getCareHomeJobs:", error);
@@ -450,35 +467,37 @@ async function getCareHome_Jobs(req, res) {
 
 async function getJobApplicants(req, res) {
   try {
-    const { jobId } = req.params; 
-
+    const { jobId } = req.params;
 
     const mongoId = await getMongoIdFromNumericId(req.user.id);
-    
+
     if (!mongoId) {
-      return res.status(404).json({ success: false, message: "Carehome not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Carehome not found" });
     }
 
-    const applications = await Application.find({ 
-      jobId: jobId, 
-      carehomeId: mongoId 
+    const applications = await Application.find({
+      jobId: jobId,
+      carehomeId: mongoId,
     }).lean();
-
 
     const detailedApplicants = await Promise.all(
       applications.map(async (app) => {
-        const user = await User.findOne({ userId: app.userId }).select('name email').lean();
+        const user = await User.findOne({ userId: app.userId })
+          .select("name email")
+          .lean();
         return {
           ...app,
           userName: user ? user.name : "Unknown User",
-          userEmail: user ? user.email : "N/A"
+          userEmail: user ? user.email : "N/A",
         };
       })
     );
 
     res.status(200).json({
       success: true,
-      applicants: detailedApplicants
+      applicants: detailedApplicants,
     });
   } catch (error) {
     console.error("Error fetching job applicants:", error);
