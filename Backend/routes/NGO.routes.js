@@ -21,6 +21,14 @@ router.get(
 );
 
 router.post(
+  "/api/ngo-dashboard/:ngoID/create-fundraiser",
+  authenticate,
+  authorizeRoles("NGO"),
+  upload.single("image"),
+  NGOController.createFundraiser
+);
+
+router.post(
   "/api/ngo/:ngoID/create-event",
   authenticate,
   authorizeRoles("NGO"),
@@ -55,7 +63,7 @@ router.get("/api/carehomes-list", async (req, res) => {
 });
 
 
-router.get('/events', NGOController.getEvents);
+router.get('/api/events', NGOController.getEvents);
 
 router.post('/registerUser/:ngoID',authenticate,authorizeRoles("Donor"), NGOController.registerUser);
 

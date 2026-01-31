@@ -36,27 +36,26 @@ const CreateEvent = () => {
 
     
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize to midnight
+    today.setHours(0, 0, 0, 0); 
     const inputDate = new Date(formData.deadline);
 
     
     if (isNaN(inputDate) || inputDate < today) {
-      setDateError(true); // Show the red error text
+      setDateError(true); 
       return; 
     }
 
     const dataToSend = new FormData();
     dataToSend.append('id_NGO', ngoID);
+    dataToSend.append('userRole', 'NGO'); 
+    dataToSend.append('type', 'event');  
     dataToSend.append('event_name', formData.event_name);
     dataToSend.append('description', formData.description);
     dataToSend.append('event_location', formData.event_location);
     dataToSend.append('event_time', formData.event_time);
     dataToSend.append('deadline', formData.deadline);
     dataToSend.append('image', imageFile);
-    
-    // Hidden fields for Backend logic
-    dataToSend.append('userRole', 'NGO'); 
-    dataToSend.append('type', 'event');   
+     
 
     try {
       const response = await fetch(`http://localhost:3000/api/ngo/${ngoID}/create-event`, {

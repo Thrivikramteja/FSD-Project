@@ -201,37 +201,30 @@ async function editNGOProfile(req, res) {
   }
 }
 
-function renderCreateEventForm(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
-
-  if (req.user.role !== "NGO" || req.user.id !== ngoID) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-
-  res.render("NGOs/create_event", {
-    ngoID,
-    user: req.user,
-    userRole: req.user.role,
-  });
-}
-
 async function createEvent(req, res) {
-  
   const ngoID = req.params.ngoID;
 
   if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
-    return res.status(403).json({ 
-      success: false, 
-      message: "Forbidden: You do not have permission to create an event for this NGO" 
+    return res.status(403).json({
+      success: false,
+      message:
+        "Forbidden: You do not have permission to create an event for this NGO",
     });
   }
 
-  const { event_location, event_name, deadline, event_time, description } = req.body;
+  const { event_location, event_name, deadline, event_time, description } =
+    req.body;
 
   try {
-    // 2. Data Validation
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "Event image is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Event image is required" });
+    }
+
+    let imagePath = null;
+    if (req.file) {
+      imagePath = `/uploads/Events/${req.file.filename}`;
     }
 
     const newEvent = new Event({
@@ -242,22 +235,20 @@ async function createEvent(req, res) {
       event_time,
       description,
       number_of_registrations: 0,
-      imagePath: req.file.path, // Populated by Multer
+      imagePath,
     });
 
-    // 3. Database Persistence
     await newEvent.save();
 
-    res.status(200).json({ 
-      success: true, 
-      message: "Event created successfully!" 
+    res.status(200).json({
+      success: true,
+      message: "Event created successfully!",
     });
-
   } catch (error) {
     console.error("Event Creation Error:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Failed to create event. Please try again later." 
+    res.status(500).json({
+      success: false,
+      message: "Failed to create event. Please try again later.",
     });
   }
 }
@@ -279,7 +270,10 @@ async function createFundraiser(req, res) {
   } = req.body;
 
   try {
-    let imagePath = req.file.path.split(path.sep).slice(-3).join("/");
+    let imagePath = null;
+    if (req.file) {
+      imagePath = `/uploads/Fundraisers/${req.file.filename}`;
+    }
 
     const newFundraiser = new CreatedFundraiser({
       carehomeId: id_carehome,
@@ -360,7 +354,9 @@ async function registerUser(req, res) {
       { $inc: { number_of_registrations: 1 } }
     );
 
-    res.status(200).json({ message: "Registration successful!", success: true });
+    res
+      .status(200)
+      .json({ message: "Registration successful!", success: true });
   } catch (error) {
     res.status(500).json({ message: "Internal server error." });
   }
@@ -553,7 +549,6 @@ module.exports = {
   getNGO,
   rendercreatefundraiser,
   createFundraiser,
-  renderCreateEventForm,
   createEvent,
   getEditNGOProfile,
   editNGOProfile,

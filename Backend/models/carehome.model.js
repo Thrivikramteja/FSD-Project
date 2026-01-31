@@ -31,10 +31,7 @@ const carehomeSchema = new mongoose.Schema({
 carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
 
 carehomeSchema.statics.getCareHomes = async function () {
-  const carehomes = await Carehome.find(
-    {},
-    { carehomeId: 1, care_home_name: 1 }
-  );
+  const carehomes = await Carehome.find({});
   return carehomes;
 };
 
@@ -224,7 +221,8 @@ carehomeSchema.statics.recentDonations = async function (careId) {
 
     for (const donation of donations) {
       try {
-        const donor = await User.findOne({ id_donor: donation.id_donor });
+        console.log(" hi the doaniton id is " +  donation.userId);
+        const donor = await User.findOne({ userId: donation.userId });
 
         result.push({
           donor_name: donor ? donor.name : "Anonymous",

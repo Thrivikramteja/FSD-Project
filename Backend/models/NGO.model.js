@@ -27,10 +27,8 @@ const ngoSchema = new mongoose.Schema({
   otpExpires: { type: Date, default: null },
 });
 
-// Add auto-increment plugin only for ngoId
 ngoSchema.plugin(AutoIncrement, { inc_field: "ngoId" });
 
-// Event Schema
 const eventSchema = new mongoose.Schema({
   ngoId: {
     type: Number,

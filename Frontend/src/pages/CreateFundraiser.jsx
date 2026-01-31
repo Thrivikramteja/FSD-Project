@@ -86,6 +86,8 @@ const CreateFundraiser = () => {
 
     
     const dataToSend = new FormData();
+    dataToSend.append('userRole', 'NGO'); 
+    dataToSend.append('type', 'fundraiser');
     dataToSend.append('id_NGO', ngoID);
     dataToSend.append('id_carehome', formData.id_carehome);
     dataToSend.append('fundraiser_name', formData.fundraiser_name);
@@ -96,7 +98,7 @@ const CreateFundraiser = () => {
     dataToSend.append('image', imageFile);
 
     try {
-      const response = await fetch(`http://localhost:3000/NGO-dashboard/${ngoID}/create-fundraiser`, {
+      const response = await fetch(`http://localhost:3000/api/ngo-dashboard/${ngoID}/create-fundraiser`, {
         method: 'POST',
         body: dataToSend, // Fetch
         credentials: 'include'
@@ -104,7 +106,7 @@ const CreateFundraiser = () => {
 
       if (response.ok) {
         // Redirect to dashboard on success
-        navigate(`/NGO-dashboard/${ngoID}`);
+        navigate(`/ngo-dashboard/${ngoID}`);
       } else {
         alert("Failed to create fundraiser. Please try again.");
       }

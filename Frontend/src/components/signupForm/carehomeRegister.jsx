@@ -62,8 +62,10 @@ export default function CarehomeRegistration() {
     image: null,
   };
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     const formData = new FormData();
+
+    formData.append("userRole", "Carehome");
 
     Object.keys(values).forEach((key) => {
       if (key !== "image") {
@@ -71,25 +73,29 @@ export default function CarehomeRegistration() {
       }
     });
 
-    formData.append("image", values.image);
-
-    formData.append("userRole", "Carehome");
+    if (values.image) {
+      formData.append("image", values.image);
+    }
 
     try {
-      const response = await fetch("http://localhost:3000/api/registerCarehome", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/registerCarehome",
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
 
+      const result = await response.json(); 
 
       if (response.ok) {
-        setMessage(response.message);
-        window.location.href = "/login"
-        // setTimeout(() => (), 1000);
-        // resetForm();
+        setMessage(result.message || "Registration successful!");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1500);
       } else {
-        setMessage("Registration failed. Please try again.");
+        setMessage(result.message || "Registration failed. Please try again.");
       }
     } catch (err) {
       console.error(err);
