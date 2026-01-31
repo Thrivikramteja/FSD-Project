@@ -2,6 +2,7 @@ import { useRef } from "react";
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Heart, Sparkles, Shield, Award, TrendingUp, Users, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom'; // Added useParams
+import { useSearchParams } from "react-router-dom";
 import Header from '../components/header';
 import Footer from '../components/footer';
 import { headerConfig } from "../config/headerConfig"; 
@@ -12,8 +13,9 @@ const MAX_DONATION_AMOUNT = 1000000;
 
 const DonateMoneyPage = () => {
     const navigate = useNavigate();
-    const { carehomeId } = useParams(); // Capture ID from URL /donate/money/:carehomeId
-    
+    const [searchParams] = useSearchParams()
+    // const { carehomeId } = useParams(); // Capture ID from URL /donate/money/:carehomeId
+    const carehomeId = searchParams.get("carehome_id");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [donorData, setDonorData] = useState(null);
 
