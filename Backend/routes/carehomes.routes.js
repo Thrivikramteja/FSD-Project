@@ -13,6 +13,12 @@ router.get(
   authorizeRoles("Carehome"),
   carehomesController.getCarehome
 );
+router.get(
+  "/api/carehome/profile/:carehomeId",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.getCarehomeProfile
+);
 
 router.put(
   "/api/carehome/:carehomeId",

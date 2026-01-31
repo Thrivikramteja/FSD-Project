@@ -315,6 +315,30 @@ async function editCarehomeProfile(req, res) {
   }
 }
 
+async function getCarehomeProfile(req, res) {
+  const careId = parseInt(req.params.carehomeId, 10);
+
+  if (req.user.role !== "Carehome" || req.user.id !== careId) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  try {
+    const carehome = await Carehome.findOne(
+      { carehomeId: careId },
+      "care_home_name contact email ifsc"
+    );
+
+    if (!carehome) {
+      return res.status(404).json({ message: "Carehome not found" });
+    }
+
+    res.status(200).json(carehome);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+
 // Helper to resolve numeric Carehome ID to MongoDB ObjectId
 async function getMongoIdFromNumericId(numericId) {
   const carehome = await Carehome.findOne({ carehomeId: numericId }); 
@@ -497,6 +521,7 @@ module.exports = {
   accpet_item_doantions,
   get_don_items,
   editCarehomeProfile,
+  getCarehomeProfile,
   post_createjob,
   get_alljobs,
   getCareHome_Jobs,

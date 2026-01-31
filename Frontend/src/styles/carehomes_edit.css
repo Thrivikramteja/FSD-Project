@@ -14,6 +14,7 @@
 
 .edits1 {
     background-image: url(greenbackground.avif);
+    padding-top: 100px;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -61,7 +62,7 @@
     width: 100%;
     
     
-    margin-top: -10px; 
+    margin-top: 40px;
     margin-bottom: 40px; 
     
     background: var(--card-bg); 
@@ -174,3 +175,23 @@ span[id*="-error"] {
     margin-top: 4px;
     color: #e74c3c !important; 
 }
+/* Add this to your carehomes_edit.css or footer.css */
+footer {
+  width: 100%;
+  padding: 30px 20px; /* adjust top/bottom padding */
+  margin: 0;
+  box-sizing: border-box;
+  background-color: var(--primary-green); /* or whatever color you like */
+  color: white;
+}
+
+footer * {
+  margin: 0;
+  padding: 0;
+}
+
+footer .footer-content {
+  max-width: 1200px; /* optional, for central content */
+  margin: 0 auto;
+}
+
