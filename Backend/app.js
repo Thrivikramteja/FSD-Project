@@ -9,12 +9,23 @@ require("dotenv").config();
 
 const accessLogStream = rfs.createStream("access.log", {
   interval: "1d",
-  path: path.join(__dirname, "log"),
+  path: path.join(__dirname, "accessLogs"),
+});
+
+const errorLogStream = rfs.createStream("error.log", {
+  interval: "1d",
+  path: path.join(__dirname, "errorLogs"),
 });
 
 const app = express();
 
 app.use(morgan("combined", { stream: accessLogStream }));
+app.use(
+  morgan("combined", {
+    stream: errorLogStream,
+    skip: (req, res) => res.statusCode < 400,
+  })
+);
 
 const baseRoutes = require("./routes/base.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
