@@ -7,6 +7,7 @@ const {
   UserRegisteredEvent,
 } = require("../models/user.model");
 const { Carehome } = require("../models/carehome.model");
+const { nextTick } = require("process");
 
 function getRegister(req, res) {
   res.render("NGOs/ngo_registration");
@@ -37,7 +38,8 @@ async function get_allngo(req, res) {
 
     res.json(enrichedNGOs);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch NGOs" });
+    err.message = "Failed to fetch NGOs"
+    nextTick(err)
   }
 }
 
@@ -64,10 +66,8 @@ async function register(req, res) {
       message: "NGO Registration successful",
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to register NGO",
-    });
+    error.message = "Failed to register NGO"
+    nextTick(error);
   }
 }
 
@@ -92,7 +92,8 @@ async function getEditNGOProfile(req, res) {
       userRole: req.user.role,
     });
   } catch (error) {
-    res.status(500).send("Failed to load NGO profile");
+    error.message = "Failed to load NGO profile";
+    nextTick(error);
   }
 }
 
@@ -104,7 +105,8 @@ async function getEvents(req, res) {
 
     res.json(events);
   } catch (error) {
-    res.status(500).json({ message: "Failed to load events" });
+    error.message = "Failed to load events"
+    nextTick(error);
   }
 }
 
@@ -136,7 +138,8 @@ async function getFundraisers(req, res) {
       userRole: req.user.role,
     });
   } catch (error) {
-    res.status(500).send("Failed to load fundraisers");
+    error.message = "Failed to load fundraisers"
+    next(error);
   }
 }
 
@@ -157,7 +160,8 @@ async function getallFundraisers(req, res) {
 
     res.json(ongoing_fund);
   } catch (error) {
-    res.status(500).json({ message: "Failed to load fundraisers" });
+    error.message = "Failed to load fundraisers";
+    next(error);
   }
 }
 
@@ -194,10 +198,8 @@ async function editNGOProfile(req, res) {
       ngo: updatedNGO,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update profile due to a server error.",
-    });
+    error.message = "Failed to update profile due to a server error.";
+    next(error);
   }
 }
 
@@ -246,10 +248,8 @@ async function createEvent(req, res) {
     });
   } catch (error) {
     console.error("Event Creation Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create event. Please try again later.",
-    });
+    error.message = "Failed to create event. Please try again later.";
+    next(error);
   }
 }
 
@@ -295,7 +295,8 @@ async function createFundraiser(req, res) {
       fundraiserId: newFundraiser._id,
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to create fundraiser" });
+    error.message  = "Failed to create fundraiser";
+    next(error);
   }
 }
 
@@ -358,7 +359,8 @@ async function registerUser(req, res) {
       .status(200)
       .json({ message: "Registration successful!", success: true });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error." });
+   error.message =  "Internal server error."
+   next(error);
   }
 }
 
@@ -377,7 +379,8 @@ async function rendercreatefundraiser(req, res) {
       care: carehomes,
     });
   } catch (error) {
-    res.status(500).send("Failed to load the Create Fundraiser form");
+    error.message = "Failed to load the Create Fundraiser form";
+    next(error);
   }
 }
 
@@ -477,9 +480,8 @@ async function getNGO(req, res) {
       userRole: req.user.role,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "An error occurred while loading the dashboard" });
+    error.message = "An error occurred while loading the dashboard"
+    next(error);
   }
 }
 
@@ -511,7 +513,8 @@ async function editEvent(req, res) {
 
     res.redirect(`/NGO-dashboard/${ngoID}`);
   } catch (error) {
-    res.status(500).send("Failed to update event");
+    error.message = "Failed to update event";
+    next(error);
   }
 }
 
@@ -539,7 +542,8 @@ async function renderEditEvent(req, res) {
       userRole: req.user.role,
     });
   } catch (error) {
-    res.status(500).send("Failed to load the Edit Event form");
+    error.message = "Failed to load the Edit Event form";
+    next(error);
   }
 }
 

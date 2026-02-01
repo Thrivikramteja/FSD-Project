@@ -63,11 +63,8 @@ const applyToJob = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Apply Controller Error:", err);
-        res.status(500).json({ 
-            success: false, 
-            message: "An internal server error occurred." 
-        });
+        err.message = "An internal server error occurred.";
+        next(err);
     }
 };
 

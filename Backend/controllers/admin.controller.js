@@ -32,6 +32,8 @@ async function Getadmin(req, res) {
     });
   } catch (error) {
     console.log("got error while  rendering admin : " + error);
+    error.message = "got error while  rendering admin";
+    next(error);
   }
 }
 

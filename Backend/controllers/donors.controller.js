@@ -40,11 +40,8 @@ async function getdonor(req, res) {
     });
   } catch (error) {
     console.error("Error occurred while fetching user dashboard data:", error);
-    res
-      .status(500)
-      .send(
-        "An error occurred while loading the dashboard. Please try again later."
-      );
+    error.message = "An error occurred while loading the dashboard. Please try again later."
+    next(error);
   }
 }
 
@@ -62,7 +59,8 @@ async function get_deadline(ngoId, fundraiser_name) {
     return fundraiser.deadline; // Return the deadline
   } catch (error) {
     console.error("Error fetching deadline:", error);
-    throw error;
+    error.message = "error while fetching deadline";
+    next(error);
   }
 }
 
@@ -90,7 +88,6 @@ async function contributed_fund(req, res) {
     const fundraiser_name = req.params.fundraiser_name;
     const amount_contributed = req.body.your_amount;
 
-    // --- CHANGE: Use req.user (from JWT) instead of req.session ---
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Authentication required" });
     }
@@ -127,7 +124,8 @@ async function contributed_fund(req, res) {
 
   } catch (error) {
     console.error("Error in contributed_fund:", error);
-    res.status(500).json({ message: "An error occurred while processing the contribution." });
+    error.message = "An error occurred while processing the contribution.";
+    next(error);
   }
 }
 
@@ -144,7 +142,8 @@ async function getEditDonorProfile(req, res) {
     });
   } catch (error) {
     console.error("Error rendering the Create Event form:", error);
-    res.status(500).send("Failed to load the Create Event form");
+    error.message = "Failed to load the Create Event form";
+    next(error);
   }
 }
 
@@ -171,11 +170,8 @@ async function editDonorProfile(req, res) {
 
   } catch (error) {
     console.error("Error updating donor profile:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to update profile due to a server error."
-    });
+    error.message = "Failed to update profile due to a server error.";
+    next(error);
   }
 }
 
@@ -213,27 +209,26 @@ async function getUserActivity (req, res) {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    error.message = "Server error";
+    next(error);
   }
 };
 
 async function getTickerData(req, res) {
   try {
-    // 1. Fetch 4 most recent direct money donations
-    // We populate the user name based on the numeric userId
+  
     const recentMoney = await DonationMoney.find()
       .sort({ donated_at: -1 })
       .limit(4)
       .lean();
 
-    // 2. Fetch 4 most recent fundraiser contributions
+  
     const recentFundraiser = await UserContributedFundraiser.find()
       .sort({ contributed_at: -1 })
       .limit(4)
       .lean();
 
-    // 3. Combine and Format for Ticker
-    // We need to fetch names because the schemas only store numeric userIds
+ 
     const combineData = async (list, type) => {
       return Promise.all(list.map(async (item) => {
         const user = await User.findOne({ userId: item.userId }).lean();
@@ -253,7 +248,8 @@ async function getTickerData(req, res) {
     res.status(200).json({ success: true, data: tickerData });
   } catch (error) {
     console.error("Ticker Data Error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch ticker data" });
+    error.message = "Failed to fetch ticker data";
+    next(error);
   }
 }
 
@@ -284,7 +280,8 @@ async function getUserApplications(req, res) {
     });
   } catch (error) {
     console.error("Error fetching user applications:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    error.message =  "Server error";
+    next(error);
   }
 }
 

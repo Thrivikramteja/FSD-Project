@@ -13,7 +13,8 @@ async function getCareHomesApi(req, res) {
     const carehomes = await Carehome.getCareHomes();
     res.json(carehomes);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch carehomes" });
+    error.message = "Failed to fetch carehomes";
+    next(error);
   }
 }
 
@@ -29,7 +30,8 @@ async function donateMoney(req, res) {
       userRole: req.user?.role || null,
     });
   } catch (error) {
-    res.status(500).send("Server Error");
+    error.message = "Server Error"
+    next(error);
   }
 }
 
@@ -69,10 +71,8 @@ async function insertMoney(req, res) {
 
   } catch (error) {
     console.error("Donation processing error:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Internal server error while processing your donation." 
-    });
+    error.message = "Internal server error while processing your donation." ;
+    next(error);
   }
 }
 
@@ -88,8 +88,9 @@ async function donateItems(req, res) {
       user: req.user || null,
       userRole: req.user?.role || null,
     });
-  } catch {
-    res.status(500).send("Server Error");
+  } catch(error) {
+    error.message = "Server Error"
+    next(error);
   }
 }
 
@@ -131,10 +132,9 @@ async function get_don_items(req, res) {
       success: true,
       message: "Your donation request has been sent successfully.",
     });
-  } catch {
-    res.status(500).json({
-      error: "Failed to save the donation message.",
-    });
+  } catch(err) {
+    err.message = "Failed to save the donation message.";
+    next(err);
   }
 }
 
@@ -171,8 +171,9 @@ async function registerCarehome(req, res) {
     res.status(200).json({
       message: "Carehome Registration successful",
     });
-  } catch {
-    res.status(500).send("Registration failed");
+  } catch(err) {
+      err.message = "Registration failed"
+      next(err);
   }
 }
 
@@ -206,8 +207,9 @@ async function getCarehome(req, res) {
       user: req.user,
       userRole: req.user.role,
     });
-  } catch {
-    res.status(500).json({ error: "Dashboard load failed" });
+  } catch(err) {
+    err.message = "Dashboard load failed"
+    next(err);
   }
 }
 
@@ -270,7 +272,8 @@ async function accpet_item_doantions(req, res) {
     res.json({ success: true, message: `Request ${action}ed successfully.` });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    err.message = "Internal server error"
+    next(err);
   }
 }
 async function editCarehomeProfile(req, res) {
@@ -322,11 +325,9 @@ async function editCarehomeProfile(req, res) {
       message: "Care Home details updated successfully.",
       carehome: updatedCarehome,
     });
-  } catch {
-    res.status(500).json({
-      success: false,
-      message: "Server error occurred while updating the profile.",
-    });
+  } catch(err) {
+    err.message = "Server error occurred while updating the profile."
+    next(err);
   }
 }
 
@@ -349,7 +350,8 @@ async function getCarehomeProfile(req, res) {
 
     res.status(200).json(carehome);
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    err.message = "Server error";
+    next(err);
   }
 }
 
@@ -410,10 +412,8 @@ async function post_createjob(req, res) {
     });
   } catch (error) {
     console.error("Create Job Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "An internal server error occurred while creating the job.",
-    });
+    error.message = "An internal server error occurred while creating the job.";
+    next(error);
   }
 }
 
@@ -425,10 +425,8 @@ async function get_alljobs(req, res) {
       jobs,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    err.message = "Server error";
+    next(err);
   }
 }
 
@@ -446,7 +444,8 @@ async function getCarehomePublic(req, res) {
     res.json(carehome);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    error.message = "Internal server error";
+    next(error);
   }
 }
 
@@ -485,7 +484,8 @@ async function getCareHome_Jobs(req, res) {
     });
   } catch (error) {
     console.error("Error in getCareHomeJobs:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    error.message = "Server error";
+    next(error);
   }
 }
 
@@ -525,7 +525,8 @@ async function getJobApplicants(req, res) {
     });
   } catch (error) {
     console.error("Error fetching job applicants:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    error.message = "Server error";
+    next(error);
   }
 }
 

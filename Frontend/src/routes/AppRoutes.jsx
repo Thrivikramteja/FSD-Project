@@ -23,6 +23,7 @@ import DonateFundraiser from "../pages/DonateFundraiser";
 import ProtectedRoute from "./ProtectedRoute";
 import DonorRegistration from "../pages/DonorRegistration";
 import ViewCare from "../pages/ViewCare";
+import ErrorFace from "../components/ErrorFace";
 
 const AppRoutes = () => {
   return (
@@ -34,7 +35,7 @@ const AppRoutes = () => {
       <Route path="/donate-items" element={<DonateItemsPage />} />
       <Route path="/donate-funds" element={<DonateMoneyPage />} />
       <Route path="/jobs" element={<ListJobPage />} />
-
+      <Route path="/error" element={<ErrorFace />} />
       <Route path="/carehomes" element={<AllCarehomes />} />
       <Route path="/all-ngos" element={<AllNgos />} />
       <Route path="/events" element={<AllEvents />} />
@@ -93,6 +94,7 @@ const AppRoutes = () => {
     </ProtectedRoute>
   }
 />
+<Route path="*" element={<ErrorFace message="Page not found" />} />
 
 
       <Route path="/carehome-dashboard/get-job" element={<CreateJob />} />

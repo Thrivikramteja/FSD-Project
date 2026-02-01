@@ -35,10 +35,8 @@ async function signup(req, res) {
     });
   } catch (error) {
     console.error("Signup error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    error.message = "Internal Server Error";
+    next(error);
   }
 }
 
@@ -117,10 +115,8 @@ async function login(req, res) {
     });
   } catch (err) {
     console.error("Login error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    err.message = "Internal server error";
+    next(err);
   }
 }
 
@@ -193,10 +189,8 @@ async function verifyOTP(req, res) {
     });
   } catch (err) {
     console.error("Verification error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    err.message =  "Internal server error";
+    next(err);
   }
 }
 
@@ -230,10 +224,8 @@ async function forgotPassword(req, res) {
     });
   } catch (err) {
     console.error("Forgot password error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    err.message = "Internal server error"
+    next(err);
   }
 }
 
@@ -262,7 +254,8 @@ async function checkAuth(req, res) {
     });
   } catch (error) {
     console.error("CheckAuth Error:", error);
-    return res.status(500).json({ success: false, message: "Server error during authentication" });
+    error.message = "Server error during authentication";
+    next(error);
   }
 }
 
