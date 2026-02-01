@@ -71,6 +71,10 @@ function Loginpage() {
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
+
+      setTimeout(() => {
+        window.location.href = "/error";
+      }, 5000);
     }
   };
 
@@ -92,7 +96,7 @@ function Loginpage() {
       if (response.ok) {
         setTempAuthData({ email, role });
         setShowForgot(false);
-        setShowOtp(true); // Trigger the same OTP component
+        setShowOtp(true);
       } else {
         setError(
           data.message || "User not found. Check email or sign up newly."
@@ -101,12 +105,15 @@ function Loginpage() {
     } catch (err) {
       console.log(err);
       setError("Connection error. Please try again.");
+
+      setTimeout(() => {
+        window.location.href = "/error";
+      }, 5000);
     } finally {
       setIsVerifying(false);
     }
   };
 
-  // CLEANED UP: This now handles both 2FA and Forgot Password Login
   const handleVerifyOtp = async (otpCode) => {
     setIsVerifying(true);
     setError("");
@@ -136,6 +143,10 @@ function Loginpage() {
     } catch (err) {
       console.error(err);
       setError("Verification failed. Please try again.");
+
+      setTimeout(() => {
+        window.location.href = "/error";
+      }, 5000);
     } finally {
       setIsVerifying(false);
     }

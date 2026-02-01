@@ -15,36 +15,43 @@ const EditProfile = () => {
   });
 
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [error, setError] = useState(null); // NEW
 
   /* ================= FETCH EXISTING DATA ================= */
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const res = await fetch(`/api/carehome/profile/${careid}`, {
-        credentials: "include",
-      });
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`/api/carehome/profile/${careid}`, {
+          credentials: "include",
+        });
 
-      console.log("STATUS:", res.status);
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.message || "Failed to load profile");
+        }
 
-      const data = await res.json();
-      console.log("API DATA:", data);
+        const data = await res.json();
 
-      setFormData({
-  fullname: data.care_home_name || "",
-  phne: data.contact || "",
-  mail: data.email || "",
-  ifsc: data.ifsc || "",
-});
+        setFormData({
+          fullname: data.care_home_name || "",
+          phne: data.contact || "",
+          mail: data.email || "",
+          ifsc: data.ifsc || "",
+        });
 
-    } catch (err) {
-      console.error("FETCH ERROR:", err);
-    }
-  };
+      } catch (err) {
+        console.error("FETCH ERROR:", err);
 
-  fetchProfile();
-}, [careid]);
+        setError(err.message || "Profile fetch failed");
 
+        setTimeout(() => {
+          window.location.href = "/error";
+        }, 5000);
+      }
+    };
 
+    fetchProfile();
+  }, [careid]);
 
   /* ================= HANDLE CHANGE ================= */
   const handleChange = (e) => {
@@ -87,18 +94,22 @@ useEffect(() => {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setMessage({ type: "success", text: "Profile updated successfully" });
-      } else {
-        const data = await response.json().catch(() => ({}));
-        setMessage({
-          type: "error",
-          text: data.message || "Update failed",
-        });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Update failed");
       }
+
+      setMessage({ type: "success", text: "Profile updated successfully" });
+
     } catch (err) {
       console.error(err);
-      setMessage({ type: "error", text: "Network error" });
+
+      setMessage({ type: "error", text: err.message || "Network error" });
+
+      setTimeout(() => {
+        window.location.href = "/error";
+      }, 5000);
     }
   };
 
@@ -109,6 +120,12 @@ useEffect(() => {
 
       <div className="carehome1">
         <h1>Edit Carehome Profile</h1>
+
+        {error && (
+          <p style={{ color: "red", textAlign: "center" }}>
+            Error: {error}
+          </p>
+        )}
 
         {message.text && (
           <div

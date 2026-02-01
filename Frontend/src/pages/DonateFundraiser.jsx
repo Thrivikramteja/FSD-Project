@@ -20,8 +20,8 @@ const DonateFundraiser = () => {
     const [total, setTotal] = useState(0);
     const [pan, setPan] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null); // NEW
 
-    // --- FETCH USER DATA ---
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -29,16 +29,25 @@ const DonateFundraiser = () => {
                     credentials: "include"
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData({
-                        name: data.user?.name || data.user?.full_name || "",
-                        email: data.user?.email || "",
-                        mobile_number: data.user?.mobile_number || data.user?.phone || ""
-                    });
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || "Failed to fetch user data");
                 }
+
+                const data = await response.json();
+                setUserData({
+                    name: data.user?.name || data.user?.full_name || "",
+                    email: data.user?.email || "",
+                    mobile_number: data.user?.mobile_number || data.user?.phone || ""
+                });
             } catch (err) {
                 console.error("Error fetching user data:", err);
+
+                setError(err.message || "Failed to load user data");
+
+                setTimeout(() => {
+                    window.location.href = "/error";
+                }, 5000);
             } finally {
                 setLoadingUser(false);
             }
@@ -46,7 +55,6 @@ const DonateFundraiser = () => {
         fetchUserData();
     }, []);
 
-    // --- LOGIC: CALCULATION ---
     useEffect(() => {
         const calculatedTip = amount * 0.08;
         setTip(calculatedTip);
@@ -55,40 +63,46 @@ const DonateFundraiser = () => {
 
     const handleQuickAmount = (val) => setAmount(val);
 
-    // --- NEW: HANDLE SUBMISSION ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setError(null);
 
         try {
             const response = await fetch(`http://localhost:3000/api/donate/${ngoId}/${name_fund}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    your_amount: amount, // Backend expects 'your_amount'
+                    your_amount: amount,
                     pan: pan,
                     full_name: userData.name,
                     email: userData.email,
                     phone: userData.mobile_number
                 }),
-                credentials: 'include' // Important for session/JWT access
+                credentials: 'include'
             });
 
             const result = await response.json();
 
-            if (response.ok) {
-                window.alert("Donation Successful! Thank you for your contribution.");
-                
-                // Wait 3 seconds then redirect to dashboard
-                setTimeout(() => {
-                    navigate('/'); // Or a specific success page
-                }, 2000);
-            } else {
-                window.alert(`Error: ${result.message || "Failed to process donation"}`);
+            if (!response.ok) {
+                throw new Error(result.message || "Failed to process donation");
             }
-        } catch (error) {
-            console.error("Submission error:", error);
-            window.alert("A network error occurred. Please try again.");
+
+            window.alert("Donation Successful! Thank you for your contribution.");
+
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+
+        } catch (err) {
+            console.error("Submission error:", err);
+
+            setError(err.message || "Network error occurred");
+
+            setTimeout(() => {
+                window.location.href = "/error";
+            }, 5000);
+
         } finally {
             setIsSubmitting(false);
         }
@@ -103,13 +117,16 @@ const DonateFundraiser = () => {
                     Donating to <span className={styles.highlight}>{name_fund}</span>
                 </h2>
 
-                {/* Updated to use onSubmit instead of action/method */}
+                {error && (
+                    <p style={{ color: "red", textAlign: "center" }}>
+                        Error: {error}
+                    </p>
+                )}
+
                 <form className={styles.donationForm} onSubmit={handleSubmit}>
-                    
                     <div className={styles.gridContainer}>
                         
                         <div className={styles.detailsColumn}>
-                            {/* SECTION: DONATION AMOUNT */}
                             <div className={styles.glassCard}>
                                 <h2 className={styles.cardHeading}>Donation Amount</h2>
                                 <div className={styles.popularOptions}>
@@ -141,9 +158,9 @@ const DonateFundraiser = () => {
                                 </div>
                             </div>
 
-                            {/* SECTION: YOUR DETAILS */}
                             <div className={styles.glassCard}>
                                 <h2 className={styles.cardHeading}>Your Details</h2>
+
                                 <div className={styles.formGroup}>
                                     <label>Full Name</label>
                                     <input 
@@ -184,11 +201,11 @@ const DonateFundraiser = () => {
                                 >
                                     {isSubmitting ? "Processing..." : `Donate Now ₹${total.toFixed(2)}`}
                                 </button>
+
                                 <p className={styles.secureNote}>🔒 All payments are securely processed</p>
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN: LIVE INVOICE */}
                         <div className={styles.invoiceColumn}>
                             <div className={styles.invoiceSticky}>
                                 <div className={styles.invoiceCard}>

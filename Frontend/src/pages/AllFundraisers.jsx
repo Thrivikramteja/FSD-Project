@@ -27,14 +27,26 @@ const AllFundraisers = () => {
     const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:3000/fundraisers");
-        if (!response.ok) throw new Error("Failed to fetch fundraisers");
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.message || "Failed to fetch fundraisers");
+        }
+
         const data = await response.json();
         setFundraisers(data);
         setFilteredFundraisers(data); 
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        console.error("Error fetching fundraisers:", err);
+
+        setError(err.message || "Failed to load fundraisers");
         setLoading(false);
+
+        // Redirect after 5 seconds
+        setTimeout(() => {
+          window.location.href = "/error";
+        }, 5000);
       }
     };
     fetchData();
@@ -74,7 +86,6 @@ const AllFundraisers = () => {
   };
 
   const handleDonateClick = (fund) => {
-    
     if (!auth.user) {
       alert("Please login first to donate");
       return;

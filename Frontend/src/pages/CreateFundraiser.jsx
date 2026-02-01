@@ -7,7 +7,6 @@ const CreateFundraiser = () => {
   const { ngoID } = useParams();
   const navigate = useNavigate();
 
-  
   const [formData, setFormData] = useState({
     id_carehome: 'None',
     fundraiser_name: '',
@@ -16,34 +15,45 @@ const CreateFundraiser = () => {
     deadline: '',
     tag: 'General'
   });
+
   const [imageFile, setImageFile] = useState(null);
   const [carehomes, setCarehomes] = useState([]); 
-  
-  
+
   const [errors, setErrors] = useState({
     carehome: false,
     goal: false,
     date: false
   });
 
-  
+  const [error, setError] = useState(null); // NEW
+
   useEffect(() => {
     const fetchCarehomes = async () => {
       try {
         const res = await fetch('http://localhost:3000/api/carehomes-list');
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.message || "Failed to load carehomes");
+        }
+
         const data = await res.json();
         setCarehomes(data);
       } catch (err) {
         console.error("Failed to load carehomes", err);
+
+        setError(err.message || "Failed to load carehomes");
+
+        setTimeout(() => {
+          window.location.href = "/error";
+        }, 5000);
       }
     };
     fetchCarehomes();
   }, []);
 
- 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Clear error when user types
     setErrors({ ...errors, [e.target.name]: false });
   };
 
@@ -51,28 +61,23 @@ const CreateFundraiser = () => {
     setImageFile(e.target.files[0]);
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    
+
     let newErrors = { carehome: false, goal: false, date: false };
     let hasError = false;
 
-   
     const goalValue = parseInt(formData.goal_amount, 10);
     if (isNaN(goalValue) || goalValue < 100000) {
       newErrors.goal = true;
       hasError = true;
     }
 
-    // B. Dropdown Validation
     if (formData.id_carehome === "None" || formData.id_carehome === "") {
       newErrors.carehome = true;
       hasError = true;
     }
 
-    // C. Date Validation
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const inputDate = new Date(formData.deadline);
@@ -82,9 +87,8 @@ const CreateFundraiser = () => {
     }
 
     setErrors(newErrors);
-    if (hasError) return; // Stop submission
+    if (hasError) return;
 
-    
     const dataToSend = new FormData();
     dataToSend.append('userRole', 'NGO'); 
     dataToSend.append('type', 'fundraiser');
@@ -100,31 +104,41 @@ const CreateFundraiser = () => {
     try {
       const response = await fetch(`http://localhost:3000/api/ngo-dashboard/${ngoID}/create-fundraiser`, {
         method: 'POST',
-        body: dataToSend, // Fetch
+        body: dataToSend,
         credentials: 'include'
       });
 
-      if (response.ok) {
-        // Redirect to dashboard on success
-        navigate(`/ngo-dashboard/${ngoID}`);
-      } else {
-        alert("Failed to create fundraiser. Please try again.");
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Failed to create fundraiser");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
+
+      navigate(`/ngo-dashboard/${ngoID}`);
+
+    } catch (err) {
+      console.error("Submission error:", err);
+
+      setError(err.message || "Failed to create fundraiser.");
+
+      setTimeout(() => {
+        window.location.href = "/error";
+      }, 5000);
     }
   };
 
   return (
-    
     <div className="ngo-dashboard-page">
-
       <div className="form-container">
         <h2 className="head_ing">Create New Fundraiser</h2>
 
+        {error && (
+          <p style={{ color: "red", textAlign: "center" }}>
+            Error: {error}
+          </p>
+        )}
+
         <form onSubmit={handleSubmit} encType="multipart/form-data">
           
-          {/* Care Home Dropdown */}
           <div className="form-group">
             <label>Please select one care home:</label>
             <select 
@@ -142,7 +156,7 @@ const CreateFundraiser = () => {
                 </option>
               ))}
             </select>
-            {/* Conditional Error Message */}
+
             {errors.carehome && (
               <span id="val_error" style={{ color: 'red', display: 'block' }}>
                 Must select one care home before proceeding
@@ -150,7 +164,6 @@ const CreateFundraiser = () => {
             )}
           </div>
 
-          {/* Title */}
           <div className="form-group">
             <label>Title:</label>
             <input 
@@ -162,7 +175,6 @@ const CreateFundraiser = () => {
             />
           </div>
 
-          {/* Description */}
           <div className="form-group">
             <label>Description:</label>
             <textarea 
@@ -173,7 +185,6 @@ const CreateFundraiser = () => {
             />
           </div>
 
-          {/* Goal Amount */}
           <div className="form-group">
             <label>Goal Amount:</label>
             <input 
@@ -191,7 +202,6 @@ const CreateFundraiser = () => {
             )}
           </div>
 
-          {/* Deadline */}
           <div className="form-group">
             <label>Deadline:</label>
             <input 
@@ -209,7 +219,6 @@ const CreateFundraiser = () => {
             )}
           </div>
 
-          {/* Tag Dropdown */}
           <div className="form-group">
             <label>Tag:</label>
             <select 
@@ -230,7 +239,6 @@ const CreateFundraiser = () => {
             </select>
           </div>
 
-          
           <div className="form-group">
             <label>Image:</label>
             <input 

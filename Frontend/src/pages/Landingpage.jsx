@@ -16,24 +16,38 @@ export default function LandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [tickerData, setTickerData] = useState([]);
+  const [error, setError] = useState(null);
 
   const ngos = useSelector((state) => state.entities.ngos);
   const events = useSelector((state) => state.entities.events);
 
   useEffect(() => {
-    // 1. Existing Redux dispatch for NGOs and Events
+    // Existing Redux dispatch
     dispatch(fetchLandingData());
 
-    // 2. Local fetch for the live donation ticker
+    // Ticker fetch
     const fetchTicker = async () => {
       try {
         const response = await fetch("http://localhost:3000/ticker-data");
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.message || "Failed to fetch ticker data");
+        }
+
         const json = await response.json();
+
         if (json.success) {
           setTickerData(json.data);
         }
       } catch (err) {
         console.error("Ticker fetch failed:", err);
+
+        setError(err.message || "Failed to load ticker");
+
+        setTimeout(() => {
+          window.location.href = "/error";
+        }, 5000);
       }
     };
 
@@ -43,8 +57,6 @@ export default function LandingPage() {
   return (
     <div>
       <Header navItems={headerConfig.landing} />
-      
-      {/* Live Ticker placed between Header and Carousel */}
       
       <Carousel />
 
@@ -67,7 +79,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CAREHOMES / UPCOMING EVENTS */}
         <section className="preview-section">
           <h2
             className="clickable-heading"
@@ -85,7 +96,9 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
-            <DonationTicker donations={tickerData} />
+
+        <DonationTicker donations={tickerData} />
+
         <FAQ />
       </main>
 

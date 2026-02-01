@@ -6,7 +6,6 @@ const CreateEvent = () => {
   const { ngoID } = useParams();
   const navigate = useNavigate();
 
-  // 1. STATE
   const [formData, setFormData] = useState({
     event_name: '',
     description: '',
@@ -14,15 +13,13 @@ const CreateEvent = () => {
     event_time: '',
     deadline: '' 
   });
-  const [imageFile, setImageFile] = useState(null);
-  
- 
-  const [dateError, setDateError] = useState(false);
 
-  
+  const [imageFile, setImageFile] = useState(null);
+  const [dateError, setDateError] = useState(false);
+  const [error, setError] = useState(null); // NEW
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Reset error when user fixes the date
     if (e.target.name === 'deadline') setDateError(false);
   };
 
@@ -30,16 +27,13 @@ const CreateEvent = () => {
     setImageFile(e.target.files[0]);
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault(); 
 
-    
     const today = new Date();
     today.setHours(0, 0, 0, 0); 
     const inputDate = new Date(formData.deadline);
 
-    
     if (isNaN(inputDate) || inputDate < today) {
       setDateError(true); 
       return; 
@@ -55,7 +49,6 @@ const CreateEvent = () => {
     dataToSend.append('event_time', formData.event_time);
     dataToSend.append('deadline', formData.deadline);
     dataToSend.append('image', imageFile);
-     
 
     try {
       const response = await fetch(`http://localhost:3000/api/ngo/${ngoID}/create-event`, {
@@ -64,22 +57,35 @@ const CreateEvent = () => {
         credentials: 'include'
       });
 
-      if (response.ok) {
-        navigate(`/NGO-dashboard/${ngoID}`);
-      } else {
-        alert("Failed to create event. Please check inputs.");
-        console.log(response);
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Failed to create event");
       }
-    } catch (error) {
-      console.error("Error creating event:", error);
+
+      navigate(`/NGO-dashboard/${ngoID}`);
+
+    } catch (err) {
+      console.error("Error creating event:", err);
+
+      setError(err.message || "Failed to create event.");
+
+      // Redirect after 5 seconds
+      setTimeout(() => {
+        window.location.href = "/error";
+      }, 5000);
     }
   };
 
   return (
     <div className="ngo-dashboard-page">
-
       <div className="form-container">
         <h2 className="head_ing">Create New Event</h2>
+
+        {error && (
+          <p style={{ color: "red", textAlign: "center" }}>
+            Error: {error}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} encType="multipart/form-data">
           
@@ -135,7 +141,6 @@ const CreateEvent = () => {
               onChange={handleChange} 
               required 
             />
-            {/* Error Message*/}
             {dateError && (
               <span id="dateerror" style={{ color: 'red', display: 'block' }}>
                 Date must be valid ({'>'}=today)
@@ -157,7 +162,6 @@ const CreateEvent = () => {
           <button type="submit" className="gradient-btn">Create Event</button>
         </form>
       </div>
-
     </div>
   );
 };

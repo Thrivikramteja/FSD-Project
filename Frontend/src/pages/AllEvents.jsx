@@ -19,9 +19,10 @@ const AllEvents = () => {
         console.log("sent req to events")
 
         if (!response.ok) {
-          throw new Error("Failed to fetch events");
+          const errData = await response.json();
+          throw new Error(errData.message || "Failed to fetch events");
         }
-
+        
         const data = await response.json();
         console.log(data);
         setEvents(data);

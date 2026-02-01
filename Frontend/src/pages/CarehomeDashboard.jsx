@@ -7,26 +7,41 @@ import styles from '../styles/CarehomeDashboard.module.css';
 const CarehomeDashboard = () => {
     const { careid } = useParams(); 
     const [data, setData] = useState(null);
-    const [jobs, setJobs] = useState([]); // List of job cards
-    const [selectedJobId, setSelectedJobId] = useState(null); // Tracks drill-down view
-    const [applicants, setApplicants] = useState([]); // Applicants for selected job
+    const [jobs, setJobs] = useState([]);
+    const [selectedJobId, setSelectedJobId] = useState(null);
+    const [applicants, setApplicants] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);   // NEW
 
     const fetchData = async () => {
         try {
-            // Fetch main dashboard data
             const dashRes = await fetch(`http://localhost:3000/api/carehome-dashboard/${careid}`, { credentials: 'include' });
-            // Fetch jobs for this carehome
             const jobsRes = await fetch(`http://localhost:3000/api/carehome/my-jobs`, { credentials: 'include' });
 
-            if (dashRes.ok && jobsRes.ok) {
-                const dashResult = await dashRes.json();
-                const jobsResult = await jobsRes.json();
-                setData(dashResult);
-                setJobs(jobsResult.jobs || []);
+            if (!dashRes.ok) {
+                const errData = await dashRes.json();
+                throw new Error(errData.message || "Failed to load dashboard");
             }
-        } catch (error) {
-            console.error("Error fetching dashboard data:", error);
+
+            if (!jobsRes.ok) {
+                const errData = await jobsRes.json();
+                throw new Error(errData.message || "Failed to load jobs");
+            }
+
+            const dashResult = await dashRes.json();
+            const jobsResult = await jobsRes.json();
+
+            setData(dashResult);
+            setJobs(jobsResult.jobs || []);
+        } catch (err) {
+            console.error("Error fetching dashboard data:", err);
+
+            setError(err.message || "Failed to load dashboard");
+            
+            // Redirect after 5 seconds
+            setTimeout(() => {
+                window.location.href = "/error";
+            }, 5000);
         } finally {
             setLoading(false);
         }
@@ -36,7 +51,6 @@ const CarehomeDashboard = () => {
         fetchData();
     }, [careid]);
 
-    // Handles the transition to view applicants for a specific job
     const handleViewApplicants = async (jobId) => {
         try {
             const response = await fetch(`http://localhost:3000/api/carehome/jobs/${jobId}/applicants`, { credentials: 'include' });
@@ -76,6 +90,15 @@ const CarehomeDashboard = () => {
     };
 
     if (loading) return <div className={styles.loader}>Loading Premium Dashboard...</div>;
+
+    if (error) {
+        return (
+            <div className={styles.error}>
+                Error: {error}
+            </div>
+        );
+    }
+
     if (!data) return <div className={styles.error}>No dashboard data found.</div>;
 
     return (
@@ -128,7 +151,6 @@ const CarehomeDashboard = () => {
                         </section>
                     ) : (
                         <>
-                            {/* STATS SECTION */}
                             <section className={styles.statsGrid}>
                                 <div className={styles.statCard}>
                                     <h3>Active Fundraisers</h3>
@@ -142,7 +164,6 @@ const CarehomeDashboard = () => {
                                 ))}
                             </section>
 
-                            {/* DYNAMIC JOB CARDS SECTION */}
                             <section className={styles.glassSection}>
                                 <h2 className={styles.sectionTitle}>
                                     <span className={styles.icon}>💼</span> Open Positions
@@ -168,7 +189,6 @@ const CarehomeDashboard = () => {
                                 </div>
                             </section>
 
-                            {/* FUNDRAISERS */}
                             <section className={styles.glassSection}>
                                 <h2 className={styles.sectionTitle}>Active Fundraisers</h2>
                                 <div className={styles.cardGrid}>
@@ -179,12 +199,6 @@ const CarehomeDashboard = () => {
                                                 <span>Raised: ₹{fund.amount_raised_so_far}</span>
                                                 <span> Goal: ₹{fund.goal_amount}</span>
                                             </div>
-                                            {fund.amount_raised_so_far >= fund.goal_amount && (
-                                                <div className={styles.goalReachedMessage}>
-                                                    <p><strong>Congratulations from the CareConnect Platform!</strong></p>
-                                                    <p>You have successfully reached your target. We hope these contributions are used for the greater good of your residents.</p>
-                                                </div>
-                                            )}
                                             <div className={styles.progressBar}>
                                                 <div className={styles.progressFill} style={{ width: `${(fund.amount_raised_so_far / fund.goal_amount) * 100}%` }}></div>
                                             </div>
@@ -193,7 +207,6 @@ const CarehomeDashboard = () => {
                                 </div>
                             </section>
 
-                            {/* PENDING ITEM DONATION REQUESTS */}
                             <section className={styles.glassSection}>
                                 <h2 className={styles.sectionTitle}>Pending Item Requests</h2>
                                 <div className={styles.messageList}>
@@ -211,28 +224,6 @@ const CarehomeDashboard = () => {
                                     )) : <p className={styles.emptyText}>No pending requests.</p>}
                                 </div>
                             </section>
-
-                            {/* --- NEW SECTION: RECENT MONEY DONATIONS --- */}
-                                                    <section className={styles.glassSection}>
-                            <h2 className={styles.sectionTitle}>
-                                <span className={styles.icon}>💰</span> Recent Money Donations
-                            </h2>
-                            <div className={styles.messageList}>
-                                {data.recentDonations?.length > 0 ? data.recentDonations.map((don, index) => (
-                                    <div className={styles.messageItem} key={index}>
-                                        <div className={styles.msgDetails}>
-                                            {/* Maps to 'donor_name' and 'amount' from your existing backend */}
-                                            <strong>{don.donor_name}: ₹{don.amount}</strong>
-                                            <p>
-                                                Received: {don.donated_at ? new Date(don.donated_at).toLocaleDateString() : "Recently Received"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <p className={styles.emptyText}>No money donations yet.</p>
-                                )}
-                            </div>
-                        </section>
                         </>
                     )}
                 </main>
