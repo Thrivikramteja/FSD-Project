@@ -272,45 +272,45 @@ const careHomeJobSchema = new mongoose.Schema({
 
 //new feature : application for jobs
 //when a user applies for job it get stores in this schema
-const applicationSchema = new mongoose.Schema({
-  // Reference to the specific Job posted
-  jobId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'CareHomeJob', 
-    required: true 
-  },
+// const applicationSchema = new mongoose.Schema({
+//   // Reference to the specific Job posted
+//   jobId: { 
+//     type: mongoose.Schema.Types.ObjectId, 
+//     ref: 'CareHomeJob', 
+//     required: true 
+//   },
   
   // Reference to the User (Document reference)
   // Even if your friend is using a custom 'id', MongoDB's _id is the anchor.
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
-  },
+//   userId: { 
+//     type: mongoose.Schema.Types.ObjectId, 
+//     ref: 'User', 
+//     required: true 
+//   },
 
-  // Reference to the CareHome Document
-  carehomeId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Carehome',
-    required: true
-  },
+//   // Reference to the CareHome Document
+//   carehomeId: { 
+//     type: mongoose.Schema.Types.ObjectId, 
+//     ref: 'Carehome',
+//     required: true
+//   },
 
-  status: { 
-    type: String, 
-    enum: ['Pending', 'Accepted', 'Rejected'], 
-    default: 'Pending' 
-  },
+//   status: { 
+//     type: String, 
+//     enum: ['Pending', 'Accepted', 'Rejected'], 
+//     default: 'Pending' 
+//   },
 
-  appliedAt: { 
-    type: Date, 
-    default: Date.now 
-  }
-});
+//   appliedAt: { 
+//     type: Date, 
+//     default: Date.now 
+//   }
+// });
 
-const JobApplication = mongoose.model("JobApplication", applicationSchema);
+// const JobApplication = mongoose.model("JobApplication", applicationSchema);
 const Carehome = mongoose.model("Carehome", carehomeSchema);
 const DonationMoney = mongoose.model("DonationMoney", donationMoneySchema);
 const donate_items = mongoose.model("donate_items", donationitemschema);
 const CareHomeJob = mongoose.model("CareHomeJob", careHomeJobSchema);
 
-module.exports = { Carehome, DonationMoney, donate_items, CareHomeJob , JobApplication };
+module.exports = { Carehome, DonationMoney, donate_items, CareHomeJob };

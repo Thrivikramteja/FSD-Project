@@ -8,6 +8,11 @@ const { CareHomeJob } = require("../models/carehome.model");
 const Application = require("../models/Application");
 const { User } = require("../models/user.model");
 
+const {
+  sendAcceptedEmail,
+  sendRejectedEmail,
+} = require("../services/otpService");
+
 async function getCareHomesApi(req, res) {
   try {
     const carehomes = await Carehome.getCareHomes();
@@ -30,22 +35,18 @@ async function donateMoney(req, res) {
       userRole: req.user?.role || null,
     });
   } catch (error) {
-    error.message = "Server Error"
+    error.message = "Server Error";
     next(error);
   }
 }
 
 async function insertMoney(req, res) {
   try {
- 
     const total = parseFloat(req.body.total);
-    
 
-    const userId = req.user.id; 
-    
+    const userId = req.user.id;
 
     const carehomeId = parseInt(req.params.carehomeId, 10);
-
 
     if (!userId || isNaN(carehomeId) || isNaN(total) || total <= 0) {
       return res.status(400).json({
@@ -54,12 +55,11 @@ async function insertMoney(req, res) {
       });
     }
 
-
     await DonationMoney.saveDonation({
-      userId: userId,           
-      amount_donated: total,    
-      carehomeId: carehomeId,  
-      user: req.user,         
+      userId: userId,
+      amount_donated: total,
+      carehomeId: carehomeId,
+      user: req.user,
       userRole: req.user.role,
     });
 
@@ -68,16 +68,69 @@ async function insertMoney(req, res) {
       message: "Your donation has been saved successfully!",
       redirectUrl: "/",
     });
-
   } catch (error) {
     console.error("Donation processing error:", error);
-    error.message = "Internal server error while processing your donation." ;
+    error.message = "Internal server error while processing your donation.";
     next(error);
   }
 }
 
 async function register(req, res) {
   res.render("carehomes/care_reg");
+}
+
+async function rejectApplication(req, res) {
+  const { id } = req.params;
+
+  try {
+    const application = await Application.findByIdAndUpdate(
+      id,
+      { status: "Rejected" },
+      { new: true }
+    );
+
+    if (!application) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
+    await sendRejectedEmail(
+      application.email,
+      application.userName,
+      application.jobTitle
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+async function acceptApplication(req, res) {
+  const { id } = req.params;
+
+  try {
+    const application = await Application.findByIdAndUpdate(
+      id,
+      { status: "Accepted" },
+      { new: true }
+    );
+
+    if (!application) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
+    await sendAcceptedEmail(
+      application.email,
+      application.userName,
+      application.jobTitle
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 }
 
 async function donateItems(req, res) {
@@ -88,8 +141,8 @@ async function donateItems(req, res) {
       user: req.user || null,
       userRole: req.user?.role || null,
     });
-  } catch(error) {
-    error.message = "Server Error"
+  } catch (error) {
+    error.message = "Server Error";
     next(error);
   }
 }
@@ -132,7 +185,7 @@ async function get_don_items(req, res) {
       success: true,
       message: "Your donation request has been sent successfully.",
     });
-  } catch(err) {
+  } catch (err) {
     err.message = "Failed to save the donation message.";
     next(err);
   }
@@ -171,9 +224,9 @@ async function registerCarehome(req, res) {
     res.status(200).json({
       message: "Carehome Registration successful",
     });
-  } catch(err) {
-      err.message = "Registration failed"
-      next(err);
+  } catch (err) {
+    err.message = "Registration failed";
+    next(err);
   }
 }
 
@@ -207,8 +260,8 @@ async function getCarehome(req, res) {
       user: req.user,
       userRole: req.user.role,
     });
-  } catch(err) {
-    err.message = "Dashboard load failed"
+  } catch (err) {
+    err.message = "Dashboard load failed";
     next(err);
   }
 }
@@ -272,7 +325,7 @@ async function accpet_item_doantions(req, res) {
     res.json({ success: true, message: `Request ${action}ed successfully.` });
   } catch (err) {
     console.error(err);
-    err.message = "Internal server error"
+    err.message = "Internal server error";
     next(err);
   }
 }
@@ -325,8 +378,8 @@ async function editCarehomeProfile(req, res) {
       message: "Care Home details updated successfully.",
       carehome: updatedCarehome,
     });
-  } catch(err) {
-    err.message = "Server error occurred while updating the profile."
+  } catch (err) {
+    err.message = "Server error occurred while updating the profile.";
     next(err);
   }
 }
@@ -354,7 +407,6 @@ async function getCarehomeProfile(req, res) {
     next(err);
   }
 }
-
 
 // Helper to resolve numeric Carehome ID to MongoDB ObjectId
 async function getMongoIdFromNumericId(numericId) {
@@ -547,4 +599,6 @@ module.exports = {
   getCareHome_Jobs,
   getJobApplicants,
   getCarehomePublic,
+  rejectApplication,
+  acceptApplication,
 };
