@@ -1,0 +1,105 @@
+.glassContainer {
+    min-height: 100vh;
+    /* Soft Mint to Sage Gradient */
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.glassCard {
+    /* Slightly more opaque white for light themes */
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 650px;
+    padding: 40px;
+    /* Darker text for readability on light background */
+    color: #2d3436; 
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 35px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    /* Deep Forest Green Gradient */
+    background: linear-gradient(to right, #2d6a4f, #40916c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.inputGroup label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #52796f; /* Muted Sage */
+    text-transform: uppercase;
+}
+
+.inputGroup input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 14px;
+    color: #1b4332;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #74c69d; /* Bright Mint */
+    box-shadow: 0 0 0 4px rgba(116, 198, 157, 0.2);
+}
+
+.updateBtn {
+    flex: 2;
+    /* Emerald Green */
+    background: #40916c; 
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.updateBtn:hover {
+    background: #2d6a4f;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(64, 145, 108, 0.3);
+}
+
+.backBtn {
+    flex: 1;
+    background: transparent;
+    color: #40916c;
+    border: 1.5px solid #40916c;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.backBtn:hover {
+    background: rgba(64, 145, 108, 0.05);
+}
+
+/* Updated Alerts for the Green Theme */
+.success { border: 1px solid #74c69d; color: #1b4332; background: rgba(116, 198, 157, 0.15); }
+.error { border: 1px solid #ff8787; color: #c92a2a; background: rgba(255, 135, 135, 0.15); }
