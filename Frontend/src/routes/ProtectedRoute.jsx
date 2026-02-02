@@ -9,6 +9,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <p>Loading...</p>;
   }
 
+  console.log(auth.user);
+
   if (!auth.user) {
     return <Navigate to="/login" replace />;
   }

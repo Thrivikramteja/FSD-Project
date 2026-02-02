@@ -69,8 +69,7 @@ async function login(req, res) {
         return res.status(200).json({
           success: true,
           role: "Admin",
-          user: { name: "System Admin", email: email }, // Added for context
-          redirect: "/admin-dashboard", // Clean redirect path
+          user: { name: "System Admin", email: email }, 
         });
       }
 
@@ -102,10 +101,8 @@ async function login(req, res) {
 
     const otp = generateOTP();
     user.otpCode = otp;
-    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 min
+    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); 
     await user.save();
-
-    await sendOTPEmail(user.email, otp);
 
     return res.status(200).json({
       success: true,
@@ -233,7 +230,7 @@ async function checkAuth(req, res) {
   try {
     const { id, role } = req.user;
     let fullUser = null;
-
+    
     if (role === "NGO") {
         fullUser = await NGO.findOne({ ngoId: id }).lean();
     } else if (role === "Donor") {
@@ -248,7 +245,7 @@ async function checkAuth(req, res) {
 
     return res.status(200).json({
       success: true,
-      user: fullUser || { email: req.user.email, name: "Admin" }, 
+      user: fullUser ? fullUser : { email: req.user.email, name: "Admin" }, 
       role: role,
     });
   } catch (error) {

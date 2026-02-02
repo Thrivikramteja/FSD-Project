@@ -63,15 +63,12 @@ function Loginpage() {
           setShowOtp(true);
         } else {
           const userRole = data.role;
-          login({ ...data.user, role: data.role });
-          // navigate(data.redirect);
+          login({ user: data.user, role: data.role });
           if (userRole === "Admin") {
-            navigate("/admin-dashboard"); 
-        }
-        else {
-            // Standard dynamic pathing for other roles
+            navigate("/admin-dashboard");
+          } else {
             navigate(data.redirect || "/");
-        }
+          }
         }
       } else {
         setError(data.message || "Login failed.");
