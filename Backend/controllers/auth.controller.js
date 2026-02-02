@@ -7,7 +7,11 @@ const { Carehome } = require("../models/carehome.model");
 
 const { generateOTP, sendOTPEmail } = require("../services/otpService");
 
-async function signup(req, res) {
+// Admin Credentials
+const ADMIN_EMAIL = "chinnikarthik22@gmail.com";
+const ADMIN_PASS = "wbd_3";
+
+async function signup(req, res, next) {
   const { fullname, mail, password, phone, checkbox } = req.body;
 
   try {
@@ -40,7 +44,7 @@ async function signup(req, res) {
   }
 }
 
-async function login(req, res) {
+async function login(req, res, next) {
   const { userRole, email, password } = req.body;
 
   try {
@@ -53,36 +57,17 @@ async function login(req, res) {
     } else if (userRole === "Carehome") {
       user = await Carehome.getCarehome(email);
     } else if (userRole === "Admin") {
-      if (email === "fsd@gmail.com" && password === "123456") {
-        const token = jwt.sign(
-          { role: "Admin", email: email },
-          process.env.JWT_SECRET,
-          { expiresIn: "1d" }
-        );
-
-        res.cookie("token", token, {
-          httpOnly: true,
-          sameSite: "lax",
-          secure: false, 
-        });
-
-        return res.status(200).json({
-          success: true,
-          role: "Admin",
-          user: { name: "System Admin", email: email }, // Added for context
-          redirect: "/admin-dashboard", // Clean redirect path
-        });
+      if (email === ADMIN_EMAIL && password === ADMIN_PASS) {
+        user = await User.getUserByEmail(email);
+        if (!user) {
+            // If admin isn't in DB yet, create a placeholder so save() works
+            user = new User({ name: "Admin", email: email, password: password, role: "Admin" });
+        }
+      } else {
+        return res.status(401).json({ success: false, message: "Invalid admin credentials" });
       }
-
-      return res.status(401).json({
-        success: false,
-        message: "Invalid admin credentials",
-      });
     } else {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid user role",
-      });
+      return res.status(400).json({ success: false, message: "Invalid user role" });
     }
 
     if (!user) {
@@ -92,17 +77,20 @@ async function login(req, res) {
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Incorrect password",
-      });
+    // Admin password check is already done above, standard roles checked here
+    if (userRole !== "Admin") {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return res.status(401).json({
+            success: false,
+            message: "Incorrect password",
+          });
+        }
     }
 
     const otp = generateOTP();
     user.otpCode = otp;
-    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 min
+    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); 
     await user.save();
 
     await sendOTPEmail(user.email, otp);
@@ -121,14 +109,14 @@ async function login(req, res) {
   }
 }
 
-async function verifyOTP(req, res) {
+async function verifyOTP(req, res, next) {
   const { email, otp, userRole } = req.body;
 
   try {
     let user = null;
 
     if (userRole === "NGO") user = await NGO.getNGO(email);
-    else if (userRole === "Donor") user = await User.getUserByEmail(email);
+    else if (userRole === "Donor" || userRole === "Admin") user = await User.getUserByEmail(email);
     else if (userRole === "Carehome") user = await Carehome.getCarehome(email);
 
     if (!user || user.otpCode !== otp || user.otpExpires < Date.now()) {
@@ -149,13 +137,13 @@ async function verifyOTP(req, res) {
         ? plainUser.ngoId
         : userRole === "Carehome"
         ? plainUser.carehomeId
-        : plainUser.userId;
+        : userRole === "Admin" ? "ADMIN_ID" : plainUser.userId;
 
     const token = jwt.sign(
       { 
         id: userId, 
         role: userRole,
-        name: plainUser.name,
+        name: plainUser.name || "Admin",
         email: plainUser.email 
       },
       process.env.JWT_SECRET,
@@ -179,6 +167,9 @@ async function verifyOTP(req, res) {
       case "Carehome":
         dashboardUrl = `/carehome-dashboard/${plainUser.carehomeId}`;
         break;
+      case "Admin":
+        dashboardUrl = `/admin-dashboard`;
+        break;
     }
 
     return res.status(200).json({
@@ -194,7 +185,7 @@ async function verifyOTP(req, res) {
   }
 }
 
-async function forgotPassword(req, res) {
+async function forgotPassword(req, res, next) { // added next
   const { email, userRole } = req.body;
 
   try {
@@ -229,9 +220,19 @@ async function forgotPassword(req, res) {
   }
 }
 
-async function checkAuth(req, res) {
+async function checkAuth(req, res, next) {
   try {
     const { id, role } = req.user;
+    
+    // Minimal change: Bypass DB check for static Admin
+    if (role === "Admin") {
+        return res.status(200).json({
+            success: true,
+            user: { email: req.user.email, name: "System Admin" },
+            role: "Admin",
+        });
+    }
+
     let fullUser = null;
 
     if (role === "NGO") {
@@ -242,13 +243,13 @@ async function checkAuth(req, res) {
         fullUser = await Carehome.findOne({ carehomeId: id }).lean();
     }
 
-    if (!fullUser && role !== "Admin") {
+    if (!fullUser) {
         return res.status(404).json({ success: false, message: "User not found" });
     }
 
     return res.status(200).json({
       success: true,
-      user: fullUser || { email: req.user.email, name: "Admin" }, 
+      user: fullUser, 
       role: role,
     });
   } catch (error) {

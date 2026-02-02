@@ -1,0 +1,110 @@
+/* ErrorFace.module.css */
+
+.errorBody { 
+    margin: 0; 
+    padding: 0; 
+    width: 100%; 
+    min-height: 100vh; 
+    background-color: #F2EEE8; 
+    font-family: 'Open Sans', sans-serif; 
+    text-align: center; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.face { 
+    width: 300px; 
+    height: 300px; 
+    border: 4px solid #383A41; 
+    border-radius: 10px; 
+    background-color: #FFFFFF; 
+    margin: 0 auto; 
+    position: relative; 
+    top: 100px;
+}
+
+.band { 
+    width: 350px; 
+    height: 27px; 
+    border: 4px solid #383A41; 
+    border-radius: 5px; 
+    margin-left: -25px; 
+    margin-top: 50px; 
+    position: relative; 
+}
+
+/* Sub-classes for the band */
+.red { height: 33.3%; width: 100%; background-color: #EB6D6D; }
+.white { height: 33.3%; width: 100%; background-color: #FFFFFF; }
+.blue { height: 33.3%; width: 100%; background-color: #5E7FDC; }
+
+.eyes { width: 128px; margin: 40px auto 0; }
+
+.eyes::before, 
+.eyes::after { 
+    content: ""; 
+    display: inline-block; 
+    width: 30px; 
+    height: 15px; 
+    border: 7px solid #383A41; 
+    border-top-left-radius: 22px; 
+    border-top-right-radius: 22px; 
+    border-bottom: 0; 
+}
+
+.eyes::before { margin-right: 20px; }
+.eyes::after { margin-left: 20px; }
+
+.dimples { width: 180px; margin: 15px auto 0; }
+
+.dimples::before, 
+.dimples::after { 
+    content: ""; 
+    display: inline-block; 
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background-color: rgba(235,109,109,0.4); 
+}
+
+.dimples::before { margin-right: 40px; }
+.dimples::after { margin-left: 40px; }
+
+.mouth { 
+    width: 40px; 
+    height: 5px; 
+    border-radius: 5px; 
+    background-color: #383A41; 
+    margin: 25px auto 0; 
+}
+
+.title { 
+    font-weight: 800; 
+    color: #383A41; 
+    font-size: 2.5em; 
+    padding-top: 120px; 
+    margin: 0;
+}
+
+.mailNotice { 
+    color: #5E7FDC; 
+    font-weight: bold; 
+    margin-top: 10px; 
+}
+
+.btn { 
+    display: inline-block; 
+    padding: 20px; 
+    background-color: #5E7FDC; 
+    color: white; 
+    width: 320px; 
+    margin: 40px auto; 
+    border: none; 
+    border-radius: 5px; 
+    font-size: 1.2em; 
+    cursor: pointer; 
+    transition: all .2s linear; 
+}
+
+.btn:hover { background-color: rgba(94,127,220, 0.8); }
