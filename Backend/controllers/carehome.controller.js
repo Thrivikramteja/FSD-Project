@@ -93,11 +93,19 @@ async function rejectApplication(req, res) {
       return res.status(404).json({ error: "Application not found" });
     }
 
-    await sendRejectedEmail(
-      application.email,
-      application.userName,
-      application.jobTitle
-    );
+    const user = await User.findOne({ id: application.userId });
+    const job = await CareHomeJob.findById(application.jobId);
+
+    if (!user?.email || !job) {
+      return res.status(400).json({ error: "Email or job not found" });
+    }
+
+    try {
+      const info = await sendRejectedEmail(user.email, user.name, job.title);
+      console.log("Email sent:", info.messageId);
+    } catch (err) {
+      console.error("Email failed:", err);
+    }
 
     res.status(200).json({ success: true });
   } catch (err) {
@@ -120,11 +128,22 @@ async function acceptApplication(req, res) {
       return res.status(404).json({ error: "Application not found" });
     }
 
-    await sendAcceptedEmail(
-      application.email,
-      application.userName,
-      application.jobTitle
-    );
+    const user = await User.findOne({ id: application.userId });
+    if (!user || !user.email) {
+      return res.status(400).json({ error: "User email not found" });
+    }
+
+    const job = await CareHomeJob.findById(application.jobId);
+    if (!job) {
+      return res.status(400).json({ error: "Job not found" });
+    }
+
+    try {
+      const info = await sendAcceptedEmail(user.email, user.name, job.title);
+      console.log("Email sent:", info.messageId);
+    } catch (err) {
+      console.error("Email failed:", err);
+    }
 
     res.status(200).json({ success: true });
   } catch (err) {
