@@ -79,9 +79,8 @@ async function register(req, res) {
   res.render("carehomes/care_reg");
 }
 
-async function rejectApplication(req, res) {
-  const { id } = req.params;
-
+async function rejectApplication(req, res, next) {
+  const { id } = req.params; 
   try {
     const application = await Application.findByIdAndUpdate(
       id,
@@ -93,28 +92,29 @@ async function rejectApplication(req, res) {
       return res.status(404).json({ error: "Application not found" });
     }
 
-    const user = await User.findOne({ id: application.userId });
+    const user = await User.findOne({ userId: Number(application.userId) });
     const job = await CareHomeJob.findById(application.jobId);
 
-    if (!user?.email || !job) {
-      return res.status(400).json({ error: "Email or job not found" });
+    if (!user || !user.email || !job) {
+      return res.status(400).json({ error: "User email or job details not found" });
     }
 
     try {
       const info = await sendRejectedEmail(user.email, user.name, job.title);
-      console.log("Email sent:", info.messageId);
+      console.log("Rejection Email sent:", info.messageId);
     } catch (err) {
-      console.error("Email failed:", err);
+      console.error("Rejection Email failed:", err);
     }
 
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("Reject Action Error:", err);
+    err.message = "Failed to process application rejection.";
+    next(err); 
   }
 }
 
-async function acceptApplication(req, res) {
+async function acceptApplication(req, res, next) {
   const { id } = req.params;
 
   try {
@@ -128,7 +128,8 @@ async function acceptApplication(req, res) {
       return res.status(404).json({ error: "Application not found" });
     }
 
-    const user = await User.findOne({ id: application.userId });
+    const user = await User.findOne({ userId: Number(application.userId) });
+    
     if (!user || !user.email) {
       return res.status(400).json({ error: "User email not found" });
     }
@@ -139,16 +140,14 @@ async function acceptApplication(req, res) {
     }
 
     try {
-      const info = await sendAcceptedEmail(user.email, user.name, job.title);
-      console.log("Email sent:", info.messageId);
+      await sendAcceptedEmail(user.email, user.name, job.title);
     } catch (err) {
-      console.error("Email failed:", err);
+      console.error("Email failed but status was updated:", err);
     }
 
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    next(err);
   }
 }
 
