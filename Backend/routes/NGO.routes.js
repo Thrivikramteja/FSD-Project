@@ -62,6 +62,20 @@ router.get("/api/carehomes-list", async (req, res) => {
   }
 });
 
+  router.get(
+    "/api/NGO-dashboard/:ngoID/details", 
+     authenticate,
+    authorizeRoles("NGO"), 
+      NGOController.getEditNGOProfile,
+  );
+
+  router.post(
+    "/api/NGO-dashboard/:ngoID/edit", 
+    authenticate,
+    authorizeRoles("NGO"), 
+    NGOController.editNGOProfile
+);
+
 
 router.get('/api/events', NGOController.getEvents);
 

@@ -24,6 +24,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import DonorRegistration from "../pages/DonorRegistration";
 import ViewCare from "../pages/ViewCare";
 import ErrorFace from "../components/ErrorFace";
+import NGOEditDetails from "../pages/NGOEditDetails"; // Import your new modular component
 
 const AppRoutes = () => {
   return (
@@ -57,6 +58,11 @@ const AppRoutes = () => {
       <Route
         path="/NGO-dashboard/:ngoID/create-event"
         element={<CreateEvent />}
+      />
+
+      <Route 
+        path="/NGO-dashboard/:ngoID/edit" 
+        element={<NGOEditDetails />} 
       />
 
       {/* Protected Routes */}

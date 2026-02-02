@@ -71,30 +71,39 @@ async function register(req, res) {
   }
 }
 
-async function getEditNGOProfile(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
 
-  if (req.user.role !== "NGO" || req.user.id !== ngoID) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-
-  try {
-    const ngo = await NGO.getNGOById(ngoID);
-
-    if (!ngo) {
-      return res.status(404).send("NGO not found");
+async function getEditNGOProfile(req, res, next) {
+    const ngoID = req.params.ngoID; 
+    console.log("hi myy name is ngo " + ngoID);
+    // 1. THE DRILL: Force string comparison to avoid type mismatch
+    if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
+        return res.status(403).json({ 
+            success: false, 
+            message: "Forbidden: Identity mismatch." 
+        });
     }
 
-    res.render("NGOs/ngo_edit", {
-      ngoID,
-      ngo,
-      user: req.user,
-      userRole: req.user.role,
-    });
-  } catch (error) {
-    error.message = "Failed to load NGO profile";
-    nextTick(error);
-  }
+    try {
+        const ngoArray = await NGO.getNGOById(ngoID);
+        console.log("hi i am from controller " + ngoArray);
+
+        const ngo = ngoArray && ngoArray.length > 0 ? ngoArray[0] : null;
+        
+        if (!ngo) {
+            const err = new Error("NGO profile not found.");
+            err.statusCode = 404;
+            return next(err);
+        }
+
+        res.status(200).json({
+            success: true,
+            ngo: ngo 
+        });
+
+    } catch (error) {
+        error.message = "Secure data retrieval failed.";
+        next(error); 
+    }
 }
 
 async function getEvents(req, res) {
@@ -165,42 +174,56 @@ async function getallFundraisers(req, res) {
   }
 }
 
-async function editNGOProfile(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
 
-  if (req.user.role !== "NGO" || req.user.id !== ngoID) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
+async function editNGOProfile(req, res, next) {
+    
+    const ngoID = req.params.ngoID;
+    console.log(req.user.id);
 
-  const { fullname, phone, bank, accnum, ifsc, darpan } = req.body;
-
-  try {
-    const updatedNGO = await NGO.findOneAndUpdate(
-      { ngoId: ngoID },
-      {
-        Ngoname: fullname,
-        darpan_id: darpan,
-        phone,
-        account_holder_name: bank,
-        account_number: accnum,
-        IFSC_code: ifsc,
-      },
-      { new: true }
-    );
-
-    if (!updatedNGO) {
-      return res.status(404).json({ message: "NGO not found" });
+    if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
+        return res.status(403).json({ 
+            success: false, 
+            message: "Forbidden: Identity mismatch." 
+        });
     }
 
-    res.status(200).json({
-      success: true,
-      message: "NGO profile updated successfully.",
-      ngo: updatedNGO,
-    });
-  } catch (error) {
-    error.message = "Failed to update profile due to a server error.";
-    next(error);
-  }
+    const { fullname, phone, bank, accnum, ifsc, darpan } = req.body;
+
+    try {
+        
+        const updatedNGO = await NGO.findOneAndUpdate(
+            { ngoId: ngoID }, 
+            {
+                $set: {
+                    Ngoname: fullname,
+                    darpan_id: darpan,
+                    phone: phone,
+                    account_holder_name: bank,
+                    account_number: accnum,
+                    ifsc: ifsc,
+                }
+            },
+            { new: true, runValidators: true } 
+        );
+
+        if (!updatedNGO) {
+            const err = new Error("NGO profile not found.");
+            err.statusCode = 404;
+            return next(err);
+        }
+
+        
+        res.status(200).json({
+            success: true,
+            message: "NGO profile updated successfully.",
+            ngo: updatedNGO,
+        });
+
+    } catch (error) {
+       
+        error.message = "Failed to update profile due to a server error.";
+        next(error);
+    }
 }
 
 async function createEvent(req, res) {
