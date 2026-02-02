@@ -93,8 +93,6 @@ async function login(req, res, next) {
     user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); 
     await user.save();
 
-    await sendOTPEmail(user.email, otp);
-
     return res.status(200).json({
       success: true,
       twoFactorRequired: true,
@@ -234,7 +232,7 @@ async function checkAuth(req, res, next) {
     }
 
     let fullUser = null;
-
+    
     if (role === "NGO") {
         fullUser = await NGO.findOne({ ngoId: id }).lean();
     } else if (role === "Donor") {
@@ -249,7 +247,7 @@ async function checkAuth(req, res, next) {
 
     return res.status(200).json({
       success: true,
-      user: fullUser, 
+      user: fullUser ? fullUser : { email: req.user.email, name: "Admin" }, 
       role: role,
     });
   } catch (error) {
