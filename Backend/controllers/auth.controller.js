@@ -69,7 +69,8 @@ async function login(req, res) {
         return res.status(200).json({
           success: true,
           role: "Admin",
-          redirect: "/admin-dashboard",
+          user: { name: "System Admin", email: email }, // Added for context
+          redirect: "/admin-dashboard", // Clean redirect path
         });
       }
 
@@ -150,7 +151,6 @@ async function verifyOTP(req, res) {
         ? plainUser.carehomeId
         : plainUser.userId;
 
-    // Added name and email to the token so the frontend/middleware can access them easily
     const token = jwt.sign(
       { 
         id: userId, 
@@ -229,7 +229,6 @@ async function forgotPassword(req, res) {
   }
 }
 
-// Updated checkAuth to perform a quick DB lookup to ensure data freshness
 async function checkAuth(req, res) {
   try {
     const { id, role } = req.user;
@@ -249,7 +248,7 @@ async function checkAuth(req, res) {
 
     return res.status(200).json({
       success: true,
-      user: fullUser || { email: req.user.email }, 
+      user: fullUser || { email: req.user.email, name: "Admin" }, 
       role: role,
     });
   } catch (error) {

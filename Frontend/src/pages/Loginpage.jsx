@@ -62,8 +62,16 @@ function Loginpage() {
           setTempAuthData({ email: data.email, role: formData.userRole });
           setShowOtp(true);
         } else {
+          const userRole = data.role;
           login({ ...data.user, role: data.role });
-          navigate(data.redirect);
+          // navigate(data.redirect);
+          if (userRole === "Admin") {
+            navigate("/admin-dashboard"); 
+        }
+        else {
+            // Standard dynamic pathing for other roles
+            navigate(data.redirect || "/");
+        }
         }
       } else {
         setError(data.message || "Login failed.");

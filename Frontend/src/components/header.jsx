@@ -24,7 +24,7 @@ const Header = ({ navItems = [] }) => {
         dashboardPath = `/carehome-dashboard/${auth.user.carehomeId}`;
         break;
       case "Admin":
-        dashboardPath = `/admin-dashboard/${auth.user.userId}`;
+        dashboardPath = "/admin-dashboard";
         break;
       default:
         break;
