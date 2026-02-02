@@ -2,14 +2,13 @@ const { NGO, Event } = require("../models/NGO.model");
 
 async function getLandingPage(req, res, next) {
   try {
-    
-    // throw new Error("hi i am karthik"); 
     const ongoing_fund = await NGO.ongoing_fund();
     const upcoming_eve = await Event.upcoming_eve();
 
     res.status(200).json({ ongoing_fund, upcoming_eve });
   } catch (error) {
-    error.message = "Could not load the latest updates. Please refresh the page.";
+    error.message =
+      "Could not load the latest updates. Please refresh the page.";
     next(error);
   }
 }
@@ -66,7 +65,7 @@ async function getNGO(req, res) {
       model.getname(ngoID, (err, data) => {
         if (err) {
           console.error("Error fetching name:", err);
-          resolve("Unknown NGO"); 
+          resolve("Unknown NGO");
         } else {
           resolve(data);
         }
@@ -85,7 +84,7 @@ async function getNGO(req, res) {
     });
   } catch (error) {
     console.error("Error in getNGO controller:", error);
-    error.message = "An error occurred while loading the dashboard"
+    error.message = "An error occurred while loading the dashboard";
     next(error);
   }
 }

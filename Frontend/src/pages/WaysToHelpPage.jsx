@@ -11,7 +11,7 @@ return (
   <Header navItems={headerConfig.landing} /> 
 
  <div className="help-container">
-   <h2 className="help-heading"> Ways to Help CareConnect</h2>
+   <h2 className="help-heading"> Ways to Contribute</h2>
    <div className="help-grid">
      <div className="help-card help-card--items">
        <h5 className="help-title"> Donate Items</h5>

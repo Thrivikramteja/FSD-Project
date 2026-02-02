@@ -7,25 +7,19 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import Carousel from "../components/carousel";
 import FAQ from "../components/faq";
-import DonationTicker from '../pages/DonationTicker';
+import DonationTicker from "../pages/DonationTicker";
 
-import '../styles/landing_page.css'
+import "../styles/landing_page.css";
 import { headerConfig } from "../config/headerConfig";
 
 export default function LandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [tickerData, setTickerData] = useState([]);
-  const [error, setError] = useState(null);
-
-  const ngos = useSelector((state) => state.entities.ngos);
-  const events = useSelector((state) => state.entities.events);
 
   useEffect(() => {
-    // Existing Redux dispatch
     dispatch(fetchLandingData());
 
-    // Ticker fetch
     const fetchTicker = async () => {
       try {
         const response = await fetch("http://localhost:3000/ticker-data");
@@ -57,43 +51,69 @@ export default function LandingPage() {
   return (
     <div>
       <Header navItems={headerConfig.landing} />
-      
+
       <Carousel />
 
       <main>
-        <section className="preview-section">
-          <h2
-            className="clickable-heading"
-            onClick={() => navigate("/discover")}
-          >
-            NGOs
-          </h2>
+        <section className="how-it-works-section">
+          <div className="section-container">
+            <div className="section-header">
+              <h2 className="section-title">Making a Difference Together</h2>
+              <p className="section-subtitle">
+                A unified platform connecting those who can give with those in
+                need.
+              </p>
+            </div>
 
-          <div className="preview-list">
-            {ngos.slice(0, 4).map((ngo) => (
-              <div key={ngo._id} className="preview-card">
-                <h4>{ngo.name}</h4>
-                <p>{ngo.location}</p>
+            <div className="features-grid">
+              <div className="feature-card">
+                <div className="icon-wrapper donor-icon">🤝</div>
+                <h3>For Donors</h3>
+                <p>
+                  Easily browse verified NGOs and Carehomes. Donate food,
+                  clothes, or funds directly to specific causes and track your
+                  impact in real-time.
+                </p>
+                <button
+                  className="feature-link"
+                  onClick={() => navigate("/ways-to-help")}
+                >
+                  Start Giving →
+                </button>
               </div>
-            ))}
-          </div>
-        </section>
 
-        <section className="preview-section">
-          <h2
-            className="clickable-heading"
-            onClick={() => navigate("/discover")}
-          >
-            Carehomes
-          </h2>
-
-          <div className="preview-list">
-            {events.slice(0, 4).map((ev) => (
-              <div key={ev._id} className="preview-card">
-                <h4>{ev.event_name}</h4>
-                <p>{new Date(ev.event_date).toDateString()}</p>
+              <div className="feature-card">
+                <div className="icon-wrapper ngo-icon">🏢</div>
+                <h3>For NGOs</h3>
+                <p>
+                  Manage your fundraisers and event management in one place.
+                  Connect with a community of donors and streamline your
+                  distribution process.
+                </p>
+                <button
+                  className="feature-link"
+                  onClick={() => navigate("/signup")}
+                >
+                  Partner with Us →
+                </button>
               </div>
-            ))}
+
+              <div className="feature-card">
+                <div className="icon-wrapper home-icon">🏠</div>
+                <h3>For Care Homes</h3>
+                <p>
+                  Post essential requirements and job opportunities for
+                  caregivers. Get the support your residents need from a network
+                  of verified providers.
+                </p>
+                <button
+                  className="feature-link"
+                  onClick={() => navigate("/signup")}
+                >
+                  Join the Network →
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
