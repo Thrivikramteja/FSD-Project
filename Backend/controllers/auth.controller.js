@@ -9,7 +9,7 @@ const { generateOTP, sendOTPEmail } = require("../services/otpService");
 
 // Admin Credentials
 const ADMIN_EMAIL = "chinnikarthik22@gmail.com";
-const ADMIN_PASS = "wbd_3";
+const ADMIN_PASS = "123456";
 
 async function signup(req, res, next) {
   const { fullname, mail, password, phone, checkbox } = req.body;
@@ -92,6 +92,8 @@ async function login(req, res, next) {
     user.otpCode = otp;
     user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); 
     await user.save();
+
+    await sendOTPEmail(user.email, otp);
 
     return res.status(200).json({
       success: true,

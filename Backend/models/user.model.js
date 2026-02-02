@@ -6,20 +6,17 @@ const donorSchema = new mongoose.Schema({
   userId: { type: Number, unique: true },
   name: {
     type: String,
-    required: true,
   },
   email: {
     type: String,
-    required: true,
+
     unique: true,
   },
   password: {
     type: String,
-    required: true,
   },
   mobile_number: {
     type: String,
-    required: true,
   },
   receive_notifications: {
     type: Boolean,
@@ -77,74 +74,66 @@ const userRegisteredEventsSchema = new mongoose.Schema({
   // ADD THIS ONE FIELD
   eventObjectId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Event', 
+    ref: "Event",
     required: true,
-  }
+  },
 });
-
 
 donorSchema.statics.participatedEvents = async function (userId) {
   const currentDate = new Date();
-  
+
   const events = await UserRegisteredEvent.aggregate([
     // Match user's registrations
     { $match: { userId: userId } },
-    
+
     // Lookup current event data using eventObjectId
     {
       $lookup: {
-        from: 'events', // Your events collection name
-        localField: 'eventObjectId',
-        foreignField: '_id',
-        as: 'eventData'
-      }
+        from: "events", // Your events collection name
+        localField: "eventObjectId",
+        foreignField: "_id",
+        as: "eventData",
+      },
     },
-    
-    
-    { $unwind: '$eventData' },
-    
-    
+
+    { $unwind: "$eventData" },
+
     {
       $match: {
-        'eventData.event_date': { $lt: currentDate }
-      }
-    }
+        "eventData.event_date": { $lt: currentDate },
+      },
+    },
   ]);
-  
+
   return events;
 };
 
 donorSchema.statics.upcomingEvents = async function (userId) {
   const currentDate = new Date();
-  
+
   const upcoming = await UserRegisteredEvent.aggregate([
-    
     { $match: { userId: userId } },
-    
-    
+
     {
       $lookup: {
-        from: 'events', 
-        localField: 'eventObjectId',
-        foreignField: '_id',
-        as: 'eventData'
-      }
+        from: "events",
+        localField: "eventObjectId",
+        foreignField: "_id",
+        as: "eventData",
+      },
     },
-    
-    
-    { $unwind: '$eventData' },
-    
-    
+
+    { $unwind: "$eventData" },
+
     {
       $match: {
-        'eventData.event_date': { $gt: currentDate }
-      }
-    }
+        "eventData.event_date": { $gt: currentDate },
+      },
+    },
   ]);
-  
+
   return upcoming;
 };
-
 
 const userContributedFundraisersSchema = new mongoose.Schema({
   userId: {
@@ -174,17 +163,16 @@ const userContributedFundraisersSchema = new mongoose.Schema({
 
   fundraiserObjectId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CreatedFundraiser',
+    ref: "CreatedFundraiser",
     required: true,
-  }
+  },
 });
 
-donorSchema.statics.contributedFundraisers = async function (userId) 
-{
+donorSchema.statics.contributedFundraisers = async function (userId) {
   const currentDate = new Date();
   const fundraisers = await UserContributedFundraiser.find({
     userId: userId,
-    deadline: {$lt: currentDate},
+    deadline: { $lt: currentDate },
   }).sort({ contributed_at: -1 });
   return fundraisers;
 };
@@ -219,11 +207,11 @@ const createdFundraisersSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  imagePath: {  
+  imagePath: {
     type: String,
-    required: true, 
+    required: true,
   },
-    tag: {
+  tag: {
     type: String,
     enum: [
       "Health",
@@ -241,57 +229,57 @@ const createdFundraisersSchema = new mongoose.Schema({
 const donate_it_message = new mongoose.Schema({
   carehomeId: {
     type: Number,
-    required: true
+    required: true,
   },
   userId: {
     type: Number,
-    required: true
+    required: true,
   },
   category: {
     type: String,
-    required: true
+    required: true,
   },
   delivery_date: {
     type: Date,
-    required: true
+    required: true,
   },
   location: {
     type: String,
-    required: true
+    required: true,
   },
   description: {
     type: String,
-  }
+  },
 });
 
 const accept_or_rejct = new mongoose.Schema({
   carehomeId: {
     type: Number,
-    require: true
+    require: true,
   },
   userId: {
     type: Number,
-    require: true
+    require: true,
   },
   message: {
     type: String,
-    reuiqre: true
+    reuiqre: true,
   },
   category: {
     type: String,
-    require: true
+    require: true,
   },
-  delivery:{
+  delivery: {
     type: Date,
-    require: true
+    require: true,
   },
   when_date: {
     type: Date,
-    require: true
-  }
+    require: true,
+  },
 });
 
-accept_or_rejct.statics.get_newmessages = async function(userId) {
+accept_or_rejct.statics.get_newmessages = async function (userId) {
   const messages = await user_message
     .find({ userId: userId })
     .sort({ when_date: -1 }) // Sort by `when_date` in descending order
@@ -303,7 +291,7 @@ donorSchema.statics.ongoingfund = async function (userId) {
   const currentDate = new Date();
   const fundraisers = await UserContributedFundraiser.find({
     userId: userId,
-    deadline: {$gte: currentDate},
+    deadline: { $gte: currentDate },
   });
   return fundraisers;
 };
@@ -322,15 +310,9 @@ const UserContributedFundraiser = mongoose.model(
   userContributedFundraisersSchema
 );
 
-const donate_items_mes = mongoose.model(
-  "donate_items_mes",
-  donate_it_message
-);
+const donate_items_mes = mongoose.model("donate_items_mes", donate_it_message);
 
-const user_message = mongoose.model(
-  "user_message",
-  accept_or_rejct
-);
+const user_message = mongoose.model("user_message", accept_or_rejct);
 
 module.exports = {
   User,
@@ -338,5 +320,5 @@ module.exports = {
   UserContributedFundraiser,
   UserRegisteredEvent,
   donate_items_mes,
-  user_message
+  user_message,
 };
