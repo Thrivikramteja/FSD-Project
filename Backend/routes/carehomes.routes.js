@@ -37,7 +37,10 @@ router.post(
 router.get("/api/carehomes", carehomesController.getCareHomesApi);
 router.get("/api/jobs", carehomesController.get_alljobs);
 // Add this to carehomes.routes.js
-router.get("/api/carehomes/viewcare/:carehomeId", carehomesController.getCarehomePublic);
+router.get(
+  "/api/carehomes/viewcare/:carehomeId",
+  carehomesController.getCarehomePublic
+);
 
 router.post(
   "/api/registerCarehome",
@@ -45,16 +48,53 @@ router.post(
   carehomesController.registerCarehome
 );
 
-router.post('/carehome-dashboard/post-job',authenticate,authorizeRoles("Carehome"), carehomesController.post_createjob);
+router.post(
+  "/carehome-dashboard/post-job",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.post_createjob
+);
 
-router.post('/donate_items_user',  authenticate,
-  authorizeRoles("Donor"), carehomesController.get_don_items);
+router.post(
+  "/donate_items_user",
+  authenticate,
+  authorizeRoles("Donor"),
+  carehomesController.get_don_items
+);
 
- router.post('/donate_item/action',authenticate,
-  authorizeRoles("Carehome"), carehomesController.accpet_item_doantions);
+router.post(
+  "/donate_item/action",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.accpet_item_doantions
+);
 
-  router.get('/api/carehome/my-jobs',authenticate,
-  authorizeRoles("Carehome"),carehomesController.getCareHome_Jobs);
+router.get(
+  "/api/carehome/my-jobs",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.getCareHome_Jobs
+);
 
-  router.get('/api/carehome/jobs/:jobId/applicants', authenticate, authorizeRoles("Carehome"),  carehomesController.getJobApplicants);
+router.get(
+  "/api/carehome/jobs/:jobId/applicants",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.getJobApplicants
+);
+
+router.patch(
+  "/api/applications/:id/reject",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.rejectApplication
+);
+
+router.patch(
+  "/api/applications/:id/accept",
+  authenticate,
+  authorizeRoles("Carehome"),
+  carehomesController.acceptApplication
+);
+
 module.exports = router;

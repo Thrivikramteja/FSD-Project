@@ -4,6 +4,14 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.notification {
+  background-color: #dcfce7; 
+  color: #166534;            
+  padding: 1rem;             
+  border-radius: 6px;        
+  font-family: sans-serif;   
+}
+
 .dashboardHeader {
     text-align: center;
     padding: 40px 20px;

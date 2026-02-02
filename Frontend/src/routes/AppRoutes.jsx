@@ -14,7 +14,7 @@ import CarehomeDashboard from "../pages/CarehomeDashboard";
 import EditProfile from "../pages/EditProfileCarehome";
 import CreateJob from "../pages/createJob";
 // import OrphanageDashboard from "../pages/OrphanageDashboard";
-// import AdminDashboard from "../pages/AdminDashboard";
+import AdminDashboard from "../pages/AdminDashboard";
 import AllCarehomes from "../pages/AllCarehomes";
 import AllNgos from "../pages/AllNgos";
 import AllEvents from "../pages/AllEvents";
@@ -105,18 +105,17 @@ const AppRoutes = () => {
 
       <Route path="/carehome-dashboard/get-job" element={<CreateJob />} />
 
-      {/*
       <Route
         path="/admin-dashboard"
         element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["Admin"]}> 
             <AdminDashboard />
           </ProtectedRoute>
         }
-      />*/}
+      />
 
       {/* Fallback route */}
-      {/* <Route path="*" element={<LandingPage />} /> */}
+      <Route path="*" element={<ErrorFace message="Page not found" />} />
     </Routes>
   );
 };

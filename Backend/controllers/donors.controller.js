@@ -1,9 +1,4 @@
-const path = require('path');
-
-const {
-  DonationMoney,
-  donate_items
-} = require("../models/carehome.model"); 
+const { DonationMoney, donate_items } = require("../models/carehome.model");
 
 const {
   User,
@@ -13,9 +8,7 @@ const {
   user_message,
 } = require("../models/user.model");
 
-
 const Application = require("../models/Application");
-const { CareHomeJob, Carehome } = require("../models/carehome.model");
 
 async function getdonor(req, res) {
   const user_ID = parseInt(req.params.userId, 10);
@@ -28,7 +21,7 @@ async function getdonor(req, res) {
     const upcomingEvents = await User.upcomingEvents(user_ID);
     const recentMessages = await user_message.get_newmessages(user_ID);
 
-    res.render("users/user_dashboard",{
+    res.render("users/user_dashboard", {
       name: name || "Donor",
       participatedEvents: participatedEvents || [],
       contributedFundraisers: contributedFundraisers || [],
@@ -36,11 +29,12 @@ async function getdonor(req, res) {
       upcomingEvents: upcomingEvents || [],
       user: req.session.user,
       recentMessages: recentMessages,
-      userRole: userRole
+      userRole: userRole,
     });
   } catch (error) {
     console.error("Error occurred while fetching user dashboard data:", error);
-    error.message = "An error occurred while loading the dashboard. Please try again later."
+    error.message =
+      "An error occurred while loading the dashboard. Please try again later.";
     next(error);
   }
 }
@@ -92,11 +86,14 @@ async function contributed_fund(req, res) {
       return res.status(401).json({ message: "Authentication required" });
     }
 
-    const userId = req.user.id; 
+    const userId = req.user.id;
     console.log("JWT User ID contributing: " + userId);
 
     const deadline = await get_deadline(ngoId, fundraiser_name);
-    const fundraiser = await CreatedFundraiser.findOne({ ngoId, fundraiser_name });
+    const fundraiser = await CreatedFundraiser.findOne({
+      ngoId,
+      fundraiser_name,
+    });
 
     if (!fundraiser) {
       return res.status(404).json({ message: "Fundraiser not found" });
@@ -109,7 +106,7 @@ async function contributed_fund(req, res) {
       amount_contributed: amount_contributed,
       contributed_at: new Date(),
       deadline: deadline,
-      fundraiserObjectId: fundraiser._id
+      fundraiserObjectId: fundraiser._id,
     });
 
     await newContribution.save();
@@ -120,8 +117,9 @@ async function contributed_fund(req, res) {
       { new: true }
     );
 
-    res.status(200).json({ success: true, message: "Contribution recorded successfully" });
-
+    res
+      .status(200)
+      .json({ success: true, message: "Contribution recorded successfully" });
   } catch (error) {
     console.error("Error in contributed_fund:", error);
     error.message = "An error occurred while processing the contribution.";
@@ -147,12 +145,9 @@ async function getEditDonorProfile(req, res) {
   }
 }
 
-
 async function editDonorProfile(req, res) {
   const { fullname, phone, mail } = req.body;
   const userId = parseInt(req.params.userId, 10);
-
-
 
   try {
     const updatedUser = await User.findOneAndUpdate(
@@ -161,13 +156,11 @@ async function editDonorProfile(req, res) {
       { new: true }
     );
 
-
     res.status(200).json({
       success: true,
       message: "Donor profile updated successfully.",
-      user: updatedUser
+      user: updatedUser,
     });
-
   } catch (error) {
     console.error("Error updating donor profile:", error);
     error.message = "Failed to update profile due to a server error.";
@@ -175,22 +168,24 @@ async function editDonorProfile(req, res) {
   }
 }
 
-async function getUserActivity (req, res) {
+async function getUserActivity(req, res) {
   try {
     const userId = Number(req.params.userId);
 
-    const eventsParticipated = await UserRegisteredEvent.find({ userId })
-      .populate("eventObjectId");
+    const eventsParticipated = await UserRegisteredEvent.find({
+      userId,
+    }).populate("eventObjectId");
 
     const eventsUpcoming = eventsParticipated.filter(
-      evt => new Date(evt.event_date) > new Date()
+      (evt) => new Date(evt.event_date) > new Date()
     );
     const already = eventsParticipated.filter(
-      evt => new Date(evt.event_date) < new Date
+      (evt) => new Date(evt.event_date) < new Date()
     );
 
-    const fundraisersContributed = await UserContributedFundraiser.find({ userId })
-      .populate("fundraiserObjectId"); 
+    const fundraisersContributed = await UserContributedFundraiser.find({
+      userId,
+    }).populate("fundraiserObjectId");
 
     const donationsMoney = await DonationMoney.find({ userId });
 
@@ -203,47 +198,51 @@ async function getUserActivity (req, res) {
         events_upcoming: eventsUpcoming,
         fundraisers_contributed: fundraisersContributed,
         donations_money: donationsMoney,
-        donations_items: donationsItems
-      }
+        donations_items: donationsItems,
+      },
     });
-
   } catch (error) {
     console.error(error);
     error.message = "Server error";
     next(error);
   }
-};
+}
 
 async function getTickerData(req, res) {
   try {
-  
     const recentMoney = await DonationMoney.find()
       .sort({ donated_at: -1 })
       .limit(4)
       .lean();
 
-  
     const recentFundraiser = await UserContributedFundraiser.find()
       .sort({ contributed_at: -1 })
       .limit(4)
       .lean();
 
- 
     const combineData = async (list, type) => {
-      return Promise.all(list.map(async (item) => {
-        const user = await User.findOne({ userId: item.userId }).lean();
-        return {
-          name: user ? user.name : "Anonymous",
-          amount: type === 'money' ? item.amount_donated : item.amount_contributed,
-          date: type === 'money' ? item.donated_at : item.contributed_at
-        };
-      }));
+      return Promise.all(
+        list.map(async (item) => {
+          const user = await User.findOne({ userId: item.userId }).lean();
+          return {
+            name: user ? user.name : "Anonymous",
+            amount:
+              type === "money" ? item.amount_donated : item.amount_contributed,
+            date: type === "money" ? item.donated_at : item.contributed_at,
+          };
+        })
+      );
     };
 
-    const moneyFormatted = await combineData(recentMoney, 'money');
-    const fundraiserFormatted = await combineData(recentFundraiser, 'fundraiser');
+    const moneyFormatted = await combineData(recentMoney, "money");
+    const fundraiserFormatted = await combineData(
+      recentFundraiser,
+      "fundraiser"
+    );
 
-    const tickerData = [...moneyFormatted, ...fundraiserFormatted].sort((a, b) => b.date - a.date);
+    const tickerData = [...moneyFormatted, ...fundraiserFormatted].sort(
+      (a, b) => b.date - a.date
+    );
 
     res.status(200).json({ success: true, data: tickerData });
   } catch (error) {
@@ -253,34 +252,31 @@ async function getTickerData(req, res) {
   }
 }
 
-
-
 async function getUserApplications(req, res) {
   try {
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
     const applications = await Application.find({ userId: userId })
       .populate({
-       
-        path: 'jobId', 
-        model: 'CareHomeJob', 
-        select: 'title type pay'
+        path: "jobId",
+        model: "CareHomeJob",
+        select: "title type pay",
       })
       .populate({
-        path: 'carehomeId',
-        model: 'Carehome', 
-        select: 'name location'
+        path: "carehomeId",
+        model: "Carehome",
+        select: "name location",
       })
       .sort({ appliedAt: -1 })
       .lean();
 
     res.status(200).json({
       success: true,
-      applications: applications
+      applications: applications,
     });
   } catch (error) {
     console.error("Error fetching user applications:", error);
-    error.message =  "Server error";
+    error.message = "Server error";
     next(error);
   }
 }
@@ -292,5 +288,5 @@ module.exports = {
   contributed_fund,
   getUserActivity,
   getTickerData,
-  getUserApplications
+  getUserApplications,
 };
