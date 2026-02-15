@@ -25,6 +25,7 @@ import DonorRegistration from "../pages/DonorRegistration";
 import ViewCare from "../pages/ViewCare";
 import ErrorFace from "../components/ErrorFace";
 import NGOEditDetails from "../pages/NGOEditDetails"; // Import your new modular component
+import NGOProfile from "../pages/NGOProfile";
 
 const AppRoutes = () => {
   return (
@@ -64,6 +65,8 @@ const AppRoutes = () => {
         path="/NGO-dashboard/:ngoID/edit" 
         element={<NGOEditDetails />} 
       />
+
+      <Route path="/ngo-profile/:id" element={<NGOProfile />} />
 
       {/* Protected Routes */}
       <Route

@@ -81,5 +81,7 @@ router.get('/api/events', NGOController.getEvents);
 
 router.post('/registerUser/:ngoID',authenticate,authorizeRoles("Donor"), NGOController.registerUser);
 
+router.get('/api/NGOs/profile/:id',NGOController.getNGOProfileDetails);
+
 
 module.exports = router;
