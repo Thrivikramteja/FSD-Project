@@ -14,7 +14,7 @@ export default function DonorDashboard() {
   const [user, setUser] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [activity, setActivity] = useState(null);
-  const [applications, setApplications] = useState([]); // New state for jobs
+  const [applications, setApplications] = useState([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -49,7 +49,7 @@ export default function DonorDashboard() {
   useEffect(() => {
     if (!user) return;
 
-    // Fetch general activity
+    // Fetch user activity (Donations, Events, etc.)
     fetch(`http://localhost:3000/api/activity/${user.userId}`, {
       credentials: "include",
     })
@@ -59,9 +59,9 @@ export default function DonorDashboard() {
           setActivity(data.data);
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error("Activity Fetch Error:", err));
 
-    // NEW: Fetch job applications
+    // Fetch job applications
     fetch(`http://localhost:3000/my-applications`, {
       credentials: "include",
     })
@@ -71,7 +71,7 @@ export default function DonorDashboard() {
           setApplications(data.applications);
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error("Applications Fetch Error:", err));
   }, [user]);
 
   if (auth.loading || !user) {
@@ -112,7 +112,7 @@ export default function DonorDashboard() {
         <div className={styles.dashboardLayout}>
           <div className={styles.activityColumn}>
             
-            {/* NEW: Job Applications Section */}
+            {/* Job Applications */}
             <section className={styles.contentSection}>
               <h2 className={styles.sectionTitle}>My Job Applications</h2>
               <div className={styles.cardGrid}>
@@ -120,12 +120,12 @@ export default function DonorDashboard() {
                   applications.map((app) => (
                     <div key={app._id} className={styles.dataCard}>
                       <div className={styles.appHeader}>
-                        <h4>{app.jobId?.title || "Deleted Position"}</h4>
-                        <span className={`${styles.statusBadge} ${styles[app.status.toLowerCase()]}`}>
+                        <h4>{app.jobId?.title || "Position Unavailable"}</h4>
+                        <span className={`${styles.statusBadge} ${styles[app.status?.toLowerCase()]}`}>
                           {app.status}
                         </span>
                       </div>
-                      <p><strong>Carehome:</strong> {app.carehomeName}</p>
+                      <p><strong>Carehome:</strong> {app.carehomeId?.name || "Care Home"}</p>
                       <p>Applied: {new Date(app.appliedAt).toLocaleDateString()}</p>
                     </div>
                   ))
@@ -133,61 +133,16 @@ export default function DonorDashboard() {
               </div>
             </section>
 
-            {/* Events Participated */}
-            <section className={styles.contentSection}>
-              <h2 className={styles.sectionTitle}>Events Participated</h2>
-              <div className={styles.cardGrid}>
-                {activity?.events_participated?.length > 0 ? (
-                  activity.events_participated.map((evt) => (
-                    <div key={evt._id} className={styles.dataCard}>
-                      <h4>{evt.event_name}</h4>
-                      <p>Date: {new Date(evt.event_date).toDateString()}</p>
-                      <p>Location: {evt.event_location}</p>
-                    </div>
-                  ))
-                ) : <p className={styles.noData}>No participated events.</p>}
-              </div>
-            </section>
-
-            {/* Upcoming Events */}
-            <section className={styles.contentSection}>
-              <h2 className={styles.sectionTitle}>Upcoming Events</h2>
-              <div className={styles.cardGrid}>
-                {activity?.events_upcoming?.length > 0 ? (
-                  activity.events_upcoming.map((evt) => (
-                    <div key={evt._id} className={styles.dataCard}>
-                      <h4>{evt.event_name}</h4>
-                      <p>Date: {new Date(evt.event_date).toDateString()}</p>
-                      <p>Location: {evt.event_location}</p>
-                    </div>
-                  ))
-                ) : <p className={styles.noData}>No upcoming events.</p>}
-              </div>
-            </section>
-
-            {/* Contributed Fundraisers */}
-            <section className={styles.contentSection}>
-              <h2 className={styles.sectionTitle}>Contributed Fundraisers</h2>
-              <div className={styles.cardGrid}>
-                {activity?.fundraisers_contributed?.length > 0 ? (
-                  activity.fundraisers_contributed.map((f) => (
-                    <div key={f._id} className={styles.dataCard}>
-                      <h4>{f.fundraiser_name}</h4>
-                      <p>Amount: ₹{f.amount_contributed}</p>
-                      <p>Deadline: {new Date(f.deadline).toDateString()}</p>
-                    </div>
-                  ))
-                ) : <p className={styles.noData}>No fundraiser contributions.</p>}
-              </div>
-            </section>
-
-            {/* Money Donations */}
+            {/* Money Donations - Cleaned up (No Images) */}
             <section className={styles.contentSection}>
               <h2 className={styles.sectionTitle}>Money Donations</h2>
               <div className={styles.cardGrid}>
                 {activity?.donations_money?.length > 0 ? (
                   activity.donations_money.map((d) => (
                     <div key={d._id} className={styles.dataCard}>
+                      <h4 style={{ color: '#2c3e50', marginBottom: '8px' }}>
+                        {d.carehomeDetails?.care_home_name || "Care Home"}
+                      </h4>
                       <p className={styles.highlightText}>Amount: ₹{d.amount_donated}</p>
                       <p>Date: {new Date(d.donated_at).toDateString()}</p>
                     </div>
@@ -203,13 +158,32 @@ export default function DonorDashboard() {
                 {activity?.donations_items?.length > 0 ? (
                   activity.donations_items.map((item) => (
                     <div key={item._id} className={styles.dataCard}>
-                      <h4>{item.category}</h4>
+                      <h4 style={{ color: '#27ae60', marginBottom: '8px' }}>
+                        {item.carehomeDetails?.care_home_name || "Care Home"}
+                      </h4>
+                      <p><strong>Category:</strong> {item.category}</p>
                       <p>Description: {item.description || "No description"}</p>
                       <p>Delivery: {new Date(item.delivery).toDateString()}</p>
                       <p>Location: {item.location}</p>
                     </div>
                   ))
                 ) : <p className={styles.noData}>No item donations yet.</p>}
+              </div>
+            </section>
+
+            {/* Events Participated */}
+            <section className={styles.contentSection}>
+              <h2 className={styles.sectionTitle}>Events Participated</h2>
+              <div className={styles.cardGrid}>
+                {activity?.events_participated?.length > 0 ? (
+                  activity.events_participated.map((evt) => (
+                    <div key={evt._id} className={styles.dataCard}>
+                      <h4>{evt.eventObjectId?.event_name || evt.event_name}</h4>
+                      <p>Date: {new Date(evt.eventObjectId?.event_date || evt.event_date).toDateString()}</p>
+                      <p>Location: {evt.eventObjectId?.event_location || evt.event_location}</p>
+                    </div>
+                  ))
+                ) : <p className={styles.noData}>No participated events.</p>}
               </div>
             </section>
           </div>

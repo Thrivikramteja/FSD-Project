@@ -1,4 +1,6 @@
-const { DonationMoney, donate_items } = require("../models/carehome.model");
+// const { DonationMoney, donate_items } = require("../models/carehome.model");
+const { Carehome, DonationMoney, donate_items } = require("../models/carehome.model");
+
 
 const {
   User,
@@ -168,43 +170,90 @@ async function editDonorProfile(req, res) {
   }
 }
 
-async function getUserActivity(req, res) {
+// async function getUserActivity(req, res) {
+//   try {
+//     const userId = Number(req.params.userId);
+
+//     const eventsParticipated = await UserRegisteredEvent.find({
+//       userId,
+//     }).populate("eventObjectId");
+
+//     const eventsUpcoming = eventsParticipated.filter(
+//       (evt) => new Date(evt.event_date) > new Date()
+//     );
+//     const already = eventsParticipated.filter(
+//       (evt) => new Date(evt.event_date) < new Date()
+//     );
+
+//     const fundraisersContributed = await UserContributedFundraiser.find({
+//       userId,
+//     }).populate("fundraiserObjectId");
+
+//     const donationsMoney = await DonationMoney.find({ userId });
+
+//     const donationsItems = await donate_items.find({ userId });
+
+//     return res.status(200).json({
+//       success: true,
+//       data: {
+//         events_participated: already,
+//         events_upcoming: eventsUpcoming,
+//         fundraisers_contributed: fundraisersContributed,
+//         donations_money: donationsMoney,
+//         donations_items: donationsItems,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     error.message = "Server error";
+//     next(error);
+//   }
+// }
+
+async function getUserActivity(req, res, next) {
   try {
-    const userId = Number(req.params.userId);
+    const userIdParam = req.params.userId;
+    // Fix: Handles both the long string ObjectId from the URL and numeric IDs
+    const userId = isNaN(userIdParam) ? userIdParam : Number(userIdParam);
 
-    const eventsParticipated = await UserRegisteredEvent.find({
-      userId,
-    }).populate("eventObjectId");
+    // Parallel fetch using .lean() so we can modify the objects
+    const [eventsParticipated, fundraisersContributed, donationsMoney, donationsItems] = await Promise.all([
+      UserRegisteredEvent.find({ userId }).populate("eventObjectId"),
+      UserContributedFundraiser.find({ userId }).populate("fundraiserObjectId"),
+      DonationMoney.find({ userId }).lean(),
+      donate_items.find({ userId }).lean()
+    ]);
 
-    const eventsUpcoming = eventsParticipated.filter(
-      (evt) => new Date(evt.event_date) > new Date()
-    );
-    const already = eventsParticipated.filter(
-      (evt) => new Date(evt.event_date) < new Date()
-    );
+    // Manual join helper to attach Care Home metadata
+    const attachCareHomeDetails = async (donations) => {
+      return Promise.all(
+        donations.map(async (don) => {
+          const carehome = await Carehome.findOne({ carehomeId: don.carehomeId })
+            .select("care_home_name imagePath city")
+            .lean();
+          return { 
+            ...don, 
+            carehomeDetails: carehome || { care_home_name: "Care Home Details Unavailable" } 
+          };
+        })
+      );
+    };
 
-    const fundraisersContributed = await UserContributedFundraiser.find({
-      userId,
-    }).populate("fundraiserObjectId");
-
-    const donationsMoney = await DonationMoney.find({ userId });
-
-    const donationsItems = await donate_items.find({ userId });
+    const enrichedMoney = await attachCareHomeDetails(donationsMoney);
+    const enrichedItems = await attachCareHomeDetails(donationsItems);
 
     return res.status(200).json({
       success: true,
       data: {
-        events_participated: already,
-        events_upcoming: eventsUpcoming,
+        events_participated: eventsParticipated.filter(evt => new Date(evt.event_date) < new Date()),
+        events_upcoming: eventsParticipated.filter(evt => new Date(evt.event_date) > new Date()),
         fundraisers_contributed: fundraisersContributed,
-        donations_money: donationsMoney,
-        donations_items: donationsItems,
+        donations_money: enrichedMoney, // Now contains Name & Image
+        donations_items: enrichedItems,
       },
     });
   } catch (error) {
-    console.error(error);
-    error.message = "Server error";
-    next(error);
+    next(error); // Sends error to your global handler in app.js
   }
 }
 
