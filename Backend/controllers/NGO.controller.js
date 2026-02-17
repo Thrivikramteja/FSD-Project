@@ -43,9 +43,10 @@ async function get_allngo(req, res) {
   }
 }
 
-async function register(req, res) {
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+async function register(req, res, next) {
   try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    
     const ngo = new NGO({
       Ngoname: req.body.Ngoname,
       darpan_id: req.body.darpan_id,
@@ -66,8 +67,10 @@ async function register(req, res) {
       message: "NGO Registration successful",
     });
   } catch (error) {
-    error.message = "Failed to register NGO"
-    nextTick(error);
+    console.log(error);
+ 
+    error.message = "Failed to register NGO"; 
+    next(error); 
   }
 }
 
@@ -570,6 +573,58 @@ async function renderEditEvent(req, res) {
   }
 }
 
+//ngo profile
+// controller function
+// controllers/ngoController.js
+
+const getNGOProfileDetails = async (req, res) => {
+    const { id } = req.params; 
+
+    try {
+      
+        const ngo = await NGO.findOne({ ngoId: parseInt(id) }).lean();
+        if (!ngo) return res.status(404).json({ success: false, message: "NGO not found" });
+
+        const [rawFundraisers, events] = await Promise.all([
+            CreatedFundraiser.find({ ngoId: parseInt(id) }).sort({ deadline: -1 }).lean(),
+            Event.find({ ngoId: parseInt(id) }).sort({ event_date: 1 }).lean()
+        ]);
+
+    
+        const carehomeIds = [...new Set(rawFundraisers.map(f => f.carehomeId))];
+        const carehomes = await Carehome.find({ carehomeId: { $in: carehomeIds } }, 'carehomeId name').lean();
+        
+        const fundraisers = rawFundraisers.map(f => {
+            const home = carehomes.find(c => c.carehomeId === f.carehomeId);
+            return { ...f, carehomeName: home ? home.name : "Beneficiary Care Home" };
+        });
+
+        const now = new Date();
+
+
+        const activeFundraisers = fundraisers.filter(f => new Date(f.deadline) >= now);
+        const pastFundraisers = fundraisers.filter(f => new Date(f.deadline) < now);
+
+        const upcomingEvents = events.filter(e => new Date(e.event_date) >= now);
+        const pastEvents = events.filter(e => new Date(e.event_date) < now);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                ngo,
+                activeFundraisers,
+                pastFundraisers,
+                upcomingEvents,
+                pastEvents
+            }
+        });
+
+    } catch (error) {
+        console.error("NGO Profile Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 module.exports = {
   getRegister,
   register,
@@ -588,4 +643,5 @@ module.exports = {
   registerUser,
   getallFundraisers,
   render_donate_fundraiser,
+  getNGOProfileDetails,
 };
