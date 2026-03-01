@@ -38,15 +38,15 @@ async function get_allngo(req, res) {
 
     res.json(enrichedNGOs);
   } catch (err) {
-    err.message = "Failed to fetch NGOs"
-    nextTick(err)
+    err.message = "Failed to fetch NGOs";
+    nextTick(err);
   }
 }
 
 async function register(req, res, next) {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    
+
     const ngo = new NGO({
       Ngoname: req.body.Ngoname,
       darpan_id: req.body.darpan_id,
@@ -68,45 +68,43 @@ async function register(req, res, next) {
     });
   } catch (error) {
     console.log(error);
- 
-    error.message = "Failed to register NGO"; 
-    next(error); 
+
+    error.message = "Failed to register NGO";
+    next(error);
   }
 }
 
-
 async function getEditNGOProfile(req, res, next) {
-    const ngoID = req.params.ngoID; 
-    console.log("hi myy name is ngo " + ngoID);
-    // 1. THE DRILL: Force string comparison to avoid type mismatch
-    if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
-        return res.status(403).json({ 
-            success: false, 
-            message: "Forbidden: Identity mismatch." 
-        });
+  const ngoID = req.params.ngoID;
+  console.log("hi myy name is ngo " + ngoID);
+  // 1. THE DRILL: Force string comparison to avoid type mismatch
+  if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
+    return res.status(403).json({
+      success: false,
+      message: "Forbidden: Identity mismatch.",
+    });
+  }
+
+  try {
+    const ngoArray = await NGO.getNGOById(ngoID);
+    console.log("hi i am from controller " + ngoArray);
+
+    const ngo = ngoArray && ngoArray.length > 0 ? ngoArray[0] : null;
+
+    if (!ngo) {
+      const err = new Error("NGO profile not found.");
+      err.statusCode = 404;
+      return next(err);
     }
 
-    try {
-        const ngoArray = await NGO.getNGOById(ngoID);
-        console.log("hi i am from controller " + ngoArray);
-
-        const ngo = ngoArray && ngoArray.length > 0 ? ngoArray[0] : null;
-        
-        if (!ngo) {
-            const err = new Error("NGO profile not found.");
-            err.statusCode = 404;
-            return next(err);
-        }
-
-        res.status(200).json({
-            success: true,
-            ngo: ngo 
-        });
-
-    } catch (error) {
-        error.message = "Secure data retrieval failed.";
-        next(error); 
-    }
+    res.status(200).json({
+      success: true,
+      ngo: ngo,
+    });
+  } catch (error) {
+    error.message = "Secure data retrieval failed.";
+    next(error);
+  }
 }
 
 async function getEvents(req, res) {
@@ -117,7 +115,7 @@ async function getEvents(req, res) {
 
     res.json(events);
   } catch (error) {
-    error.message = "Failed to load events"
+    error.message = "Failed to load events";
     nextTick(error);
   }
 }
@@ -150,7 +148,7 @@ async function getFundraisers(req, res) {
       userRole: req.user.role,
     });
   } catch (error) {
-    error.message = "Failed to load fundraisers"
+    error.message = "Failed to load fundraisers";
     next(error);
   }
 }
@@ -177,56 +175,50 @@ async function getallFundraisers(req, res) {
   }
 }
 
-
 async function editNGOProfile(req, res, next) {
-    
-    const ngoID = req.params.ngoID;
-    console.log(req.user.id);
+  const ngoID = req.params.ngoID;
+  console.log(req.user.id);
 
-    if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
-        return res.status(403).json({ 
-            success: false, 
-            message: "Forbidden: Identity mismatch." 
-        });
+  if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
+    return res.status(403).json({
+      success: false,
+      message: "Forbidden: Identity mismatch.",
+    });
+  }
+
+  const { fullname, phone, bank, accnum, ifsc, darpan } = req.body;
+
+  try {
+    const updatedNGO = await NGO.findOneAndUpdate(
+      { ngoId: ngoID },
+      {
+        $set: {
+          Ngoname: fullname,
+          darpan_id: darpan,
+          phone: phone,
+          account_holder_name: bank,
+          account_number: accnum,
+          ifsc: ifsc,
+        },
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedNGO) {
+      const err = new Error("NGO profile not found.");
+      err.statusCode = 404;
+      return next(err);
     }
 
-    const { fullname, phone, bank, accnum, ifsc, darpan } = req.body;
-
-    try {
-        
-        const updatedNGO = await NGO.findOneAndUpdate(
-            { ngoId: ngoID }, 
-            {
-                $set: {
-                    Ngoname: fullname,
-                    darpan_id: darpan,
-                    phone: phone,
-                    account_holder_name: bank,
-                    account_number: accnum,
-                    ifsc: ifsc,
-                }
-            },
-            { new: true, runValidators: true } 
-        );
-
-        if (!updatedNGO) {
-            const err = new Error("NGO profile not found.");
-            err.statusCode = 404;
-            return next(err);
-        }
-
-        
-        res.status(200).json({
-            success: true,
-            message: "NGO profile updated successfully.",
-            ngo: updatedNGO,
-        });
-
-    } catch (error) {
-       
-        error.message = "Failed to update profile due to a server error.";
-        next(error);
-    }
+    res.status(200).json({
+      success: true,
+      message: "NGO profile updated successfully.",
+      ngo: updatedNGO,
+    });
+  } catch (error) {
+    error.message = "Failed to update profile due to a server error.";
+    next(error);
+  }
 }
 
 async function createEvent(req, res) {
@@ -321,7 +313,7 @@ async function createFundraiser(req, res) {
       fundraiserId: newFundraiser._id,
     });
   } catch (error) {
-    error.message  = "Failed to create fundraiser";
+    error.message = "Failed to create fundraiser";
     next(error);
   }
 }
@@ -385,8 +377,8 @@ async function registerUser(req, res) {
       .status(200)
       .json({ message: "Registration successful!", success: true });
   } catch (error) {
-   error.message =  "Internal server error."
-   next(error);
+    error.message = "Internal server error.";
+    next(error);
   }
 }
 
@@ -506,7 +498,7 @@ async function getNGO(req, res) {
       userRole: req.user.role,
     });
   } catch (error) {
-    error.message = "An error occurred while loading the dashboard"
+    error.message = "An error occurred while loading the dashboard";
     next(error);
   }
 }
@@ -573,58 +565,123 @@ async function renderEditEvent(req, res) {
   }
 }
 
-//ngo profile
-// controller function
-// controllers/ngoController.js
-
 const getNGOProfileDetails = async (req, res) => {
-    const { id } = req.params; 
+  const { id } = req.params;
 
-    try {
-      
-        const ngo = await NGO.findOne({ ngoId: parseInt(id) }).lean();
-        if (!ngo) return res.status(404).json({ success: false, message: "NGO not found" });
+  try {
+    const ngo = await NGO.findOne({ ngoId: parseInt(id) }).lean();
+    if (!ngo)
+      return res.status(404).json({ success: false, message: "NGO not found" });
 
-        const [rawFundraisers, events] = await Promise.all([
-            CreatedFundraiser.find({ ngoId: parseInt(id) }).sort({ deadline: -1 }).lean(),
-            Event.find({ ngoId: parseInt(id) }).sort({ event_date: 1 }).lean()
-        ]);
+    const [rawFundraisers, events] = await Promise.all([
+      CreatedFundraiser.find({ ngoId: parseInt(id) })
+        .sort({ deadline: -1 })
+        .lean(),
+      Event.find({ ngoId: parseInt(id) })
+        .sort({ event_date: 1 })
+        .lean(),
+    ]);
 
-    
-        const carehomeIds = [...new Set(rawFundraisers.map(f => f.carehomeId))];
-        const carehomes = await Carehome.find({ carehomeId: { $in: carehomeIds } }, 'carehomeId name').lean();
-        
-        const fundraisers = rawFundraisers.map(f => {
-            const home = carehomes.find(c => c.carehomeId === f.carehomeId);
-            return { ...f, carehomeName: home ? home.name : "Beneficiary Care Home" };
-        });
+    const carehomeIds = [...new Set(rawFundraisers.map((f) => f.carehomeId))];
+    const carehomes = await Carehome.find(
+      { carehomeId: { $in: carehomeIds } },
+      "carehomeId name"
+    ).lean();
 
-        const now = new Date();
+    const fundraisers = rawFundraisers.map((f) => {
+      const home = carehomes.find((c) => c.carehomeId === f.carehomeId);
+      return { ...f, carehomeName: home ? home.name : "Beneficiary Care Home" };
+    });
 
+    const now = new Date();
 
-        const activeFundraisers = fundraisers.filter(f => new Date(f.deadline) >= now);
-        const pastFundraisers = fundraisers.filter(f => new Date(f.deadline) < now);
+    const activeFundraisers = fundraisers.filter(
+      (f) => new Date(f.deadline) >= now
+    );
+    const pastFundraisers = fundraisers.filter(
+      (f) => new Date(f.deadline) < now
+    );
 
-        const upcomingEvents = events.filter(e => new Date(e.event_date) >= now);
-        const pastEvents = events.filter(e => new Date(e.event_date) < now);
+    const upcomingEvents = events.filter((e) => new Date(e.event_date) >= now);
+    const pastEvents = events.filter((e) => new Date(e.event_date) < now);
 
-        res.status(200).json({
-            success: true,
-            data: {
-                ngo,
-                activeFundraisers,
-                pastFundraisers,
-                upcomingEvents,
-                pastEvents
-            }
-        });
-
-    } catch (error) {
-        console.error("NGO Profile Error:", error);
-        res.status(500).json({ success: false, message: "Server Error" });
-    }
+    res.status(200).json({
+      success: true,
+      data: {
+        ngo,
+        activeFundraisers,
+        pastFundraisers,
+        upcomingEvents,
+        pastEvents,
+      },
+    });
+  } catch (error) {
+    console.error("NGO Profile Error:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 };
 
+// controllers/ngoController.js
+
+async function getCampaignDetails(req, res, next) {
+  const { ngoID, type, id } = req.params;
+
+  // Safeguard: Block requests with 'undefined' identifiers
+  if (!id || id === 'undefined' || !ngoID || ngoID === 'undefined') {
+    return res.status(400).json({ success: false, message: "Invalid ID parameters." });
+  }
+
+  // Security: Identity Mismatch Check
+  if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
+    return res.status(403).json({ success: false, message: "Forbidden: Identity mismatch." });
+  }
+
+  try {
+    let details = {};
+    let participantsList = [];
+
+    if (type === "fundraiser") {
+      const fundraiser = await CreatedFundraiser.findOne({ _id: id, ngoId: parseInt(ngoID) });
+      if (!fundraiser) return res.status(404).json({ success: false, message: "Fundraiser not found" });
+
+      details = {
+        name: fundraiser.fundraiser_name,
+        description: fundraiser.description,
+        totalRaised: fundraiser.amount_raised_so_far || 0,
+        status: new Date(fundraiser.deadline) >= new Date() ? "Active" : "Completed",
+      };
+      // Once you have a Donation model, you would populate participantsList here similarly.
+
+    } else if (type === "event") {
+      const event = await Event.findOne({ _id: id, ngoId: parseInt(ngoID) });
+      if (!event) return res.status(404).json({ success: false, message: "Event not found" });
+
+      // CRITICAL: Populate 'userId' to get Name and Email
+      const registrations = await UserRegisteredEvent.find({ eventObjectId: id })
+        .populate("userId", "name email") 
+        .lean();
+
+      details = {
+        name: event.event_name,
+        description: event.description,
+        participantCount: event.number_of_registrations || 0,
+        status: new Date(event.event_date) >= new Date() ? "Upcoming" : "Completed",
+      };
+
+      // Map the populated data correctly for the frontend
+      participantsList = registrations.map((reg) => ({
+        userName: reg.userId ? reg.userId.name : "Unknown User",
+        userEmail: reg.userId ? reg.userId.email : "N/A",
+        timestamp: reg.createdAt || reg.event_date,
+      }));
+    }
+
+    res.status(200).json({ success: true, ...details, list: participantsList });
+  } catch (error) {
+    console.error("Fetch Details Error:", error);
+    next(error);
+  }
+}
 module.exports = {
   getRegister,
   register,
@@ -644,4 +701,5 @@ module.exports = {
   getallFundraisers,
   render_donate_fundraiser,
   getNGOProfileDetails,
+  getCampaignDetails
 };
