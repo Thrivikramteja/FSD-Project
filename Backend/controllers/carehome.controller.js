@@ -13,7 +13,7 @@ const {
   sendRejectedEmail,
 } = require("../services/otpService");
 
-async function getCareHomesApi(req, res) {
+async function getCareHomesApi(req, res,next) {
   try {
     const carehomes = await Carehome.getCareHomes();
     res.json(carehomes);
@@ -23,7 +23,7 @@ async function getCareHomesApi(req, res) {
   }
 }
 
-async function donateMoney(req, res) {
+async function donateMoney(req, res,next) {
   try {
     const carehomes = await Carehome.getCareHomes();
     const selectedCareHomeId = req.query.carehome_id || null;
@@ -40,7 +40,7 @@ async function donateMoney(req, res) {
   }
 }
 
-async function insertMoney(req, res) {
+async function insertMoney(req, res,next) {
   try {
     const total = parseFloat(req.body.total);
 
@@ -75,7 +75,7 @@ async function insertMoney(req, res) {
   }
 }
 
-async function register(req, res) {
+async function register(req, res,next) {
   res.render("carehomes/care_reg");
 }
 
@@ -151,7 +151,7 @@ async function acceptApplication(req, res, next) {
   }
 }
 
-async function donateItems(req, res) {
+async function donateItems(req, res,next) {
   try {
     const carehomes = await Carehome.getCareHomes();
     res.render("carehomes/donate_items", {
@@ -165,7 +165,7 @@ async function donateItems(req, res) {
   }
 }
 
-async function get_don_items(req, res) {
+async function get_don_items(req, res,next) {
   try {
     if (!req.user || req.user.role !== "Donor") {
       return res.status(403).json({
@@ -209,7 +209,7 @@ async function get_don_items(req, res) {
   }
 }
 
-async function registerCarehome(req, res) {
+async function registerCarehome(req, res,next) {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
   let imagePath = null;
@@ -248,7 +248,7 @@ async function registerCarehome(req, res) {
   }
 }
 
-async function getCarehome(req, res) {
+async function getCarehome(req, res,next) {
   const careid = parseInt(req.params.carehomeId, 10);
 
   if (req.user.role !== "Carehome" || req.user.id !== careid) {
@@ -284,7 +284,7 @@ async function getCarehome(req, res) {
   }
 }
 
-async function accpet_item_doantions(req, res) {
+async function accpet_item_doantions(req, res,next) {
   try {
     // Safety Check: Identity & Role
     if (
@@ -347,7 +347,7 @@ async function accpet_item_doantions(req, res) {
     next(err);
   }
 }
-async function editCarehomeProfile(req, res) {
+async function editCarehomeProfile(req, res,next) {
   const careId = parseInt(req.params.carehomeId, 10);
 
   if (req.user.role !== "Carehome" || req.user.id !== careId) {
@@ -402,7 +402,7 @@ async function editCarehomeProfile(req, res) {
   }
 }
 
-async function getCarehomeProfile(req, res) {
+async function getCarehomeProfile(req, res,next) {
   const careId = parseInt(req.params.carehomeId, 10);
 
   if (req.user.role !== "Carehome" || req.user.id !== careId) {
@@ -432,7 +432,7 @@ async function getMongoIdFromNumericId(numericId) {
   return carehome ? carehome._id : null;
 }
 
-async function post_createjob(req, res) {
+async function post_createjob(req, res,next) {
   try {
     if (!req.user || req.user.role !== "Carehome") {
       return res.status(403).json({
@@ -487,21 +487,26 @@ async function post_createjob(req, res) {
   }
 }
 
-async function get_alljobs(req, res) {
+async function get_alljobs(req, res,next) {
   try {
-    const jobs = await CareHomeJob.find().sort({ createdAt: -1 });
+    const jobs = await CareHomeJob.find()
+      .populate("postedBy", "care_home_name city state")
+      .sort({ createdAt: -1 });
+
     res.json({
       success: true,
       jobs,
     });
   } catch (err) {
+    console.error(err);
     err.message = "Server error";
     next(err);
   }
 }
 
+
 // Add this to carehome.controller.js
-async function getCarehomePublic(req, res) {
+async function getCarehomePublic(req, res,next) {
   try {
     const careId = parseInt(req.params.carehomeId, 10);
     // Find by the numeric carehomeId
@@ -527,7 +532,7 @@ async function getMongoIdFromNumericId(numericId) {
   return carehome ? carehome._id : null;
 }
 
-async function getCareHome_Jobs(req, res) {
+async function getCareHome_Jobs(req, res,next) {
   try {
     // 1. Verify Authentication
     if (!req.user || req.user.role !== "Carehome") {
@@ -559,7 +564,7 @@ async function getCareHome_Jobs(req, res) {
   }
 }
 
-async function getJobApplicants(req, res) {
+async function getJobApplicants(req, res,next) {
   try {
     const { jobId } = req.params;
 
@@ -599,6 +604,32 @@ async function getJobApplicants(req, res) {
     next(error);
   }
 }
+async function getMyApplications(req, res, next) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false });
+    }
+
+    const userId = req.user.id;
+
+    const applications = await Application.find({ userId })
+      .populate("jobId", "title")
+      .populate("carehomeId", "care_home_name carehomeId")
+      .sort({ appliedAt: -1 });
+
+    const formatted = applications.map((app) => ({
+      ...app.toObject(),
+      carehomeName: app.carehomeId?.care_home_name || "Unknown",
+    }));
+
+    res.json({
+      success: true,
+      applications: formatted,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
 
 module.exports = {
   donateMoney,
@@ -619,4 +650,5 @@ module.exports = {
   getCarehomePublic,
   rejectApplication,
   acceptApplication,
+  getMyApplications,
 };

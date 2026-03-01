@@ -41,6 +41,13 @@ router.get(
   "/api/carehomes/viewcare/:carehomeId",
   carehomesController.getCarehomePublic
 );
+router.get(
+  "/my-applications",
+  authenticate,
+  authorizeRoles("Donor"),
+  carehomesController.getMyApplications
+);
+
 
 router.post(
   "/api/registerCarehome",

@@ -257,7 +257,7 @@ async function getUserActivity(req, res, next) {
   }
 }
 
-async function getTickerData(req, res) {
+async function getTickerData(req, res,next) {
   try {
     const recentMoney = await DonationMoney.find()
       .sort({ donated_at: -1 })
@@ -312,10 +312,10 @@ async function getUserApplications(req, res) {
         select: "title type pay",
       })
       .populate({
-        path: "carehomeId",
-        model: "Carehome",
-        select: "name location",
-      })
+  path: "carehomeId",
+  model: "Carehome",
+  select: "care_home_name city state",
+})
       .sort({ appliedAt: -1 })
       .lean();
 
