@@ -22,6 +22,25 @@ export default function DonorDashboard() {
     phone: "",
   });
 
+  // --- ADDED FETCH FUNCTION ---
+  const downloadReceipt = async (type, id) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/receipts/${type}/${id}`, {
+        credentials: "include",
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `CareConnect_${type}_Receipt.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Download Error:", err);
+    }
+  };
+
   useEffect(() => {
     if (auth.loading) return;
 
@@ -49,7 +68,6 @@ export default function DonorDashboard() {
   useEffect(() => {
     if (!user) return;
 
-    // Fetch user activity (Donations, Events, etc.)
     fetch(`http://localhost:3000/api/activity/${user.userId}`, {
       credentials: "include",
     })
@@ -61,7 +79,6 @@ export default function DonorDashboard() {
       })
       .catch((err) => console.error("Activity Fetch Error:", err));
 
-    // Fetch job applications
     fetch(`http://localhost:3000/my-applications`, {
       credentials: "include",
     })
@@ -133,7 +150,7 @@ export default function DonorDashboard() {
               </div>
             </section>
 
-            {/* Money Donations - Cleaned up (No Images) */}
+            {/* Money Donations */}
             <section className={styles.contentSection}>
               <h2 className={styles.sectionTitle}>Money Donations</h2>
               <div className={styles.cardGrid}>
@@ -145,6 +162,8 @@ export default function DonorDashboard() {
                       </h4>
                       <p className={styles.highlightText}>Amount: ₹{d.amount_donated}</p>
                       <p>Date: {new Date(d.donated_at).toDateString()}</p>
+                      {/* ADDED BUTTON */}
+                      <button className={styles.receiptBtn} onClick={() => downloadReceipt('direct', d._id)}>Download Receipt</button>
                     </div>
                   ))
                 ) : <p className={styles.noData}>No money donations yet.</p>}
@@ -181,6 +200,8 @@ export default function DonorDashboard() {
                       <h4>{evt.eventObjectId?.event_name || evt.event_name}</h4>
                       <p>Date: {new Date(evt.eventObjectId?.event_date || evt.event_date).toDateString()}</p>
                       <p>Location: {evt.eventObjectId?.event_location || evt.event_location}</p>
+                      {/* ADDED BUTTON */}
+                      <button className={styles.receiptBtn} onClick={() => downloadReceipt('event', evt._id)}>Download Certificate</button>
                     </div>
                   ))
                 ) : <p className={styles.noData}>No participated events.</p>}

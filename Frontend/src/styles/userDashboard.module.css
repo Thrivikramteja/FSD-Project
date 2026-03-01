@@ -227,6 +227,25 @@
   border: 1px solid #c7d2fe;
 }
 
+.receiptBtn {
+  margin-top: 15px;
+  background: #f0fdf4;
+  color: #1b4332;
+  border: 1px solid #1b4332;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+}
+
+.receiptBtn:hover {
+  background: #1b4332;
+  color: #fff;
+}
+
 @media (max-width: 1024px) {
   .dashboardLayout {
     grid-template-columns: 1fr;

@@ -5,6 +5,8 @@ const donorsController = require("../controllers/donors.controller");
 
 const applicationcontroller = require('../controllers/application.controller');
 
+const receiptcontroller = require('../controllers/receipt.controller');
+
 const authenticate = require("../middlewares/auth.middleware");
 const authorizeRoles = require("../middlewares/role.middleware");
 
@@ -42,5 +44,7 @@ router.get(
 router.get('/ticker-data', donorsController.getTickerData);
 
 router.get('/my-applications', authenticate,authorizeRoles("Donor"), donorsController.getUserApplications);
+
+router.get('/api/receipts/:type/:id',authenticate,authorizeRoles("Donor"),  receiptcontroller.downloadImpactReceipt);
 
 module.exports = router;
