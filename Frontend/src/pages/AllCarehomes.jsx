@@ -121,20 +121,36 @@ const AllCarehomes = () => {
                       : "No description available."}
                   </p>
 
-                  <div className="carehome-buttons">
+                  {/* <div className="carehome-buttons">
                     <Link
-                      to={`/carehomes/viewcare/${carehome.carehomeId}`}
-                      className="carehome-details-btn"
-                    >
-                      View Details
-                    </Link>
+  to={`/carehomes/viewcare/${carehome._id}`}
+  className="carehome-details-btn"
+>
+  View Details
+</Link>
 
-                    <Link
-                      to={`/donate-funds?carehome_id=${carehome.carehomeId}`}
-                      className="carehome-donate-btn"
-                    >
-                      Donate
-                    </Link>
+<Link
+  to={`/donate-funds?carehome_id=${carehome._id}`}
+  className="carehome-donate-btn"
+>
+  Donate
+</Link> */}
+<div className="carehome-buttons">
+  <Link
+    to={`/carehomes/viewcare/${carehome.carehomeId}`}
+    className="carehome-details-btn"
+  >
+    View Details
+  </Link>
+
+  <Link
+    to={`/donate-funds?carehome_id=${carehome.carehomeId}`}
+    className="carehome-donate-btn"
+  >
+    Donate
+  </Link>
+
+
                   </div>
                 </div>
               </div>

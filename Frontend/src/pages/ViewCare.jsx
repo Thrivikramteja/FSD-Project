@@ -13,8 +13,8 @@ const ViewCare = () => {
   const navItems = [
     { label: "Home", path: "/" },
     { label: "Discover", path: "/discover" },
-    { label: "Login", path: "/login" },
-    { label: "Sign Up", path: "/signup" }
+    // { label: "Login", path: "/login" },
+    // { label: "Sign Up", path: "/signup" }
   ];
 
   useEffect(() => {

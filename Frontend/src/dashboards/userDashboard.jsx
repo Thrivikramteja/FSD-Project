@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { headerConfig } from "../config/headerConfig";
@@ -125,7 +125,18 @@ export default function DonorDashboard() {
                           {app.status}
                         </span>
                       </div>
-                      <p><strong>Carehome:</strong> {app.carehomeName}</p>
+                     <p>
+  <strong>Carehome:</strong>{" "}
+  <Link 
+    to={`/carehomes/viewcare/${app.carehomeId?.carehomeId}`}
+    style={{ color: "#2f855a", fontWeight: "600" }}
+  >
+    {app.carehomeName}
+  </Link>
+</p>
+
+
+
                       <p>Applied: {new Date(app.appliedAt).toLocaleDateString()}</p>
                     </div>
                   ))

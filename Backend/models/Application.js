@@ -3,10 +3,11 @@ const mongoose = require('mongoose');
 const applicationSchema = new mongoose.Schema({
   // Reference to the Job (still hosted in your Carehome file/model)
   jobId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Job', // Ensure your Job model is registered as 'Job'
-    required: true 
-  },
+  type: mongoose.Schema.Types.ObjectId, 
+  ref: 'CareHomeJob',
+  required: true 
+},
+
   
   // Reference to the Donor
 // models/Application.js
