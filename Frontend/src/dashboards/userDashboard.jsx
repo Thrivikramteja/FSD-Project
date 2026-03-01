@@ -181,7 +181,42 @@ export default function DonorDashboard() {
               </div>
             </section>
 
-            {/* Item Donations */}
+
+            <section className={styles.contentSection}>
+              <h2 className={styles.sectionTitle}>Fundraiser Contributions</h2>
+              <div className={styles.cardGrid}>
+                {activity?.contributedFundraisers?.length > 0 ? (
+                  activity.contributedFundraisers.map((fund) => (
+                    <div key={fund._id} className={styles.dataCard}>
+                      <div className={styles.appHeader}>
+                        <h4 style={{ color: '#1e293b' }}>{fund.fundraiser_name}</h4>
+                        <span className={`${styles.statusBadge} ${styles.completed}`}>Fundraiser</span>
+                      </div>
+                      
+
+                      <p><strong>NGO:</strong> {fund.ngoName || "Partner NGO"}</p>
+                      
+                      <p className={styles.highlightText}>
+                        Contributed: ₹{fund.amount_contributed}
+                      </p>
+                      
+                      <p>Date: {new Date(fund.contributed_at).toLocaleDateString()}</p>
+                      
+                      <button 
+                        className={styles.receiptBtn} 
+                        onClick={() => downloadReceipt('fundraiser', fund._id)}
+                      >
+                        Download Receipt
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className={styles.noData}>No fundraiser contributions yet.</p>
+                )}
+              </div>
+            </section>
+
+
             <section className={styles.contentSection}>
               <h2 className={styles.sectionTitle}>Item Donations</h2>
               <div className={styles.cardGrid}>

@@ -169,10 +169,8 @@ const userContributedFundraisersSchema = new mongoose.Schema({
 });
 
 donorSchema.statics.contributedFundraisers = async function (userId) {
-  const currentDate = new Date();
   const fundraisers = await UserContributedFundraiser.find({
     userId: userId,
-    deadline: { $lt: currentDate },
   }).sort({ contributed_at: -1 });
   return fundraisers;
 };
