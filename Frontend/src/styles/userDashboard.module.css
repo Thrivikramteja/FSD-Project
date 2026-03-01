@@ -246,6 +246,12 @@
   color: #fff;
 }
 
+.fundraiserBadge {
+    background-color: #e0f2fe;
+    color: #0369a1; 
+    border: 1px solid #bae6fd;
+}
+
 @media (max-width: 1024px) {
   .dashboardLayout {
     grid-template-columns: 1fr;

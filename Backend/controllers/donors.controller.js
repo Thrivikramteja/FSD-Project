@@ -1,7 +1,5 @@
-// const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { Carehome, DonationMoney, donate_items } = require("../models/carehome.model");
-
-
+const { NGO } = require('../models/NGO.model');
 const {
   User,
   UserRegisteredEvent,
@@ -44,19 +42,20 @@ async function getdonor(req, res) {
 async function get_deadline(ngoId, fundraiser_name) {
   try {
     const fundraiser = await CreatedFundraiser.findOne(
-      { ngoId: ngoId, fundraiser_name: fundraiser_name },
-      { deadline: 1, _id: 0 }
+      { 
+        ngoId: Number(ngoId), 
+        fundraiser_name: fundraiser_name,
+      },
+      { deadline: 1, _id: 1 } 
     );
 
     if (!fundraiser) {
-      throw new Error("Fundraiser not found");
+      throw new Error(`Lookup Failed: No fundraiser named "${fundraiser_name}" for NGO ID ${ngoId}`);
     }
 
-    return fundraiser.deadline; // Return the deadline
+    return fundraiser.deadline; 
   } catch (error) {
-    console.error("Error fetching deadline:", error);
-    error.message = "error while fetching deadline";
-    next(error);
+    throw error; 
   }
 }
 
@@ -78,7 +77,7 @@ async function get_carehomeid(ngoId, fundraiser_name) {
   }
 }
 
-async function contributed_fund(req, res) {
+async function contributed_fund(req, res,next) {
   try {
     const ngoId = req.params.ngoId;
     const fundraiser_name = req.params.fundraiser_name;
@@ -170,70 +169,42 @@ async function editDonorProfile(req, res) {
   }
 }
 
-// async function getUserActivity(req, res) {
-//   try {
-//     const userId = Number(req.params.userId);
 
-//     const eventsParticipated = await UserRegisteredEvent.find({
-//       userId,
-//     }).populate("eventObjectId");
-
-//     const eventsUpcoming = eventsParticipated.filter(
-//       (evt) => new Date(evt.event_date) > new Date()
-//     );
-//     const already = eventsParticipated.filter(
-//       (evt) => new Date(evt.event_date) < new Date()
-//     );
-
-//     const fundraisersContributed = await UserContributedFundraiser.find({
-//       userId,
-//     }).populate("fundraiserObjectId");
-
-//     const donationsMoney = await DonationMoney.find({ userId });
-
-//     const donationsItems = await donate_items.find({ userId });
-
-//     return res.status(200).json({
-//       success: true,
-//       data: {
-//         events_participated: already,
-//         events_upcoming: eventsUpcoming,
-//         fundraisers_contributed: fundraisersContributed,
-//         donations_money: donationsMoney,
-//         donations_items: donationsItems,
-//       },
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     error.message = "Server error";
-//     next(error);
-//   }
-// }
 
 async function getUserActivity(req, res, next) {
   try {
     const userIdParam = req.params.userId;
-    // Fix: Handles both the long string ObjectId from the URL and numeric IDs
     const userId = isNaN(userIdParam) ? userIdParam : Number(userIdParam);
 
-    // Parallel fetch using .lean() so we can modify the objects
     const [eventsParticipated, fundraisersContributed, donationsMoney, donationsItems] = await Promise.all([
-      UserRegisteredEvent.find({ userId }).populate("eventObjectId"),
-      UserContributedFundraiser.find({ userId }).populate("fundraiserObjectId"),
+      UserRegisteredEvent.find({ userId }).populate("eventObjectId").lean(),
+      UserContributedFundraiser.find({ userId }).lean(),
       DonationMoney.find({ userId }).lean(),
       donate_items.find({ userId }).lean()
     ]);
 
-    // Manual join helper to attach Care Home metadata
+    // 1. HELPER: Attach Care Home metadata for Direct/Item donations
     const attachCareHomeDetails = async (donations) => {
       return Promise.all(
         donations.map(async (don) => {
           const carehome = await Carehome.findOne({ carehomeId: don.carehomeId })
-            .select("care_home_name imagePath city")
+            .select("care_home_name imagePath")
             .lean();
           return { 
             ...don, 
-            carehomeDetails: carehome || { care_home_name: "Care Home Details Unavailable" } 
+            carehomeDetails: carehome || { care_home_name: "Care Home Unavailable" } 
+          };
+        })
+      );
+    };
+
+    const enrichWithNGOName = async (items) => {
+      return Promise.all(
+        items.map(async (item) => {
+          const ngo = await NGO.findOne({ ngoId: item.ngoId }).select("Ngoname").lean();
+          return {
+            ...item,
+            ngoName: ngo ? ngo.Ngoname : "Partner NGO"
           };
         })
       );
@@ -241,19 +212,21 @@ async function getUserActivity(req, res, next) {
 
     const enrichedMoney = await attachCareHomeDetails(donationsMoney);
     const enrichedItems = await attachCareHomeDetails(donationsItems);
+    const enrichedFundraisers = await enrichWithNGOName(fundraisersContributed);
+    const enrichedEvents = await enrichWithNGOName(eventsParticipated);
 
     return res.status(200).json({
       success: true,
       data: {
-        events_participated: eventsParticipated.filter(evt => new Date(evt.event_date) < new Date()),
-        events_upcoming: eventsParticipated.filter(evt => new Date(evt.event_date) > new Date()),
-        fundraisers_contributed: fundraisersContributed,
-        donations_money: enrichedMoney, // Now contains Name & Image
+        events_participated: enrichedEvents.filter(evt => new Date(evt.event_date) < new Date()),
+        events_upcoming: enrichedEvents.filter(evt => new Date(evt.event_date) > new Date()),
+        contributedFundraisers: enrichedFundraisers, 
+        donations_money: enrichedMoney,
         donations_items: enrichedItems,
       },
     });
   } catch (error) {
-    next(error); // Sends error to your global handler in app.js
+    next(error); 
   }
 }
 
