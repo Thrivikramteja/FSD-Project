@@ -7,19 +7,20 @@ import styles from "../styles/CarehomeDashboard.module.css";
 const CarehomeDashboard = () => {
   const { careid } = useParams();
   const [data, setData] = useState(null);
-  const [jobs, setJobs] = useState([]); // List of job cards
-  const [selectedJobId, setSelectedJobId] = useState(null); // Tracks drill-down view
-  const [applicants, setApplicants] = useState([]); // Applicants for selected job
+  const [jobs, setJobs] = useState([]);
+  const [selectedJobId, setSelectedJobId] = useState(null);
+  const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // --- NEW STATE: For the Item Request Pop-up ---
+  const [selectedMsg, setSelectedMsg] = useState(null);
 
   const fetchData = async () => {
     try {
-      // Fetch main dashboard data
       const dashRes = await fetch(
         `http://localhost:3000/api/carehome-dashboard/${careid}`,
         { credentials: "include" }
       );
-      // Fetch jobs for this carehome
       const jobsRes = await fetch(
         `http://localhost:3000/api/carehome/my-jobs`,
         { credentials: "include" }
@@ -42,7 +43,6 @@ const CarehomeDashboard = () => {
     fetchData();
   }, [careid]);
 
-  // Handles the transition to view applicants for a specific job
   const handleViewApplicants = async (jobId) => {
     try {
       const response = await fetch(
@@ -63,7 +63,6 @@ const CarehomeDashboard = () => {
     setApplicants((prev) =>
       prev.map((a) => (a._id === app._id ? { ...a, status: "Accepted" } : a))
     );
-
     await fetch(`http://localhost:3000/api/applications/${app._id}/accept`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -75,7 +74,6 @@ const CarehomeDashboard = () => {
     setApplicants((prev) =>
       prev.map((a) => (a._id === app._id ? { ...a, status: "Rejected" } : a))
     );
-
     await fetch(`http://localhost:3000/api/applications/${app._id}/reject`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -100,11 +98,8 @@ const CarehomeDashboard = () => {
         }),
       });
       if (response.ok) {
-        alert(
-          `Request ${
-            action === "accept" ? "approved" : "declined"
-          } successfully`
-        );
+        alert(`Request ${action === "accept" ? "approved" : "declined"} successfully`);
+        setSelectedMsg(null); // Close modal on success
         fetchData();
       }
     } catch (error) {
@@ -112,14 +107,41 @@ const CarehomeDashboard = () => {
     }
   };
 
-  if (loading)
-    return <div className={styles.loader}>Loading Premium Dashboard...</div>;
-  if (!data)
-    return <div className={styles.error}>No dashboard data found.</div>;
+  if (loading) return <div className={styles.loader}>Loading Premium Dashboard...</div>;
+  if (!data) return <div className={styles.error}>No dashboard data found.</div>;
 
   return (
     <div className={styles.pageWrapper}>
       <CareHeader careid={careid} />
+
+      {/* --- ITEM REQUEST MODAL (Only shows when selectedMsg is not null) --- */}
+      {selectedMsg && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedMsg(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Donation Request Details</h3>
+              <button className={styles.closeBtn} onClick={() => setSelectedMsg(null)}>×</button>
+            </div>
+            <div className={styles.modalBody}>
+              <p><strong>Category:</strong> {selectedMsg.category}</p>
+              <p><strong>Location:</strong> {selectedMsg.location}</p>
+              <p><strong>Delivery Date:</strong> {selectedMsg.delivery_date || "Not Specified"}</p>
+              <div className={styles.modalDescriptionBox}>
+                 <strong>Description:</strong>
+                 <p>{selectedMsg.description}</p>
+              </div>
+            </div>
+            <div className={styles.btnGroupModal}>
+              <button className={styles.acceptBtn} onClick={() => handleItemAction(selectedMsg, "accept")}>
+                Approve
+              </button>
+              <button className={styles.rejectBtn} onClick={() => handleItemAction(selectedMsg, "reject")}>
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <header className={styles.dashboardHeader}>
         <h1 className={styles.mainTitle}>{data.name}</h1>
@@ -144,12 +166,10 @@ const CarehomeDashboard = () => {
 
         <main className={styles.dashboardMain}>
           {selectedJobId ? (
+            /* --- SECTION: APPLICANTS VIEW --- */
             <section className={styles.glassSection}>
               <div className={styles.sectionHeader}>
-                <button
-                  className={styles.backBtn}
-                  onClick={() => setSelectedJobId(null)}
-                >
+                <button className={styles.backBtn} onClick={() => setSelectedJobId(null)}>
                   ← Back to Dashboard
                 </button>
                 <h2 className={styles.sectionTitle}>Applicants for Job</h2>
@@ -162,56 +182,30 @@ const CarehomeDashboard = () => {
                         <h4>{app.userName}</h4>
                         <span className={styles.statusBadge}>{app.status}</span>
                       </div>
-                      <p>
-                        <strong>Exp:</strong> {app.experience} Years
-                      </p>
+                      <p><strong>Exp:</strong> {app.experience} Years</p>
                       <p className={styles.whyMe}>"{app.whyMe}"</p>
                       <div className={styles.btnGroup}>
                         {app.status === "Pending" && (
                           <>
-                            <button
-                              className={styles.acceptBtn}
-                              id="acc"
-                              onClick={() => {
-                                handleAcceptApplication(app);
-                              }}
-                            >
-                              Accept
-                            </button>
-                            <button
-                              id="rej"
-                              className={styles.rejectBtn}
-                              onClick={() => {
-                                handleRejectApplication(app);
-                              }}
-                            >
-                              Reject
-                            </button>
+                            <button className={styles.acceptBtn} onClick={() => handleAcceptApplication(app)}>Accept</button>
+                            <button className={styles.rejectBtn} onClick={() => handleRejectApplication(app)}>Reject</button>
                           </>
                         )}
                       </div>
-                      {app.status !== "Pending" && (
-                        <div className={styles.notification}>
-                          Notification sent to the applicant.
-                        </div>
-                      )}
                     </div>
                   ))
                 ) : (
-                  <p className={styles.emptyText}>
-                    No one has applied for this job yet.
-                  </p>
+                  <p className={styles.emptyText}>No one has applied yet.</p>
                 )}
               </div>
             </section>
           ) : (
             <>
+              {/* --- SECTION 1: STATS GRID --- */}
               <section className={styles.statsGrid}>
                 <div className={styles.statCard}>
                   <h3>Active Fundraisers</h3>
-                  <div className={styles.statValue}>
-                    {data.ongoing_fund?.length || 0}
-                  </div>
+                  <div className={styles.statValue}>{data.ongoing_fund?.length || 0}</div>
                 </div>
                 {data.stats?.map((stat, index) => (
                   <div className={styles.statCard} key={index}>
@@ -221,10 +215,9 @@ const CarehomeDashboard = () => {
                 ))}
               </section>
 
+              {/* --- SECTION 2: OPEN POSITIONS --- */}
               <section className={styles.glassSection}>
-                <h2 className={styles.sectionTitle}>
-                  <span className={styles.icon}>💼</span> Open Positions
-                </h2>
+                <h2 className={styles.sectionTitle}>💼 Open Positions</h2>
                 <div className={styles.cardGrid}>
                   {jobs.length > 0 ? (
                     jobs.map((job) => (
@@ -234,26 +227,18 @@ const CarehomeDashboard = () => {
                           <span>{job.type}</span> | <span>₹{job.pay}</span>
                         </div>
                         <div className={styles.btnGroup}>
-                          <button
-                            className={styles.acceptBtn}
-                            onClick={() => handleViewApplicants(job._id)}
-                          >
-                            View Applicants
-                          </button>
-                          <button className={styles.rejectBtn}>
-                            Delete Listing
-                          </button>
+                          <button className={styles.acceptBtn} onClick={() => handleViewApplicants(job._id)}>View Applicants</button>
+                          <button className={styles.rejectBtn}>Delete Listing</button>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className={styles.emptyText}>
-                      You haven't posted any jobs yet.
-                    </p>
+                    <p className={styles.emptyText}>You haven't posted any jobs yet.</p>
                   )}
                 </div>
               </section>
 
+              {/* --- SECTION 3: ACTIVE FUNDRAISERS --- */}
               <section className={styles.glassSection}>
                 <h2 className={styles.sectionTitle}>Active Fundraisers</h2>
                 <div className={styles.cardGrid}>
@@ -264,29 +249,10 @@ const CarehomeDashboard = () => {
                         <span>Raised: ₹{fund.amount_raised_so_far}</span>
                         <span> Goal: ₹{fund.goal_amount}</span>
                       </div>
-                      {fund.amount_raised_so_far >= fund.goal_amount && (
-                        <div className={styles.goalReachedMessage}>
-                          <p>
-                            <strong>
-                              Congratulations from the CareConnect Platform!
-                            </strong>
-                          </p>
-                          <p>
-                            You have successfully reached your target. We hope
-                            these contributions are used for the greater good of
-                            your residents.
-                          </p>
-                        </div>
-                      )}
                       <div className={styles.progressBar}>
                         <div
                           className={styles.progressFill}
-                          style={{
-                            width: `${
-                              (fund.amount_raised_so_far / fund.goal_amount) *
-                              100
-                            }%`,
-                          }}
+                          style={{ width: `${(fund.amount_raised_so_far / fund.goal_amount) * 100}%` }}
                         ></div>
                       </div>
                     </div>
@@ -294,30 +260,21 @@ const CarehomeDashboard = () => {
                 </div>
               </section>
 
+              {/* --- SECTION 4: PENDING ITEM REQUESTS (NEW CLICKABLE FORMAT) --- */}
               <section className={styles.glassSection}>
                 <h2 className={styles.sectionTitle}>Pending Item Requests</h2>
                 <div className={styles.messageList}>
                   {data.messages?.length > 0 ? (
                     data.messages.map((msg, index) => (
-                      <div className={styles.messageItem} key={index}>
-                        <div className={styles.msgDetails}>
+                      <div 
+                        className={styles.clickableRequestRow} 
+                        key={index}
+                        onClick={() => setSelectedMsg(msg)}
+                      >
+                        <div className={styles.msgHeader}>
                           <strong>{msg.category}</strong> - {msg.location}
-                          <p>{msg.description}</p>
                         </div>
-                        <div className={styles.btnGroupSmall}>
-                          <button
-                            className={styles.acceptBtn}
-                            onClick={() => handleItemAction(msg, "accept")}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className={styles.rejectBtn}
-                            onClick={() => handleItemAction(msg, "reject")}
-                          >
-                            Decline
-                          </button>
-                        </div>
+                        <span className={styles.expandText}>Click to view details</span>
                       </div>
                     ))
                   ) : (
@@ -326,24 +283,16 @@ const CarehomeDashboard = () => {
                 </div>
               </section>
 
+              {/* --- SECTION 5: MONEY DONATIONS --- */}
               <section className={styles.glassSection}>
-                <h2 className={styles.sectionTitle}>
-                  <span className={styles.icon}>💰</span> Recent Money Donations
-                </h2>
+                <h2 className={styles.sectionTitle}>💰 Recent Money Donations</h2>
                 <div className={styles.messageList}>
                   {data.recentDonations?.length > 0 ? (
                     data.recentDonations.map((don, index) => (
                       <div className={styles.messageItem} key={index}>
                         <div className={styles.msgDetails}>
-                          <strong>
-                            {don.donor_name}: ₹{don.amount}
-                          </strong>
-                          <p>
-                            Received:{" "}
-                            {don.donated_at
-                              ? new Date(don.donated_at).toLocaleDateString()
-                              : "Recently Received"}
-                          </p>
+                          <strong>{don.donor_name}: ₹{don.amount}</strong>
+                          <p>Received: {don.donated_at ? new Date(don.donated_at).toLocaleDateString() : "Recently"}</p>
                         </div>
                       </div>
                     ))
