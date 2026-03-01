@@ -1,145 +1,124 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import AdminEvents from './AdminEvents';
+import AdminFundraisers from './AdminFundraisers';
+import AdminDonations from './AdminDonations';
+import UserControlHub from './UserControlHub';
+import styles from '../styles/AdminDashboard.module.css';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
+    const [activeTab, setActiveTab] = useState('overview'); 
+    const navigate = useNavigate();
+    
     useEffect(() => {
-        const fetchAdminData = async () => {
-            try {
-                // Pointing to your exact route defined in admin.routes.js
-                const response = await axios.get('http://localhost:3000/api/admin/dashboard', {
-                    withCredentials: true // Crucial for authenticate middleware to see the cookie
-                });
-                setStats(response.data);
-                setLoading(false);
-            } catch (err) {
-                console.error("Dashboard fetch error:", err);
-                // If 401, they likely aren't logged in as 'Admin'
-                setError(err.response?.data?.message || "Failed to load admin data.");
-                setLoading(false);
-            }
-        };
-
-        fetchAdminData();
+        fetch('http://localhost:3000/api/admin/main-stats', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => setStats(data))
+            .catch(err => console.error('Error loading stats:', err));
     }, []);
 
-    if (loading) return <div style={centerStyle}>Loading Admin Dashboard...</div>;
-    if (error) return <div style={centerStyle}>Error: {error}</div>;
+    if (!stats) return <div className={styles.loading}>Initializing Command Center...</div>;
 
     return (
-        <div className="dashboard-container" style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
-            <header className="dashboard-header" style={headerStyle}>
-                <h1>Charity Admin Dashboard</h1>
-                <div className="header-stats">
-                    <span style={{ marginRight: '20px' }}>Last Updated: {new Date().toLocaleDateString()}</span>
-                    <Link to="/" style={{ color: 'white', fontWeight: 'bold' }}>Home</Link>
+        <div className={styles.adminWrapper}>
+            {/* Massive Header Section */}
+            <div className={styles.heroHeader}>
+                <div className={styles.headerContent}>
+                    <div className={styles.topHeaderRow}>
+                        <div className={styles.welcomeText}>
+                            <h1>Hi, Admin.</h1>
+                            <p>System Oversight & Platform Revenue Analytics</p>
+                        </div>
+                        {/* Pushed to the far right */}
+                        <button className={styles.homeBtn} onClick={() => navigate('/')}>
+                            Go to Home
+                        </button>
+                    </div>
                 </div>
-            </header>
-
-            {/* Statistics Cards */}
-            <div className="stats-grid" style={gridStyle}>
-                <StatCard title="Highest Donation" value={`₹${stats.highest_Donation}`} subtext="Anonymous Donor" />
-                <StatCard 
-                    title="Highest Contributor" 
-                    value={stats.high_con_name?.name || "N/A"} 
-                    subtext={`Total: ₹${stats.high_con_name?.total_contributed || 0}`} 
-                />
-                <StatCard title="Total Revenue" value={`₹${stats.total_revenue}`} subtext="All Time" />
-                <StatCard title="Total NGOs" value={stats.total_ngo} subtext="Active Partners" />
-                <StatCard title="Total Care Homes" value={stats.total_care} subtext="Supported" />
-                <StatCard title="Total Money Moved" value={`₹${stats.total_money}`} subtext="Through Platform" />
-                <StatCard title="Active Events" value={stats.total_events} subtext="Ongoing" />
+                
+                {/* Options Navigation */}
+                <div className={styles.navBar}>
+                    <button className={activeTab === 'overview' ? styles.active : ''} onClick={() => setActiveTab('overview')}>Business Overview</button>
+                    <button className={activeTab === 'events' ? styles.active : ''} onClick={() => setActiveTab('events')}>Events</button>
+                    <button className={activeTab === 'fundraisers' ? styles.active : ''} onClick={() => setActiveTab('fundraisers')}>Fundraisers</button>
+                    <button className={activeTab === 'donations' ? styles.active : ''} onClick={() => setActiveTab('donations')}>Direct Donations</button>
+                    <button className={activeTab === 'users' ? styles.active : ''} onClick={() => setActiveTab('users')}>Manage Users</button>
+                </div>
             </div>
 
-            {/* Fundraisers Section */}
-            <div className="fundraisers-section" style={{ marginTop: '40px' }}>
-                <h2 style={{ color: '#2c6e49', marginBottom: '20px' }}>Top Performing Fundraisers</h2>
-                <div className="fundraisers-list" style={fundraiserGridStyle}>
-                    {stats.top_fund && stats.top_fund.length > 0 ? (
-                        stats.top_fund.map((fund, index) => (
-                            <div className="fundraiser-card" key={index} style={cardStyle}>
-                                <h4 style={{ color: '#2c6e49', marginBottom: '10px' }}>{fund.fundraiser_name}</h4>
-                                <p>Raised: <strong>₹{fund.amount_raised_so_far.toLocaleString()}</strong></p>
-                                <p>Goal: ₹{fund.goal_amount.toLocaleString()}</p>
-                                <div className="progress-bar" style={progressBarStyle}>
-                                    <div 
-                                        className="progress" 
-                                        style={{ 
-                                            ...progressFillStyle, 
-                                            width: `${(fund.amount_raised_so_far / fund.goal_amount * 100).toFixed(2)}%` 
-                                        }}
-                                    ></div>
-                                </div>
+            {/* Dynamic Content Area */}
+            <div className={styles.mainStage}>
+                {activeTab === 'overview' && (
+                    <div className={styles.overviewGrid}>
+                        <div className={styles.kpiRibbon}>
+                            <div className={styles.kpiCard}>
+                                <span>Total Platform Revenue (8%)</span>
+                                <h2>₹{stats.total_revenue?.toLocaleString() || '0'}</h2>
                             </div>
-                        ))
-                    ) : (
-                        <p>No fundraiser data available.</p>
-                    )}
-                </div>
+                            <div className={styles.kpiCard}>
+                                <span>Active NGOs</span>
+                                <h2>{stats.total_ngo || '0'}</h2>
+                            </div>
+                            <div className={styles.kpiCard}>
+                                <span>Total Events</span>
+                                <h2>{stats.total_events || '0'}</h2>
+                            </div>
+                            <div className={styles.kpiCard}>
+                                <span>Top Donor</span>
+                                <h2>{stats.high_con_name?.name || 'N/A'}</h2>
+                            </div>
+                        </div>
+
+                        <div className={styles.chartSection}>
+                            <h3>Monthly Platform Commission (8% Tax)</h3>
+                            <div className={styles.revenueGraph}>
+                                {stats.monthlyBusiness?.map((m, i) => {
+                                    const maxProfit = Math.max(...stats.monthlyBusiness.map(x => x.profit || 0));
+                                    const height = maxProfit > 0 ? (m.profit / maxProfit) * 100 : 0;
+                                    return (
+                                        <div key={i} className={styles.graphBarWrapper}>
+                                            <div className={styles.graphBar} style={{ height: `${height}%` }}>
+                                                <span className={styles.barLabel}>₹{Number(m.profit).toLocaleString()}</span>
+                                            </div>
+                                            <small>{m.name}</small>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className={styles.topTable}>
+                            <h3>Top 3 Live Fundraisers</h3>
+                            <table>
+                                <thead>
+                                    <tr><th>Name</th><th>Raised</th><th>Goal</th></tr>
+                                </thead>
+                                <tbody>
+                                    {stats.top_fund && stats.top_fund.length > 0 ? (
+                                        stats.top_fund.map((f) => (
+                                            <tr key={f._id}>
+                                                <td>{f.fundraiser_name}</td>
+                                                <td>₹{f.amount_raised_so_far?.toLocaleString()}</td>
+                                                <td>₹{f.goal_amount?.toLocaleString()}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr><td colSpan="3" style={{ textAlign: 'center', padding: '20px' }}>No live fundraisers as of now.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'events' && <AdminEvents />}
+                {activeTab === 'fundraisers' && <AdminFundraisers />}
+                {activeTab === 'donations' && <AdminDonations />}
+                {activeTab === 'users' && <UserControlHub />} 
             </div>
         </div>
     );
 };
-
-// Simple StatCard Helper Component
-const StatCard = ({ title, value, subtext }) => (
-    <div className="stat-card" style={cardStyle}>
-        <h3 style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>{title}</h3>
-        <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#2c6e49' }}>{value}</p>
-        <p style={{ fontSize: '12px', color: '#999', marginTop: '5px' }}>{subtext}</p>
-    </div>
-);
-
-// Inline Styles for simplicity
-const headerStyle = {
-    background: 'linear-gradient(135deg, #2c6e49 0%, #4e9f76 100%)',
-    padding: '20px 30px',
-    borderRadius: '10px',
-    color: 'white',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '30px'
-};
-
-const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '20px'
-};
-
-const fundraiserGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '20px'
-};
-
-const cardStyle = {
-    background: 'white',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    borderLeft: '4px solid #66ed4c'
-};
-
-const progressBarStyle = {
-    background: '#eee',
-    height: '10px',
-    borderRadius: '5px',
-    marginTop: '15px',
-    overflow: 'hidden'
-};
-
-const progressFillStyle = {
-    background: 'linear-gradient(90deg, #2c6e49, #66ed4c)',
-    height: '100%',
-    transition: 'width 0.5s ease-in-out'
-};
-
-const centerStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.2rem' };
 
 export default AdminDashboard;

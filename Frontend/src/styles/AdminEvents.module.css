@@ -1,0 +1,235 @@
+.adminPage {
+    background: #F4F7F5;
+    padding: 50px;
+    font-family: 'Inter', sans-serif;
+}
+
+.loader {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #52796F;
+}
+
+/* KPI Ribbon */
+.ribbon {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.kpiCard {
+    background: #FFFFFF;
+    padding: 30px;
+    border-radius: 4px;
+    border-top: 4px solid #1B4332;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.kpiCard span { 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    color: #6B705C; 
+}
+
+.kpiCard h3 { 
+    margin: 10px 0; 
+    font-size: 26px; 
+    color: #1B4332; 
+}
+
+.kpiCard p { 
+    color: #40916C; 
+    font-weight: 600; 
+    font-size: 14px; 
+}
+
+/* Velocity Chart */
+.chartContainer {
+    background: #FFFFFF;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+    border: 1px solid #E0EADD;
+}
+
+.chartContainer h4 {
+    margin-bottom: 10px;
+    color: #1B4332;
+}
+
+.chartArea {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    border-bottom: 2px solid #F0F4F2;
+    padding: 0 10px;
+}
+
+.barWrapper { 
+    flex: 1; 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    height: 100%;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.bar {
+    background: #52796F;
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.bar:hover { 
+    background: #1B4332; 
+}
+
+.popover {
+    position: absolute; 
+    bottom: 100%;
+    left: 50%; 
+    transform: translateX(-50%);
+    background: #1B4332; 
+    color: white; 
+    padding: 4px 8px; 
+    font-size: 10px;
+    border-radius: 4px; 
+    white-space: nowrap;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.barWrapper small {
+    font-size: 10px;
+    color: #6B705C;
+}
+
+/* Table Styling */
+.tableSection {
+    background: #FFFFFF;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #E0EADD;
+}
+
+.tableHeader { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 30px; 
+}
+
+.tabButtons {
+    display: flex;
+    gap: 5px;
+}
+
+.tabButtons button {
+    background: none; 
+    border: none; 
+    padding: 10px 25px;
+    font-weight: 800; 
+    color: #A3B18A; 
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.tabButtons button.activeTab { 
+    color: #1B4332; 
+    border-bottom: 2px solid #1B4332; 
+}
+
+.tabButtons button:hover {
+    color: #52796F;
+}
+
+.searchBox {
+    padding: 10px 20px; 
+    border: 1px solid #D1DBDB; 
+    border-radius: 4px;
+    background: #F9FBF9; 
+    width: 250px;
+}
+
+.searchBox:focus {
+    outline: none;
+    border-color: #52796F;
+}
+
+.dataTable { 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+
+.dataTable th { 
+    text-align: left; 
+    padding: 15px; 
+    color: #52796F; 
+    border-bottom: 2px solid #F0F4F2; 
+    font-size: 13px; 
+}
+
+.dataTable td { 
+    padding: 15px; 
+    border-bottom: 1px solid #F0F4F2; 
+    font-size: 14px; 
+    color: #1B4332; 
+}
+
+.dataTable tbody tr:hover {
+    background: #F9FBF9;
+}
+
+.clickableRow {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.clickableRow:hover {
+    background-color: #F9FBF9 !important; /* Muted Green tint */
+}
+
+/* Modal Overlay: Smooth glassmorphism */
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(27, 67, 50, 0.4); 
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #ffffff;
+    width: 600px;
+    max-height: 80vh;
+    border-radius: 12px;
+    padding: 30px;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid #F0F4F2;
+    padding-bottom: 20px; margin-bottom: 20px;
+}
+
+.modalHeader h3 { color: #1B4332; margin: 0; font-size: 20px; }
+.modalHeader button { background: none; border: none; font-size: 28px; color: #6B705C; cursor: pointer; }
+
+.modalTable { width: 100%; border-collapse: collapse; }
+.modalTable th { text-align: left; font-size: 11px; text-transform: uppercase; color: #52796F; padding: 10px; }
+.modalTable td { padding: 12px 10px; font-size: 14px; border-bottom: 1px solid #F0F4F2; }
+
+.greenText { color: #1B4332; font-weight: 700; }
