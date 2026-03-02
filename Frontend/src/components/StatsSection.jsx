@@ -1,28 +1,29 @@
 import React, { useState } from 'react';
 
 const StatsSection = ({ name, stats, activeCampaignsCount }) => {
-  // Replaces the EJS script that toggles display
   const [showStats, setShowStats] = useState(false);
 
   return (
     <div className="dashboard-overview">
       <div className="profile-card">
-        <div className="org-name">{name}</div>
+        <h1 className="org-name">{name}</h1>
       </div>
 
-      <button 
-        id="toggle-stats-btn" 
-        title="for more details"
-        onClick={() => setShowStats(!showStats)}
-      >
-        {showStats ? "Hide Statistics" : "Statistics"}
-      </button>
+      <div className="stats-action-wrapper">
+        <button 
+          id="toggle-stats-btn" 
+          className="emerald-stats-btn"
+          title="Click for performance overview"
+          onClick={() => setShowStats(!showStats)}
+        >
+          {showStats ? "Hide Performance" : "Show Performance Statistics"}
+        </button>
+      </div>
 
-      {/* Conditionally render based on state */}
       {showStats && (
-        <div id="stats-container">
+        <div id="stats-container" className="fade-in">
           <div className="stats-card">
-            <div className="stats-number">{stats.totalFundsRaised}</div>
+            <div className="stats-number">₹{stats.totalFundsRaised}</div>
             <div className="stats-label">Total Raised</div>
           </div>
           <div className="stats-card">
@@ -31,11 +32,11 @@ const StatsSection = ({ name, stats, activeCampaignsCount }) => {
           </div>
           <div className="stats-card">
             <div className="stats-number">{stats.totalRegistrations}</div>
-            <div className="stats-label">Volunteers</div>
+            <div className="stats-label">Event Volunteers</div>
           </div>
           <div className="stats-card">
             <div className="stats-number">{stats.careHomesBenefited}</div>
-            <div className="stats-label">Care homes Associated</div>
+            <div className="stats-label">Care Homes Linked</div>
           </div>
         </div>
       )}

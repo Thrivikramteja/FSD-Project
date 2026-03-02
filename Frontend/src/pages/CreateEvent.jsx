@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import '../styles/ngo_das.css'; 
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import styles from '../styles/createEvent.module.css'; // Updated to module
 
 const CreateEvent = () => {
   const { ngoID } = useParams();
@@ -16,7 +16,7 @@ const CreateEvent = () => {
 
   const [imageFile, setImageFile] = useState(null);
   const [dateError, setDateError] = useState(false);
-  const [error, setError] = useState(null); // NEW
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -65,101 +65,116 @@ const CreateEvent = () => {
       navigate(`/NGO-dashboard/${ngoID}`);
 
     } catch (err) {
-      console.error("Error creating event:", err);
-
       setError(err.message || "Failed to create event.");
-
-      // Redirect after 5 seconds
       setTimeout(() => {
-        window.location.href = "/error";
+        navigate(`/error`);
       }, 5000);
     }
   };
 
   return (
-    <div className="ngo-dashboard-page">
-      <div className="form-container">
-        <h2 className="head_ing">Create New Event</h2>
+    <div className={styles.pageWrapper}>
+      <div className={styles.formContainer}>
+        <div className={styles.headerBox}>
+          <Link to={`/NGO-dashboard/${ngoID}`} className={styles.backLink}>← Back</Link>
+          <h2 className={styles.heading}>Create New Event</h2>
+          <p className={styles.subHeading}>Organize a community gathering or fundraiser event</p>
+        </div>
 
         {error && (
-          <p style={{ color: "red", textAlign: "center" }}>
-            Error: {error}
-          </p>
+          <div className={styles.errorBanner}>
+            <strong>Error:</strong> {error}
+          </div>
         )}
 
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <form onSubmit={handleSubmit} className={styles.eventForm}>
           
-          <div className="form-group">
-            <label>Title:</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Event Title</label>
             <input 
               type="text" 
               name="event_name" 
+              placeholder="e.g. Annual Charity Gala"
+              className={styles.input}
               value={formData.event_name} 
               onChange={handleChange} 
               required 
             />
           </div>
 
-          <div className="form-group">
-            <label>Description:</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Description</label>
             <textarea 
               name="description" 
+              placeholder="Tell donors what this event is about..."
+              className={styles.textarea}
               value={formData.description} 
               onChange={handleChange} 
               required 
             />
           </div>
 
-          <div className="form-group">
-            <label>Location:</label>
-            <input 
-              type="text" 
-              name="event_location" 
-              value={formData.event_location} 
-              onChange={handleChange} 
-              required 
-            />
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Location</label>
+              <input 
+                type="text" 
+                name="event_location" 
+                placeholder="City Hall, NY"
+                className={styles.input}
+                value={formData.event_location} 
+                onChange={handleChange} 
+                required 
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Time</label>
+              <input 
+                type="text" 
+                name="event_time" 
+                placeholder="10:00 AM - 4:00 PM"
+                className={styles.input}
+                value={formData.event_time} 
+                onChange={handleChange} 
+                required 
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Time:</label>
-            <input 
-              type="text" 
-              name="event_time" 
-              value={formData.event_time} 
-              onChange={handleChange} 
-              required 
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Date:</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Event Date</label>
             <input 
               type="date" 
               name="deadline" 
+              className={styles.input}
               value={formData.deadline} 
               onChange={handleChange} 
               required 
             />
             {dateError && (
-              <span id="dateerror" style={{ color: 'red', display: 'block' }}>
-                Date must be valid ({'>'}=today)
+              <span className={styles.fieldError}>
+                Date must be today or in the future.
               </span>
             )}
           </div>
 
-          <div className="form-group">
-            <label>Image:</label>
-            <input 
-              type="file" 
-              name="image" 
-              accept="image/*" 
-              onChange={handleFileChange} 
-              required 
-            />
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Event Banner Image</label>
+            <div className={styles.fileInputWrapper}>
+              <input 
+                type="file" 
+                name="image" 
+                accept="image/*" 
+                className={styles.fileInput}
+                onChange={handleFileChange} 
+                required 
+              />
+            </div>
           </div>
 
-          <button type="submit" className="gradient-btn">Create Event</button>
+          <button type="submit" className={styles.submitBtn}>
+            Launch Event
+          </button>
         </form>
       </div>
     </div>
