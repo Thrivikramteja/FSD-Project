@@ -6,7 +6,9 @@ import { headerConfig } from "../config/headerConfig";
 const DonatePage = () => {
     const [carehomes, setCarehomes] = useState([]);
     const [loadingHomes, setLoadingHomes] = useState(true);
-    const [error, setError] = useState(null); // NEW
+    const [error, setError] = useState(null); 
+    
+    const [isAcknowledged, setIsAcknowledged] = useState(false);
 
     const [formData, setFormData] = useState({
         carehomes: '',
@@ -34,13 +36,10 @@ const DonatePage = () => {
 
         } catch (err) {
             console.error('Error fetching care home list:', err);
-
             setError(err.message || "Failed to load care homes");
-
             setTimeout(() => {
                 window.location.href = "/error";
             }, 5000);
-
         } finally {
             setLoadingHomes(false);
         }
@@ -62,6 +61,12 @@ const DonatePage = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (!isAcknowledged) {
+            alert("Please acknowledge the data sharing agreement.");
+            return;
+        }
+
         setMessage({ type: '', text: '' }); 
         setError(null);
 
@@ -82,12 +87,11 @@ const DonatePage = () => {
             setMessage({ type: 'success', text: 'Donation request sent! Awaiting confirmation.' });
             alert('Donation request sent! Awaiting confirmation.');
             setFormData({ carehomes: '', category: '', description: '', address: '', date: '' });
+            setIsAcknowledged(false); // Reset checkbox
 
         } catch (err) {
             console.error('Network Error:', err);
-
             setError(err.message || "Network error occurred");
-
             setTimeout(() => {
                 window.location.href = "/error";
             }, 5000);
@@ -95,11 +99,8 @@ const DonatePage = () => {
     };
 
     const getAlertClass = (type) => {
-        if (type === 'success') {
-            return 'bg-green-100 text-green-700 border-green-700';
-        } else if (type === 'danger') {
-            return 'bg-red-100 text-red-700 border-red-700';
-        }
+        if (type === 'success') return 'bg-green-100 text-green-700 border-green-700';
+        if (type === 'danger') return 'bg-red-100 text-red-700 border-red-700';
         return '';
     };
 
@@ -148,7 +149,6 @@ const DonatePage = () => {
                                     </option>
                                 ))}
                             </select>
-                            {loadingHomes && <p className="text-xs text-gray-500 mt-1">Fetching list of partner homes...</p>}
                         </div>
 
                         <div>
@@ -207,6 +207,21 @@ const DonatePage = () => {
                                 value={formData.date}
                                 onChange={handleChange}
                             />
+                        </div>
+
+                        {/* 3. Added the checkbox with requested spans */}
+                        <div className="flex items-start space-x-2 pt-2">
+                            <input 
+                                type="checkbox" 
+                                id="sharing_ack" 
+                                required 
+                                className="mt-1"
+                                checked={isAcknowledged}
+                                onChange={(e) => setIsAcknowledged(e.target.checked)}
+                            />
+                            <label htmlFor="sharing_ack" className="text-sm text-gray-600">
+                                I acknowledge that my <span>name</span> and <span>phone number</span> will be shared with the care home.
+                            </label>
                         </div>
 
                         <div className="text-center pt-4">

@@ -248,7 +248,24 @@ async function registerCarehome(req, res,next) {
   }
 }
 
-async function getCarehome(req, res,next) {
+const enrichMessagesWithUser = async (messages) => {
+  return Promise.all(
+    messages.map(async (msg) => {
+
+      const user = await User.findOne({ userId: msg.userId })
+        .select("name mobile_number -_id")
+        .lean();
+        
+      return {
+        ...msg.toObject(), 
+        userName: user ? user.name : "Anonymous Donor",
+        userPhone: user ? user.mobile_number : "N/A"
+      };
+    })
+  );
+};
+
+async function getCarehome(req, res, next) {
   const careid = parseInt(req.params.carehomeId, 10);
 
   if (req.user.role !== "Carehome" || req.user.id !== careid) {
@@ -262,8 +279,11 @@ async function getCarehome(req, res,next) {
     const getname = await Carehome.getname(careid);
     const wishlist = await Carehome.getWishlist(careid);
     const stats = await Carehome.get_carehome_stats(careid);
-    const messages = await Carehome.getMessages(careid);
     const items = await donate_items.get_item_donations(careid);
+
+    const rawMessages = await Carehome.getMessages(careid);
+    
+    const messages = await enrichMessagesWithUser(rawMessages);
 
     res.json({
       name: getname.care_home_name,
@@ -283,7 +303,6 @@ async function getCarehome(req, res,next) {
     next(err);
   }
 }
-
 async function accpet_item_doantions(req, res,next) {
   try {
     // Safety Check: Identity & Role
