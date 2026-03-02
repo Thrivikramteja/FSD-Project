@@ -585,12 +585,12 @@ const getNGOProfileDetails = async (req, res) => {
     const carehomeIds = [...new Set(rawFundraisers.map((f) => f.carehomeId))];
     const carehomes = await Carehome.find(
       { carehomeId: { $in: carehomeIds } },
-      "carehomeId name"
+      "carehomeId care_home_name"
     ).lean();
 
     const fundraisers = rawFundraisers.map((f) => {
       const home = carehomes.find((c) => c.carehomeId === f.carehomeId);
-      return { ...f, carehomeName: home ? home.name : "Beneficiary Care Home" };
+      return { ...f, carehomeName: home ? home.care_home_name : "Beneficiary Care Home" };
     });
 
     const now = new Date();
