@@ -26,7 +26,6 @@ import ViewCare from "../pages/ViewCare";
 import ErrorFace from "../components/ErrorFace";
 import NGOEditDetails from "../pages/NGOEditDetails"; // Import your new modular component
 import NGOProfile from "../pages/NGOProfile";
-
 const AppRoutes = () => {
   return (
     <Routes>
