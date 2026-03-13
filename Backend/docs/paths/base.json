@@ -1,0 +1,71 @@
+{
+  "/api": {
+    "get": {
+      "tags": ["Public"],
+      "summary": "Get Landing Page Data",
+      "description": "Retrieves the latest updates including ongoing fundraisers and upcoming events for the application landing page.",
+      "responses": {
+        "200": {
+          "description": "Successfully retrieved landing page data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ongoing_fund": {
+                    "type": "array",
+                    "description": "List of currently active fundraising campaigns",
+                    "items": {
+                      "$ref": "../schemas/Fundraiser.json"
+                    }
+                  },
+                  "upcoming_eve": {
+                    "type": "array",
+                    "description": "List of scheduled upcoming events",
+                    "items": {
+                      "$ref": "../schemas/Event.json"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ongoing_fund": [
+                  {
+                    "id": "f123",
+                    "title": "Clean Water Initiative",
+                    "target_amount": 5000,
+                    "raised_amount": 1200
+                  }
+                ],
+                "upcoming_eve": [
+                  {
+                    "id": "e456",
+                    "name": "Community Tree Planting",
+                    "date": "2026-04-15",
+                    "location": "City Park"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Internal Server Error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Could not load the latest updates. Please refresh the page."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
