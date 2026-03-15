@@ -22,14 +22,32 @@
 .logo {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #ffffff;
     text-decoration: none;
     letter-spacing: -1px;
     cursor: pointer;
+    display: inline-flex;
 }
 
-.logoAccent {
-    color: #10b981; /* Mint Green */
+.logoLetter {
+    display: inline-block;
+    color: #ffffff;
+    animation: colorWave 6s ease-in-out infinite;
+}
+
+.logoAccentLetter {
+    display: inline-block;
+    color: #aeb910;
+    animation: colorWaveGreen 6s ease-in-out infinite;
+}
+
+@keyframes colorWave {
+    0%, 60%, 100% { color: #ffffff; }
+    30% { color: #10b981; }
+}
+
+@keyframes colorWaveGreen {
+    0%, 60%, 100% { color: #10b981; }
+    30% { color: #ffffff; }
 }
 
 .headerRight {

@@ -3,11 +3,32 @@ import { Link } from 'react-router-dom';
 import styles from '../styles/CareHeader.module.css'; // Importing your shared styles
 
 const Header = ({ ngoID }) => {
+    const logoWord1 = "Care";
+    const logoWord2 = "Connect";
   return (
     <header className={styles.navbar}>
       <div className={styles.navContainer}>
-        <Link to="/" className={styles.logo}>
-          Care<span className={styles.logoAccent}>Connect</span>
+        <Link to="/">
+          <div className={styles.logo} onClick={() => navigate("/")}>
+                    {logoWord1.split("").map((letter, i) => (
+                      <span
+                        key={i}
+                        className={styles.logoLetter}
+                        style={{ animationDelay: `${i * 0.12}s` }}
+                      >
+                        {letter}
+                      </span>
+                    ))}
+                    {logoWord2.split("").map((letter, i) => (
+                      <span
+                        key={i}
+                        className={styles.logoAccentLetter}
+                        style={{ animationDelay: `${(logoWord1.length + i) * 0.12}s` }}
+                      >
+                        {letter}
+                      </span>
+                    ))}
+              </div>
         </Link>
         
         <nav>
