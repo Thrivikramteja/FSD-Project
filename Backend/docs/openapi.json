@@ -1,0 +1,28 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CareConnect API",
+    "version": "1.0.0",
+    "description": "API for Donation and Event Management Platform"
+  },
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Dev Server" }
+  ],
+  "paths": {
+    "/api/admin": { "$ref": "./paths/admin.json" },
+    "/api/auth": { "$ref": "./paths/auth.json" },
+    "/api/base": { "$ref": "./paths/base.json" },
+    "/api/carehomes": { "$ref": "./paths/carehome.json" },
+    "/api/donors": { "$ref": "./paths/donor.json" },
+    "/api/ngo": { "$ref": "./paths/NGO.json" }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
