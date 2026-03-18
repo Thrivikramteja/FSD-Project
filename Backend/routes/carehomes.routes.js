@@ -104,4 +104,14 @@ router.patch(
   carehomesController.acceptApplication
 );
 
+router.post(
+  "/api/carehome/impact-story",
+  authenticate,
+  authorizeRoles("Carehome"),
+  upload.array('media'),
+  carehomesController.createImpactStory
+);
+
+router.get("/api/impact-stories", carehomesController.getImpactStories);
+
 module.exports = router;

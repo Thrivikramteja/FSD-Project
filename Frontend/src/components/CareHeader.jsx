@@ -43,6 +43,11 @@ const CareHeader = ({ careid }) => {
               </Link>
             </li>
             <li>
+              <Link to="/impact-stories" className={styles.navItem}>
+                Impact Stories
+              </Link>
+            </li>
+            <li>
               <button onClick={handleLogout} className={styles.logoutBtn}>
                 Logout
               </button>

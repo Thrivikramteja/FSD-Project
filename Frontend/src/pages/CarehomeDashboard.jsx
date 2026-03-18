@@ -15,6 +15,11 @@ const CarehomeDashboard = () => {
   // --- NEW STATE: For the Item Request Pop-up ---
   const [selectedMsg, setSelectedMsg] = useState(null);
 
+  // --- NEW STATE: For Impact Stories ---
+  const [storyTitle, setStoryTitle] = useState('');
+  const [storyDescription, setStoryDescription] = useState('');
+  const [storyFiles, setStoryFiles] = useState([]);
+
   const fetchData = async () => {
     try {
       const dashRes = await fetch(
@@ -104,6 +109,28 @@ const CarehomeDashboard = () => {
       }
     } catch (error) {
       console.error("Error processing item action:", error);
+    }
+  };
+
+  const handleUploadStory = async () => {
+    const formData = new FormData();
+    formData.append('title', storyTitle);
+    formData.append('description', storyDescription);
+    storyFiles.forEach(file => formData.append('media', file));
+    try {
+      const response = await fetch('http://localhost:3000/api/carehome/impact-story', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      if (response.ok) {
+        alert('Story uploaded!');
+        setStoryTitle('');
+        setStoryDescription('');
+        setStoryFiles([]);
+      }
+    } catch (error) {
+      console.error('Error uploading story:', error);
     }
   };
 
@@ -260,7 +287,32 @@ const CarehomeDashboard = () => {
                 </div>
               </section>
 
-              {/* --- SECTION 4: PENDING ITEM REQUESTS (NEW CLICKABLE FORMAT) --- */}
+              {/* --- SECTION 4: IMPACT STORIES UPLOAD --- */}
+              <section className={styles.glassSection}>
+                <h2 className={styles.sectionTitle}>Share Impact Stories</h2>
+                <div className={styles.storyForm}>
+                  <input
+                    type="text"
+                    placeholder="Story Title"
+                    value={storyTitle}
+                    onChange={(e) => setStoryTitle(e.target.value)}
+                  />
+                  <textarea
+                    placeholder="Describe the impact..."
+                    value={storyDescription}
+                    onChange={(e) => setStoryDescription(e.target.value)}
+                  />
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*,video/*"
+                    onChange={(e) => setStoryFiles([...e.target.files])}
+                  />
+                  <button onClick={handleUploadStory}>Upload Story</button>
+                </div>
+              </section>
+
+              {/* --- SECTION 5: PENDING ITEM REQUESTS (NEW CLICKABLE FORMAT) --- */}
               <section className={styles.glassSection}>
                 <h2 className={styles.sectionTitle}>Pending Item Requests</h2>
                 <div className={styles.messageList}>

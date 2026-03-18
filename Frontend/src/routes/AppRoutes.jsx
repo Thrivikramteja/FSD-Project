@@ -26,6 +26,7 @@ import ViewCare from "../pages/ViewCare";
 import ErrorFace from "../components/ErrorFace";
 import NGOEditDetails from "../pages/NGOEditDetails"; // Import your new modular component
 import NGOProfile from "../pages/NGOProfile";
+import ImpactStories from "../pages/ImpactStories";
 
 const AppRoutes = () => {
   return (
@@ -67,6 +68,8 @@ const AppRoutes = () => {
       />
 
       <Route path="/ngo-profile/:id" element={<NGOProfile />} />
+
+      <Route path="/impact-stories" element={<ImpactStories />} />
 
       {/* Protected Routes */}
       <Route

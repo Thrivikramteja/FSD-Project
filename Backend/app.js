@@ -32,7 +32,18 @@ app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost with any port
+    if (origin.startsWith('http://localhost:')) return callback(null, true);
+    
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true 
+}));
 
 const baseRoutes = require("./routes/base.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
@@ -40,6 +51,7 @@ const carehomeRoutes = require("./routes/carehomes.routes.js");
 const donorRoutes = require("./routes/donors.routes.js");
 const NGORoutes = require("./routes/NGO.routes.js");
 const adminRoutes = require("./routes/admin.routes.js");
+const impactStoriesRoutes = require("./routes/impactStories.routes.js");
 
 app.use(baseRoutes);
 app.use(authRoutes);
@@ -47,6 +59,7 @@ app.use(carehomeRoutes);
 app.use(donorRoutes);
 app.use(NGORoutes);
 app.use(adminRoutes);
+app.use(impactStoriesRoutes);
 
 // 404 Catch-all
 app.use((req, res, next) => {

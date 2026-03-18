@@ -6,7 +6,8 @@ export const headerConfig = {
         { label: "Care Homes", path: "/carehomes" },
         { label: "All NGOs", path: "/all-ngos" },
         { label: "Events", path: "/events" },
-        { label: "Fundraisers", path: "/fundraisers" }
+        { label: "Fundraisers", path: "/fundraisers" },
+        { label: "Impact Stories", path: "/impact-stories" }
       ]
     },
     { label: "Ways to Help", path: "/ways-to-help" },

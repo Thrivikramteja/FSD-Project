@@ -13,6 +13,11 @@ const {
   sendRejectedEmail,
 } = require("../services/otpService");
 
+async function getMongoIdFromNumericId(numericId) {
+  const carehome = await Carehome.findOne({ carehomeId: numericId });
+  return carehome ? carehome._id : null;
+}
+
 async function getCareHomesApi(req, res,next) {
   try {
     const carehomes = await Carehome.getCareHomes();
@@ -631,6 +636,46 @@ async function getMyApplications(req, res, next) {
   }
 }
 
+const ImpactStory = require('../models/ImpactStory');
+
+async function createImpactStory(req, res, next) {
+  try {
+    if (!req.user || req.user.role !== 'Carehome') {
+      return res.status(403).json({ message: 'Only carehomes can create stories' });
+    }
+    const { title, description } = req.body;
+    
+    // Convert full file paths to relative URLs
+    const images = req.files
+      .filter(file => file.mimetype.startsWith('image/'))
+      .map(file => file.path.replace(/\\/g, '/').split('public/')[1] || file.path);
+    
+    const videos = req.files
+      .filter(file => file.mimetype.startsWith('video/'))
+      .map(file => file.path.replace(/\\/g, '/').split('public/')[1] || file.path);
+    
+    const mongoId = await getMongoIdFromNumericId(req.user.id);
+    if (!mongoId) {
+      return res.status(404).json({ message: 'Carehome not found' });
+    }
+    const story = new ImpactStory({ carehomeId: mongoId, title, description, images, videos });
+    await story.save();
+    res.json({ success: true, story });
+  } catch (error) {
+    console.error('Create impact story error:', error);
+    next(error);
+  }
+}
+
+async function getImpactStories(req, res, next) {
+  try {
+    const stories = await ImpactStory.find().populate('carehomeId', 'care_home_name city');
+    res.json({ success: true, stories });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   donateMoney,
   register,
@@ -648,6 +693,8 @@ module.exports = {
   getCareHome_Jobs,
   getJobApplicants,
   getCarehomePublic,
+  createImpactStory,
+  getImpactStories,
   rejectApplication,
   acceptApplication,
   getMyApplications,

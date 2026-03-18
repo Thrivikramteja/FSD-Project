@@ -4,6 +4,7 @@ import styles from "../styles/login.module.css";
 import { AuthContext } from "../components/authContext";
 import OtpVerification from "./OtpVerification";
 import ForgotPassword from "./ForgotPassword";
+import { toast } from 'react-toastify';
 
 function Loginpage() {
   const { login } = useContext(AuthContext);
@@ -64,6 +65,7 @@ function Loginpage() {
         } else {
           const userRole = data.role;
           login({ user: data.user, role: data.role });
+          toast.success('Login successful!');
           if (userRole === "Admin") {
             navigate("/admin-dashboard");
           } else {
@@ -76,6 +78,7 @@ function Loginpage() {
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
+      toast.error('Login failed. Please try again.');
 
       setTimeout(() => {
         window.location.href = "/error";
@@ -102,6 +105,7 @@ function Loginpage() {
         setTempAuthData({ email, role });
         setShowForgot(false);
         setShowOtp(true);
+        toast.success('Password reset code sent to your email!');
       } else {
         setError(
           data.message || "User not found. Check email or sign up newly."
@@ -139,11 +143,13 @@ function Loginpage() {
 
       if (response.ok) {
         login({ user: data.user, role: data.role });
+        toast.success('OTP verified successfully!');
         if (data.redirect) {
           navigate(data.redirect);
         }
       } else {
         setError(data.message || "Invalid OTP");
+        toast.error(data.message || "Invalid OTP");
       }
     } catch (err) {
       console.error(err);
