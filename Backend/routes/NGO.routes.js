@@ -11,7 +11,7 @@ const { Carehome } = require("../models/carehome.model");
 
 router.post("/api/ngo/register", NGOController.register);
 
-router.get('/fundraisers', NGOController.getallFundraisers);
+router.get("/fundraisers", NGOController.getallFundraisers);
 
 router.get(
   "/api/ngo-dashboard/:ngoID",
@@ -62,26 +62,36 @@ router.get("/api/carehomes-list", async (req, res) => {
   }
 });
 
-  router.get(
-    "/api/NGO-dashboard/:ngoID/details", 
-     authenticate,
-    authorizeRoles("NGO"), 
-      NGOController.getEditNGOProfile,
-  );
-
-  router.post(
-    "/api/NGO-dashboard/:ngoID/edit", 
-    authenticate,
-    authorizeRoles("NGO"), 
-    NGOController.editNGOProfile
+router.get(
+  "/api/NGO-dashboard/:ngoID/details",
+  authenticate,
+  authorizeRoles("NGO"),
+  NGOController.getEditNGOProfile
 );
 
+router.get(
+  "/api/NGO-dashboard/:ngoID/details/:type/:id",
+  authenticate,
+  authorizeRoles("NGO"),
+  NGOController.getCampaignDetails
+);
 
-router.get('/api/events', NGOController.getEvents);
+router.post(
+  "/api/NGO-dashboard/:ngoID/edit",
+  authenticate,
+  authorizeRoles("NGO"),
+  NGOController.editNGOProfile
+);
 
-router.post('/registerUser/:ngoID',authenticate,authorizeRoles("Donor"), NGOController.registerUser);
+router.get("/api/events", NGOController.getEvents);
 
-router.get('/api/NGOs/profile/:id',NGOController.getNGOProfileDetails);
+router.post(
+  "/registerUser/:ngoID",
+  authenticate,
+  authorizeRoles("Donor"),
+  NGOController.registerUser
+);
 
+router.get("/api/NGOs/profile/:id", NGOController.getNGOProfileDetails);
 
 module.exports = router;

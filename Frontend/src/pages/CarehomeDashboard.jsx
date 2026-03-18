@@ -149,6 +149,10 @@ const CarehomeDashboard = () => {
               <h3>Donation Request Details</h3>
               <button className={styles.closeBtn} onClick={() => setSelectedMsg(null)}>×</button>
             </div>
+            <div className={styles.donorInfoSection} style={{ borderBottom: '1px solid #eee', marginBottom: '15px', paddingBottom: '10px' }}>
+              <p><strong>Donor Name:</strong> {selectedMsg.userName || "Anonymous Donor"}</p>
+              <p><strong>Phone:</strong> {selectedMsg.userPhone || "N/A"}</p>
+            </div>
             <div className={styles.modalBody}>
               <p><strong>Category:</strong> {selectedMsg.category}</p>
               <p><strong>Location:</strong> {selectedMsg.location}</p>

@@ -7,7 +7,8 @@ const Header = ({ navItems = [] }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth, logout } = useContext(AuthContext);
-
+  const logoWord1 = "Care";
+  const logoWord2 = "Connect";
   const isLandingPage = location.pathname === "/";
 
   // --- LOGIC PRESERVED: Role-based Dashboard Pathing ---
@@ -34,8 +35,26 @@ const Header = ({ navItems = [] }) => {
   return (
     <header className={styles.navbar}>
       <div className={styles.navContainer}>
+
         <div className={styles.logo} onClick={() => navigate("/")}>
-          Care<span className={styles.logoAccent}>Connect</span>
+          {logoWord1.split("").map((letter, i) => (
+            <span
+              key={i}
+              className={styles.logoLetter}
+              style={{ animationDelay: `${i * 0.12}s` }}
+            >
+              {letter}
+            </span>
+          ))}
+          {logoWord2.split("").map((letter, i) => (
+            <span
+              key={i}
+              className={styles.logoAccentLetter}
+              style={{ animationDelay: `${(logoWord1.length + i) * 0.12}s` }}
+            >
+              {letter}
+            </span>
+          ))}
         </div>
 
         <nav>

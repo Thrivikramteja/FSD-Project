@@ -189,6 +189,41 @@
     font-weight: 700;
 }
 
+.registeredEventCard {
+  background: #ffffff;
+  border-left: 5px solid #2f855a; /* A green "Active" border */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.eventStatusBanner {
+  background: #e6fffa;
+  color: #236c4b;
+  padding: 5px 15px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.aboutSnippet {
+  background: #f7fafc;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+
+.eventActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+
+
 @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: 1fr; }
 }

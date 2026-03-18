@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/footer';
-import '../styles/ngo_das.css'; 
+import styles from '../styles/createFundraiser.module.css'; // New Module
 
 const CreateFundraiser = () => {
   const { ngoID } = useParams();
@@ -18,87 +18,48 @@ const CreateFundraiser = () => {
 
   const [imageFile, setImageFile] = useState(null);
   const [carehomes, setCarehomes] = useState([]); 
-
-  const [errors, setErrors] = useState({
-    carehome: false,
-    goal: false,
-    date: false
-  });
-
-  const [error, setError] = useState(null); // NEW
+  const [errors, setErrors] = useState({ carehome: false, goal: false, date: false });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCarehomes = async () => {
       try {
         const res = await fetch('http://localhost:3000/api/carehomes-list');
-
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.message || "Failed to load carehomes");
-        }
-
+        if (!res.ok) throw new Error("Failed to load carehomes");
         const data = await res.json();
         setCarehomes(data);
       } catch (err) {
-        console.error("Failed to load carehomes", err);
-
-        setError(err.message || "Failed to load carehomes");
-
-        setTimeout(() => {
-          window.location.href = "/error";
-        }, 5000);
+        setError(err.message);
+        setTimeout(() => navigate("/error"), 5000);
       }
     };
     fetchCarehomes();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: false });
   };
 
-  const handleFileChange = (e) => {
-    setImageFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setImageFile(e.target.files[0]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     let newErrors = { carehome: false, goal: false, date: false };
     let hasError = false;
 
-    const goalValue = parseInt(formData.goal_amount, 10);
-    if (isNaN(goalValue) || goalValue < 100000) {
-      newErrors.goal = true;
-      hasError = true;
-    }
-
-    if (formData.id_carehome === "None" || formData.id_carehome === "") {
-      newErrors.carehome = true;
-      hasError = true;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const inputDate = new Date(formData.deadline);
-    if (isNaN(inputDate) || inputDate < today) {
-      newErrors.date = true;
-      hasError = true;
-    }
+    if (parseInt(formData.goal_amount, 10) < 100000) { newErrors.goal = true; hasError = true; }
+    if (formData.id_carehome === "None" || !formData.id_carehome) { newErrors.carehome = true; hasError = true; }
+    if (new Date(formData.deadline) < new Date().setHours(0,0,0,0)) { newErrors.date = true; hasError = true; }
 
     setErrors(newErrors);
     if (hasError) return;
 
     const dataToSend = new FormData();
-    dataToSend.append('userRole', 'NGO'); 
-    dataToSend.append('type', 'fundraiser');
+    Object.keys(formData).forEach(key => dataToSend.append(key, formData[key]));
     dataToSend.append('id_NGO', ngoID);
-    dataToSend.append('id_carehome', formData.id_carehome);
-    dataToSend.append('fundraiser_name', formData.fundraiser_name);
-    dataToSend.append('description', formData.description);
-    dataToSend.append('goal_amount', formData.goal_amount);
-    dataToSend.append('deadline', formData.deadline);
-    dataToSend.append('tag', formData.tag);
+    dataToSend.append('userRole', 'NGO');
+    dataToSend.append('type', 'fundraiser');
     dataToSend.append('image', imageFile);
 
     try {
@@ -107,154 +68,114 @@ const CreateFundraiser = () => {
         body: dataToSend,
         credentials: 'include'
       });
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Failed to create fundraiser");
-      }
-
+      if (!response.ok) throw new Error("Failed to create fundraiser");
       navigate(`/ngo-dashboard/${ngoID}`);
-
     } catch (err) {
-      console.error("Submission error:", err);
-
-      setError(err.message || "Failed to create fundraiser.");
-
-      setTimeout(() => {
-        window.location.href = "/error";
-      }, 5000);
+      setError(err.message);
+      setTimeout(() => navigate("/error"), 5000);
     }
   };
 
   return (
-    <div className="ngo-dashboard-page">
-      <div className="form-container">
-        <h2 className="head_ing">Create New Fundraiser</h2>
+    <div className={styles.pageWrapper}>
+      <div className={styles.formContainer}>
+        <div className={styles.headerBox}>
+          <Link to={`/ngo-dashboard/${ngoID}`} className={styles.backLink}>← Back to Dashboard</Link>
+          <h2 className={styles.heading}>Start a Fundraiser</h2>
+          <p className={styles.subHeading}>Set a goal and help a care home in need</p>
+        </div>
 
-        {error && (
-          <p style={{ color: "red", textAlign: "center" }}>
-            Error: {error}
-          </p>
-        )}
+        {error && <div className={styles.errorBanner}><strong>Error:</strong> {error}</div>}
 
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <form onSubmit={handleSubmit} className={styles.fundraiserForm}>
           
-          <div className="form-group">
-            <label>Please select one care home:</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Select Beneficiary Care Home</label>
             <select 
-              id="val_drop" 
-              className="care_select" 
               name="id_carehome"
+              className={styles.select}
               value={formData.id_carehome}
               onChange={handleChange}
-              autoFocus
             >
-              <option value="None">None</option>
+              <option value="None">-- Select a Care Home --</option>
               {carehomes.map(home => (
-                <option key={home.carehomeId} value={home.carehomeId}>
-                  {home.care_home_name}
-                </option>
+                <option key={home.carehomeId} value={home.carehomeId}>{home.care_home_name}</option>
               ))}
             </select>
-
-            {errors.carehome && (
-              <span id="val_error" style={{ color: 'red', display: 'block' }}>
-                Must select one care home before proceeding
-              </span>
-            )}
+            {errors.carehome && <span className={styles.fieldError}>Please select a beneficiary care home.</span>}
           </div>
 
-          <div className="form-group">
-            <label>Title:</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Campaign Title</label>
             <input 
-              type="text" 
-              name="fundraiser_name" 
+              type="text" name="fundraiser_name" 
+              placeholder="e.g. Winter Clothes for Sunshine Home"
+              className={styles.input}
               value={formData.fundraiser_name}
-              onChange={handleChange}
-              required 
+              onChange={handleChange} required 
             />
           </div>
 
-          <div className="form-group">
-            <label>Description:</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Description & Impact</label>
             <textarea 
               name="description" 
+              placeholder="Describe how the funds will be used..."
+              className={styles.textarea}
               value={formData.description}
-              onChange={handleChange}
-              required 
+              onChange={handleChange} required 
             />
           </div>
 
-          <div className="form-group">
-            <label>Goal Amount:</label>
-            <input 
-              type="number" 
-              id="goal" 
-              name="goal_amount" 
-              value={formData.goal_amount}
-              onChange={handleChange}
-              required 
-            />
-            {errors.goal && (
-              <span id="goalerror" style={{ color: 'red', display: 'block' }}>
-                Goal amount must be valid and minimum is 1,00,000
-              </span>
-            )}
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Goal Amount (₹)</label>
+              <input 
+                type="number" name="goal_amount" 
+                placeholder="Min. 1,00,000"
+                className={styles.input}
+                value={formData.goal_amount}
+                onChange={handleChange} required 
+              />
+              {errors.goal && <span className={styles.fieldError}>Minimum goal is ₹1,00,000.</span>}
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Category Tag</label>
+              <select name="tag" className={styles.select} value={formData.tag} onChange={handleChange}>
+                <option value="Health">Health</option>
+                <option value="Education">Education</option>
+                <option value="General">General</option>
+                <option value="Emergency">Emergency</option>
+                <option value="Environment">Environment</option>
+              </select>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Deadline:</label>
-            <input 
-              type="date" 
-              id="deadline" 
-              name="deadline" 
-              value={formData.deadline}
-              onChange={handleChange}
-              required 
-            />
-            {errors.date && (
-              <span id="dateerror" style={{ color: 'red', display: 'block' }}>
-                Deadline must be a valid future date.
-              </span>
-            )}
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>End Date</label>
+              <input 
+                type="date" name="deadline" 
+                className={styles.input}
+                value={formData.deadline}
+                onChange={handleChange} required 
+              />
+              {errors.date && <span className={styles.fieldError}>Select a valid future date.</span>}
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Campaign Banner</label>
+              <input 
+                type="file" name="image" 
+                accept="image/*"
+                className={styles.fileInput}
+                onChange={handleFileChange} required 
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Tag:</label>
-            <select 
-              id="tag" 
-              name="tag" 
-              className="tag-select" 
-              value={formData.tag}
-              onChange={handleChange}
-              required
-            >
-              <option value="Health">Health</option>
-              <option value="Education">Education</option>
-              <option value="General">General</option>
-              <option value="Emergency">Emergency</option>
-              <option value="Environment">Environment</option>
-              <option value="Animal Welfare">Animal Welfare</option>
-              <option value="Others">Others</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Image:</label>
-            <input 
-              type="file" 
-              id="image" 
-              name="image" 
-              accept="image/*" 
-              onChange={handleFileChange}
-              required 
-            />
-          </div>
-
-          <button type="submit" className="gradient-btn">Create Fundraiser</button>
+          <button type="submit" className={styles.submitBtn}>Launch Campaign</button>
         </form>
       </div>
-
       <Footer />
     </div>
   );

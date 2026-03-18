@@ -235,7 +235,66 @@ export default function DonorDashboard() {
                 ) : <p className={styles.noData}>No item donations yet.</p>}
               </div>
             </section>
+{/* --- SECTION: UPCOMING REGISTERED EVENTS --- */}
+<section className={styles.contentSection}>
+  <div className={styles.sectionHeader}>
+    <h2 className={styles.sectionTitle}>Upcoming Registered Events</h2>
+  </div>
 
+  <div className={styles.cardGrid}>
+    {activity?.events_upcoming?.length > 0 ? (
+      activity.events_upcoming.map((registration) => {
+        // 'eventObjectId' is the populated field from your Donor Controller
+        const eventDetails = registration.eventObjectId;
+
+        return (
+          <div key={registration._id} className={styles.dataCard} style={{ borderLeft: '5px solid #28a745' }}>
+            <div className={styles.appHeader}>
+              <h4 style={{ color: '#1a202c', margin: '0 0 10px 0' }}>
+                {eventDetails?.event_name || "Event Title"}
+              </h4>
+              <span className={`${styles.statusBadge} ${styles.pending}`}>
+                Registered
+              </span>
+            </div>
+
+            <div style={{ marginBottom: '15px', fontSize: '0.9rem', color: '#4a5568' }}>
+              <p style={{ margin: '4px 0' }}>
+                <strong> Date:</strong> {eventDetails?.event_date ? new Date(eventDetails.event_date).toDateString() : "Date TBD"}
+              </p>
+              <p style={{ margin: '4px 0' }}>
+                <strong> Location:</strong> {eventDetails?.event_location || "Venue details to follow"}
+              </p>
+              <p style={{ margin: '4px 0' }}>
+                <strong> Organized by:</strong> {registration.ngoName || "Partner NGO"}
+              </p>
+            </div>
+
+            {/* THE "ABOUT" DETAILS BOX */}
+            <div style={{ 
+              padding: '12px', 
+              backgroundColor: '#f7fafc', 
+              borderRadius: '8px', 
+              border: '1px solid #e2e8f0' 
+            }}>
+              <p style={{ fontSize: '0.85rem', lineHeight: '1.5', margin: 0, color: '#2d3748' }}>
+                <strong>About this Event:</strong><br />
+                {eventDetails?.description || "No specific description provided. Please contact the NGO for more details."}
+              </p>
+            </div>
+          </div>
+        );
+      })
+    ) : (
+      <div className={styles.noDataBox} style={{ textAlign: 'center', padding: '30px' }}>
+        <p className={styles.noData}>You have no upcoming registered events.</p>
+        <Link to="/events" className={styles.discoverLink} style={{ fontWeight: 'bold', color: '#2f855a' }}>
+          Browse & Register for Events →
+        </Link>
+      </div>
+    )}
+  </div>
+</section>
             {/* Events Participated */}
             <section className={styles.contentSection}>
               <h2 className={styles.sectionTitle}>Events Participated</h2>

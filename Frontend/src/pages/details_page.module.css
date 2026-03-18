@@ -1,0 +1,44 @@
+.wrapper { background-color: #f8fafc; min-height: 100vh; font-family: 'Segoe UI', sans-serif; }
+.container { max-width: 1000px; width: 95%; margin: 20px auto; }
+
+.btnBack { background: none; border: none; color: #064e3b; font-weight: 700; font-size: 13px; cursor: pointer; padding-bottom: 12px; }
+
+/* --- The Main Info Box --- */
+.mainInfoBox {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border-left: 6px solid #10b981;
+  margin-bottom: 30px;
+}
+
+.bannerHeader { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.title { font-size: 22px; color: #064e3b; margin: 0; font-weight: 800; }
+.desc { font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+
+.metricsGrid { display: flex; gap: 40px; border-top: 1px solid #f1f5f9; padding-top: 20px; }
+.metricItem { display: flex; flex-direction: column; }
+.label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+.value { font-size: 20px; font-weight: 800; color: #1e293b; }
+
+/* --- Badges & Status --- */
+.badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 4px; letter-spacing: 0.05em; }
+.fund { background: #ecfdf5; color: #064e3b; border: 1px solid #10b981; }
+.event { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+.statusText { color: #10b981; }
+
+/* --- Table Styles --- */
+.subHeading { font-size: 16px; color: #064e3b; margin-bottom: 12px; font-weight: 700; }
+.tableBox { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { 
+  background: linear-gradient(to right, #064e3b, #059669); 
+  color: white; padding: 12px 16px; text-align: left; font-size: 11px; text-transform: uppercase; 
+}
+.table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; color: #475569; }
+.bold { font-weight: 600; color: #064e3b; }
+.currency { color: #059669; font-weight: 700; }
+.center { text-align: center; }
+
+.loader { height: 60vh; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #064e3b; }
