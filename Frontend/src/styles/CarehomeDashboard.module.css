@@ -324,6 +324,65 @@
     border-radius: 4px;
 }
 
+/* Impact Stories Upload Styling */
+.storyForm {
+    display: grid;
+    gap: 15px;
+    background: #f8fafc;
+    border: 1px solid #d1fae5;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.storyForm input[type="text"],
+.storyForm textarea,
+.storyForm input[type="file"] {
+    width: 100%;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    color: #1f2937;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.storyForm input[type="text"]:focus,
+.storyForm textarea:focus,
+.storyForm input[type="file"]:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+.storyForm textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.storyForm button {
+    max-width: 160px;
+    align-self: flex-start;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.storyForm button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(16, 185, 129, 0.28);
+}
+
+.storyForm .fileNote {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
 .highlightText {
     color: #10b981;
     font-weight: 600;

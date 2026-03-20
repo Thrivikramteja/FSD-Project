@@ -312,6 +312,11 @@ const CarehomeDashboard = () => {
                     accept="image/*,video/*"
                     onChange={(e) => setStoryFiles([...e.target.files])}
                   />
+                  {storyFiles.length > 0 && (
+                    <div className={styles.fileNote}>
+                      Selected files: {storyFiles.map((file) => file.name).join(", ")}
+                    </div>
+                  )}
                   <button onClick={handleUploadStory}>Upload Story</button>
                 </div>
               </section>

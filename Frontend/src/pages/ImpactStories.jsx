@@ -14,18 +14,25 @@ const ImpactStories = () => {
   const [progressPercent, setProgressPercent] = useState(0);
   const storyStartTimeRef = useRef(null);
   const currentMediaRefRef = useRef(0);
+  const hasLoadToastShownRef = useRef(false);
 
   useEffect(() => {
     axios.get('/api/impact-stories')
       .then(res => {
         setStories(res.data.stories);
         setLoading(false);
-        toast.success('Impact stories loaded successfully!');
+        if (!hasLoadToastShownRef.current) {
+          toast.success('Impact stories loaded successfully!');
+          hasLoadToastShownRef.current = true;
+        }
       })
       .catch(err => {
         console.error('Error fetching stories:', err);
         setLoading(false);
-        toast.error('Failed to load impact stories. Please try again later.');
+        if (!hasLoadToastShownRef.current) {
+          toast.error('Failed to load impact stories. Please try again later.');
+          hasLoadToastShownRef.current = true;
+        }
       });
   }, []);
 
