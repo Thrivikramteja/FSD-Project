@@ -1,0 +1,50 @@
+{
+  "NGO": {
+    "type": "object",
+    "required": ["email", "Ngoname", "darpan_id"],
+    "properties": {
+      "ngoId": { "type": "integer", "description": "Auto-incremented ID" },
+      "Ngoname": { "type": "string" },
+      "darpan_id": { "type": "string" },
+      "year_established": { "type": "integer" },
+      "email": { "type": "string", "format": "email" },
+      "phone": { "type": "string" },
+      "address": { "type": "string" },
+      "account_holder_name": { "type": "string" },
+      "account_number": { "type": "string" },
+      "ifsc": { "type": "string" }
+    }
+  },
+  "Event": {
+    "type": "object",
+    "required": ["event_name", "event_location", "event_date", "event_time"],
+    "properties": {
+      "ngoId": { "type": "integer" },
+      "event_name": { "type": "string" },
+      "event_location": { "type": "string" },
+      "event_date": { "type": "string", "format": "date" },
+      "event_time": { "type": "string" },
+      "number_of_registrations": { "type": "integer", "default": 0 },
+      "description": { "type": "string" },
+      "imagePath": { "type": "string" }
+    }
+  },
+  "Fundraiser": {
+    "type": "object",
+    "required": ["fundraiser_name", "goal_amount", "deadline"],
+    "properties": {
+      "ngoId": { "type": "integer" },
+      "carehomeId": { "type": "integer" },
+      "fundraiser_name": { "type": "string" },
+      "goal_amount": { "type": "number" },
+      "amount_raised_so_far": { "type": "number", "default": 0 },
+      "description": { "type": "string" },
+      "deadline": { "type": "string", "format": "date" },
+      "imagePath": { "type": "string" },
+      "tag": {
+        "type": "string",
+        "enum": ["Health", "Education", "General", "Emergency", "Environment", "Animal Welfare", "Others"]
+      }
+    }
+  }
+}

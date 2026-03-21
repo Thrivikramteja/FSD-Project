@@ -8,14 +8,7 @@
   "servers": [
     { "url": "http://localhost:3000", "description": "Dev Server" }
   ],
-  "paths": {
-    "/api/admin": { "$ref": "./paths/admin.json" },
-    "/api/auth": { "$ref": "./paths/auth.json" },
-    "/api/base": { "$ref": "./paths/base.json" },
-    "/api/carehomes": { "$ref": "./paths/carehome.json" },
-    "/api/donors": { "$ref": "./paths/donor.json" },
-    "/api/ngo": { "$ref": "./paths/NGO.json" }
-  },
+  "paths": {},
   "components": {
     "securitySchemes": {
       "bearerAuth": {
@@ -23,6 +16,7 @@
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
-    }
+    },
+    "schemas": {}
   }
 }

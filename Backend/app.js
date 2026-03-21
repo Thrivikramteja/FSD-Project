@@ -4,6 +4,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const rfs = require("rotating-file-stream");
+const fs = require("fs"); 
+const swaggerUi = require("swagger-ui-express"); 
 //mail errors to the team
 const sendErrorEmail = require("./services/errorMailer.js");
 require("./data/database.js");
@@ -34,12 +36,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({ 
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    // Allow localhost with any port
     if (origin.startsWith('http://localhost:')) return callback(null, true);
-    
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true 
@@ -60,6 +58,51 @@ app.use(donorRoutes);
 app.use(NGORoutes);
 app.use(adminRoutes);
 app.use(impactStoriesRoutes);
+
+// --- SWAGGER SETUP START ---
+try {
+  const openApiSelector = path.join(__dirname, "docs", "openapi.json");
+  const swaggerDoc = JSON.parse(fs.readFileSync(openApiSelector, "utf8"));
+  
+  // Reset paths and schemas to ensure no circular refs from openapi.json
+  swaggerDoc.paths = {};
+  swaggerDoc.components.schemas = {};
+
+  const mergeDocs = (folderName) => {
+    const fullPath = path.join(__dirname, "docs", folderName);
+    if (!fs.existsSync(fullPath)) return;
+
+    fs.readdirSync(fullPath).forEach(file => {
+      const filePath = path.join(fullPath, file);
+      const rawData = fs.readFileSync(filePath, "utf8").trim();
+
+      if (!rawData || rawData === "{}" || rawData === "") return;
+
+      try {
+        const content = JSON.parse(rawData);
+        if (folderName === "schemas") {
+          Object.assign(swaggerDoc.components.schemas, content);
+        } else {
+          Object.assign(swaggerDoc.paths, content);
+        }
+      } catch (e) {
+        console.error(`[Swagger Error]: JSON issue in ${file}`);
+      }
+    });
+  };
+
+  mergeDocs("paths");
+  mergeDocs("schemas");
+
+  // This line serves the UI
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+  console.log("✅ Swagger UI mounted at http://localhost:3000/api-docs");
+
+} catch (err) {
+  console.error("❌ Critical Swagger Setup Error:", err.message);
+}
+// --- SWAGGER SETUP END ---
+
 
 // 404 Catch-all
 app.use((req, res, next) => {
@@ -87,6 +130,5 @@ app.use((err, req, res, next) => {
     message
   });
 });
-
 
 app.listen(3000, () => console.log("Server running on port 3000"));
