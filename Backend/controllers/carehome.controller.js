@@ -45,18 +45,24 @@ async function donateMoney(req, res,next) {
   }
 }
 
-async function insertMoney(req, res,next) {
+async function insertMoney(req, res, next) {
   try {
     const total = parseFloat(req.body.total);
-
     const userId = req.user.id;
-
     const carehomeId = parseInt(req.params.carehomeId, 10);
 
     if (!userId || isNaN(carehomeId) || isNaN(total) || total <= 0) {
       return res.status(400).json({
         message:
           "Missing or invalid data OR Login as user and try to donate money",
+      });
+    }
+
+    const carehomeExists = await Carehome.findOne({ carehomeId: carehomeId });
+    if (!carehomeExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Carehome not found",
       });
     }
 
@@ -79,7 +85,6 @@ async function insertMoney(req, res,next) {
     next(error);
   }
 }
-
 async function register(req, res,next) {
   res.render("carehomes/care_reg");
 }
@@ -170,7 +175,7 @@ async function donateItems(req, res,next) {
   }
 }
 
-async function get_don_items(req, res,next) {
+async function get_don_items(req, res, next) {
   try {
     if (!req.user || req.user.role !== "Donor") {
       return res.status(403).json({
@@ -190,6 +195,14 @@ async function get_don_items(req, res,next) {
     if (!carehomeId || !category || !location || !deliveryDate || !userId) {
       return res.status(400).json({
         error: "All fields except description are required.",
+      });
+    }
+
+    const carehomeExists = await Carehome.findOne({ carehomeId: carehomeId });
+    if (!carehomeExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Carehome not found",
       });
     }
 
