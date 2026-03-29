@@ -1,1 +1,76 @@
-{}
+{
+  "Carehome": {
+    "type": "object",
+    "required": ["care_home_name", "email"],
+    "properties": {
+      "carehomeId": { "type": "integer", "example": 501 },
+      "care_home_name": { "type": "string", "example": "Peace Haven Eldercare" },
+      "reg_number": { "type": "string" },
+      "email": { "type": "string", "format": "email" },
+      "contact": { "type": "string" },
+      "state": { "type": "string" },
+      "city": { "type": "string" },
+      "num_residents": { "type": "integer", "example": 40 },
+      "avg_expense": { "type": "number", "example": 25000 },
+      "wishlist": { "type": "string", "description": "Text list of needed items" },
+      "description": { "type": "string" },
+      "imagePath": { "type": "string" },
+      "banking": {
+        "type": "object",
+        "properties": {
+          "account_holder": { "type": "string" },
+          "account_number": { "type": "string" },
+          "ifsc": { "type": "string" }
+        }
+      }
+    }
+  },
+  "DonationMoney": {
+    "type": "object",
+    "required": ["userId", "amount_donated", "carehomeId"],
+    "properties": {
+      "userId": { "type": "integer" },
+      "carehomeId": { "type": "integer" },
+      "amount_donated": { "type": "number" },
+      "donated_at": { "type": "string", "format": "date-time" }
+    }
+  },
+  "DonatedItem": {
+    "type": "object",
+    "required": ["userId", "carehomeId", "category", "delivery", "location"],
+    "properties": {
+      "userId": { "type": "integer" },
+      "carehomeId": { "type": "integer" },
+      "category": { "type": "string" },
+      "delivery": { "type": "string", "format": "date" },
+      "description": { "type": "string" },
+      "location": { "type": "string" },
+      "donated_at": { "type": "string", "format": "date-time" }
+    }
+  },
+  "CareHomeJob": {
+    "type": "object",
+    "required": ["postedBy", "title", "description"],
+    "properties": {
+      "postedBy": { "type": "string", "description": "ObjectId of the Carehome" },
+      "title": { "type": "string", "example": "Nursing Assistant" },
+      "description": { "type": "string" },
+      "location": { "type": "string" },
+      "pay": { "type": "number" },
+      "type": { 
+        "type": "string", 
+        "enum": ["Caretaker", "Part-time", "Full-time", "Other"],
+        "default": "Other"
+      },
+      "startDate": { "type": "string", "format": "date" },
+      "endDate": { "type": "string", "format": "date" }
+    }
+  },
+  "CarehomeStat": {
+    "type": "object",
+    "properties": {
+      "title": { "type": "string", "example": "Average Cost Per Resident" },
+      "value": { "type": "string", "example": "625.00" }
+    }
+  }
+}

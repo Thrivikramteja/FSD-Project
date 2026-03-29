@@ -1,1 +1,387 @@
-{}
+{
+  "/api/carehomes": {
+    "get": {
+      "tags": ["Carehome Public"],
+      "summary": "Get all carehomes",
+      "responses": {
+        "200": {
+          "description": "List of carehomes returned successfully"
+        }
+      }
+    }
+  },
+
+  "/api/jobs": {
+    "get": {
+      "tags": ["Carehome Public"],
+      "summary": "Get all job listings",
+      "responses": {
+        "200": {
+          "description": "List of job listings"
+        }
+      }
+    }
+  },
+
+  "/api/carehomes/viewcare/{carehomeId}": {
+    "get": {
+      "tags": ["Carehome Public"],
+      "summary": "Get public carehome profile",
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Public carehome information returned"
+        }
+      }
+    }
+  },
+
+  "/api/registerCarehome": {
+    "post": {
+      "tags": ["Carehome Public"],
+      "summary": "Register a new carehome",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "care_home_name": { "type": "string" },
+                "reg_number": { "type": "string" },
+                "email": { "type": "string" },
+                "password": { "type": "string" },
+                "contact": { "type": "string" },
+                "state": { "type": "string" },
+                "city": { "type": "string" },
+                "num_residents": { "type": "integer" },
+                "avg_expense": { "type": "number" },
+                "wishlist": { "type": "string" },
+                "description": { "type": "string" },
+                "account_holder": { "type": "string" },
+                "account_number": { "type": "string" },
+                "ifsc": { "type": "string" },
+                "terms": { "type": "boolean" },
+                "image": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Carehome registered successfully"
+        }
+      }
+    }
+  },
+
+  "/api/carehome-dashboard/{carehomeId}": {
+    "get": {
+      "tags": ["Carehome Dashboard"],
+      "summary": "Get carehome dashboard data",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Dashboard data returned"
+        }
+      }
+    }
+  },
+
+  "/api/carehome/profile/{carehomeId}": {
+    "get": {
+      "tags": ["Carehome Dashboard"],
+      "summary": "Get carehome profile",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Carehome profile returned"
+        }
+      }
+    }
+  },
+
+  "/api/carehome/{carehomeId}": {
+    "put": {
+      "tags": ["Carehome Dashboard"],
+      "summary": "Update carehome profile",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "example": {
+              "fullname": "Hope Care Center",
+              "phne": "9876543210",
+              "state": "Karnataka",
+              "city": "Bangalore",
+              "mail": "carehome@mail.com",
+              "gvtid": "REG12345",
+              "bank": "Hope Trust",
+              "accnum": "1234567890",
+              "ifsc": "SBIN000123",
+              "wishlist": "Medicines, Clothes"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Carehome profile updated successfully"
+        }
+      }
+    }
+  },
+
+  "/api/carehome/{carehomeId}/donate-money": {
+    "post": {
+      "tags": ["Donor Actions"],
+      "summary": "Donate money to a carehome",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "example": {
+              "total": 500
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Donation successful"
+        }
+      }
+    }
+  },
+
+  "/donate_items_user": {
+    "post": {
+      "tags": ["Donor Actions"],
+      "summary": "Donate physical items to a carehome",
+      "security": [{ "bearerAuth": [] }],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "example": {
+              "carehomes": 5,
+              "category": "Clothes",
+              "description": "Winter clothes",
+              "address": "Bangalore",
+              "date": "2025-03-20"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Donation request sent"
+        }
+      }
+    }
+  },
+
+  "/donate_item/action": {
+    "post": {
+      "tags": ["Carehome Management"],
+      "summary": "Accept or reject item donation request",
+      "security": [{ "bearerAuth": [] }],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "example": {
+              "action": "accept",
+              "carehomeId": 3,
+              "category": "Food",
+              "delivery_date": "2025-04-10",
+              "location": "Bangalore",
+              "description": "Groceries",
+              "userId": 21
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Donation request processed"
+        }
+      }
+    }
+  },
+
+  "/api/carehome/my-jobs": {
+    "get": {
+      "tags": ["Carehome Management"],
+      "summary": "Get jobs posted by carehome",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "List of jobs posted by the carehome"
+        }
+      }
+    }
+  },
+
+  "/api/carehome/jobs/{jobId}/applicants": {
+    "get": {
+      "tags": ["Carehome Management"],
+      "summary": "Get applicants for a job",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "jobId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "List of job applicants"
+        }
+      }
+    }
+  },
+
+  "/api/applications/{id}/accept": {
+    "patch": {
+      "tags": ["Carehome Management"],
+      "summary": "Accept job application",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Application accepted"
+        }
+      }
+    }
+  },
+
+  "/api/applications/{id}/reject": {
+    "patch": {
+      "tags": ["Carehome Management"],
+      "summary": "Reject job application",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Application rejected"
+        }
+      }
+    }
+  },
+
+  "/my-applications": {
+    "get": {
+      "tags": ["Donor Actions"],
+      "summary": "Get applications submitted by donor",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "User applications returned"
+        }
+      }
+    }
+  },
+
+  "/api/carehome/impact-story": {
+    "post": {
+      "tags": ["Carehome Management"],
+      "summary": "Create an impact story",
+      "security": [{ "bearerAuth": [] }],
+      "requestBody": {
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "media": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Impact story created"
+        }
+      }
+    }
+  },
+
+  "/api/impact-stories": {
+    "get": {
+      "tags": ["Carehome Public"],
+      "summary": "Get all impact stories",
+      "responses": {
+        "200": {
+          "description": "Impact stories retrieved"
+        }
+      }
+    }
+  }
+}
