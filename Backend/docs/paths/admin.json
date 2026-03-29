@@ -1,1 +1,473 @@
-{}
+{
+  "/api/admin/dashboard": {
+    "get": {
+      "tags": ["Admin Dashboard"],
+      "summary": "Retrieve Admin Platform Dashboard Metrics",
+      "description": "Returns platform statistics including revenue, total NGOs, carehomes, events, and top fundraisers.",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "Admin dashboard metrics retrieved successfully",
+          "content": {
+            "application/json": {
+              "example": {
+                "highest_Donation": 50000,
+                "high_con_name": "Rahul Sharma",
+                "total_revenue": 85000,
+                "total_ngo": 12,
+                "total_care": 8,
+                "total_events": 20,
+                "total_money": 1000000,
+                "top_fund": [
+                  {
+                    "fundraiser_name": "Medical Aid",
+                    "amount_raised_so_far": 120000
+                  }
+                ],
+                "monthlyBusiness": [
+                  { "name": "Jan", "profit": "3200.50" },
+                  { "name": "Feb", "profit": "5400.00" }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/api/admin/main-stats": {
+    "get": {
+      "tags": ["Admin Dashboard"],
+      "summary": "Retrieve Core Platform Stats",
+      "description": "Returns same aggregated statistics used in the admin dashboard.",
+      "responses": {
+        "200": {
+          "description": "Statistics retrieved"
+        }
+      }
+    }
+  },
+
+  "/api/admin/events-analytics": {
+    "get": {
+      "tags": ["Admin Analytics"],
+      "summary": "Get Event Analytics",
+      "description": "Returns analytics of events grouped into ongoing, upcoming, and completed events along with the most influential NGO and event.",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "Event analytics retrieved successfully",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "analytics": {
+                  "influentialNgo": {
+                    "name": "Helping Hands",
+                    "impact": 120
+                  },
+                  "influentialEvent": {
+                    "event_name": "Charity Run",
+                    "number_of_registrations": 200
+                  }
+                },
+                "groups": {
+                  "ongoing": [],
+                  "upcoming": [],
+                  "completed": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/api/admin/event-registrations/{eventObjectId}": {
+    "get": {
+      "tags": ["Admin Analytics"],
+      "summary": "Get Event Registrations",
+      "description": "Returns a list of users registered for a specific event.",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "eventObjectId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Event registrations retrieved",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "registrationList": [
+                  {
+                    "name": "John Doe",
+                    "userId": 101,
+                    "registeredAt": "2025-03-10T10:22:00Z"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/api/admin/fundraisers-analytics": {
+    "get": {
+      "tags": ["Admin Analytics"],
+      "summary": "Get Fundraiser Analytics",
+      "description": "Provides analytics for fundraisers including top ongoing campaigns and NGO revenue statistics.",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "Fundraiser analytics retrieved",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "analytics": {
+                  "top3Ongoing": [],
+                  "ngoRevenue": [
+                    { "name": "Helping Hands", "total": 120000 }
+                  ]
+                },
+                "groups": {
+                  "ongoing": [],
+                  "completed": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/api/admin/fundraiser-donors/{fundraiserObjectId}": {
+    "get": {
+      "tags": ["Admin Analytics"],
+      "summary": "Get Donors for a Fundraiser",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "fundraiserObjectId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Donor list retrieved",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "donorList": [
+                  {
+                    "name": "Anita Rao",
+                    "amount": 5000,
+                    "date": "2025-03-12T10:00:00Z"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/api/admin/donations-analytics": {
+    "get": {
+      "tags": ["Admin Analytics"],
+      "summary": "Get Carehome Donation Analytics",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "Donation analytics retrieved",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "analytics": {
+                  "carehomeImpact": [
+                    { "name": "Sunrise Carehome", "total": 50000 }
+                  ],
+                  "monthlyStats": [
+                    { "name": "Jan", "total": 10000 }
+                  ],
+                  "platformTotal": 120000
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/api/admin/carehome-donors/{carehomeId}": {
+    "get": {
+      "tags": ["Admin Analytics"],
+      "summary": "Get Carehome Donors",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Carehome donor list retrieved"
+        }
+      }
+    }
+  },
+
+  "/api/admin/all-donors": {
+    "get": {
+      "tags": ["Admin Management"],
+      "summary": "Get All Donors",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "List of donors returned"
+        }
+      }
+    }
+  },
+
+  "/api/admin/donor-stats/{userId}": {
+    "get": {
+      "tags": ["Admin Management"],
+      "summary": "Get Donor Activity Stats",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Donor statistics retrieved"
+        }
+      }
+    }
+  },
+
+"/api/admin/delete-donor": {
+  "delete": {
+    "tags": ["Admin Management"],
+    "summary": "Delete Donor Account",
+    "security": [{ "bearerAuth": [] }],
+    "parameters": [
+      {
+        "name": "userId",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "integer" }
+      },
+      {
+        "name": "email",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "string" }
+      },
+      {
+        "name": "name",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "string" }
+      },
+      {
+        "name": "reason",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "string" }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Donor deleted successfully"
+      }
+    }
+  }
+},
+
+  "/api/admin/all-ngos-manage": {
+    "get": {
+      "tags": ["Admin Management"],
+      "summary": "Get All NGOs",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "NGO list retrieved"
+        }
+      }
+    }
+  },
+
+  "/api/admin/ngo-manage-stats/{ngoId}": {
+    "get": {
+      "tags": ["Admin Management"],
+      "summary": "Get NGO Management Stats",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "ngoId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "NGO statistics retrieved"
+        }
+      }
+    }
+  },
+
+"/api/admin/delete-ngo": {
+  "delete": {
+    "tags": ["Admin Management"],
+    "summary": "Delete NGO Account",
+    "security": [{ "bearerAuth": [] }],
+    "parameters": [
+      {
+        "name": "ngoId",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "integer" }
+      },
+      {
+        "name": "email",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "string" }
+      },
+      {
+        "name": "name",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "string" }
+      },
+      {
+        "name": "reason",
+        "in": "query",
+        "required": true,
+        "schema": { "type": "string" }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "NGO deleted successfully"
+      }
+    }
+  }
+},
+
+  "/api/admin/all-carehomes-manage": {
+    "get": {
+      "tags": ["Admin Management"],
+      "summary": "Get All Carehomes",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "Carehome list retrieved"
+        }
+      }
+    }
+  },
+
+  "/api/admin/carehome-manage-stats/{carehomeId}": {
+    "get": {
+      "tags": ["Admin Management"],
+      "summary": "Get Carehome Management Stats",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Carehome statistics retrieved"
+        }
+      }
+    }
+  },
+
+  "/api/admin/delete-carehome": {
+    "delete": {
+      "tags": ["Admin Management"],
+      "summary": "Delete Carehome Account",
+      "description": "Removes a carehome from the platform and sends an email notification explaining the reason.",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "carehomeId",
+          "in": "query",
+          "required": true,
+          "schema": { "type": "integer" },
+          "description": "Unique identifier of the carehome"
+        },
+        {
+          "name": "email",
+          "in": "query",
+          "required": true,
+          "schema": { "type": "string" },
+          "description": "Email address where the notification will be sent"
+        },
+        {
+          "name": "name",
+          "in": "query",
+          "required": true,
+          "schema": { "type": "string" },
+          "description": "Name of the carehome"
+        },
+        {
+          "name": "reason",
+          "in": "query",
+          "required": true,
+          "schema": { "type": "string" },
+          "description": "Reason for deleting the carehome"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Carehome deleted successfully",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Server error while deleting carehome"
+        }
+      }
+    }
+  }
+}
