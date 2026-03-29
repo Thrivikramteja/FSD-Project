@@ -21,12 +21,12 @@ const NgoControl = () => {
 
     const confirmDelete = async () => {
         if (!reason) return alert("Reason required");
-        await fetch('http://localhost:3000/api/admin/delete-ngo', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ngoId: deleteTarget.ngoId, email: deleteTarget.email, name: deleteTarget.Ngoname, reason }),
-            credentials: 'include'
-        });
+       await fetch(
+                    `http://localhost:3000/api/admin/delete-ngo?ngoId=${deleteTarget.ngoId}&email=${deleteTarget.email}&name=${deleteTarget.Ngoname}&reason=${encodeURIComponent(reason)}`,
+                    {
+                        method: 'DELETE',
+                        credentials: 'include'
+                    });
         setNgos(ngos.filter(n => n.ngoId !== deleteTarget.ngoId));
         setDeleteTarget(null);
     };

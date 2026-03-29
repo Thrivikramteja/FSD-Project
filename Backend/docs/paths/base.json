@@ -16,14 +16,14 @@
                     "type": "array",
                     "description": "List of currently active fundraising campaigns",
                     "items": {
-                      "$ref": "../schemas/Fundraiser.json"
+                      "$ref": "#/components/schemas/Fundraiser"
                     }
                   },
                   "upcoming_eve": {
                     "type": "array",
                     "description": "List of scheduled upcoming events",
                     "items": {
-                      "$ref": "../schemas/Event.json"
+                      "$ref": "#/components/schemas/Event"
                     }
                   }
                 }

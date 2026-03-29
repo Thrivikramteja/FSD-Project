@@ -24,12 +24,12 @@ const DonorControl = () => {
 
     const confirmDelete = async () => {
         if (!reason) return alert("Reason is required");
-        await fetch('http://localhost:3000/api/admin/delete-donor', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: deleteTarget.userId, email: deleteTarget.email, name: deleteTarget.name, reason }),
-            credentials: 'include'
-        });
+       await fetch(
+                `http://localhost:3000/api/admin/delete-donor?userId=${deleteTarget.userId}&email=${deleteTarget.email}&name=${deleteTarget.name}&reason=${encodeURIComponent(reason)}`,
+                {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
         setDonors(donors.filter(d => d.userId !== deleteTarget.userId));
         setDeleteTarget(null);
     };

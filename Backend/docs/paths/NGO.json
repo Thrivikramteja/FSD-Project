@@ -1,77 +1,74 @@
 {
   "/api/ngo/register": {
     "post": {
-      "tags": ["NGO Public"],
-      "summary": "Register a new NGO",
-      "description": "Public service to register an NGO entity with Darpan ID and banking details for donation disbursement.",
+      "tags": ["NGO Management"],
+      "summary": "Register NGO",
       "requestBody": {
         "content": {
           "application/json": {
-            "schema": { "$ref": "../schemas/NGO.json#/NGO" }
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Ngoname": { "type": "string" },
+                "darpan_id": { "type": "string" },
+                "year_established": { "type": "integer" },
+                "email": { "type": "string" },
+                "password": { "type": "string" },
+                "phone": { "type": "string" },
+                "address": { "type": "string" },
+                "account_holder_name": { "type": "string" },
+                "account_number": { "type": "string" },
+                "ifsc": { "type": "string" }
+              }
+            }
           }
         }
       },
-      "responses": {
-        "201": { "description": "NGO account created successfully" },
-        "400": { "description": "Invalid input or Darpan ID already exists" }
-      }
+      "responses": { "201": { "description": "Success" } }
     }
   },
   "/api/ngo-dashboard/{ngoID}": {
     "get": {
       "tags": ["NGO Dashboard"],
-      "summary": "Retrieve NGO Dashboard Data",
-      "description": "Private service for NGOs to view their profile, computed statistics, and categorized lists of fundraisers/events.",
+      "summary": "Private Dashboard Stats",
       "security": [{ "bearerAuth": [] }],
-      "parameters": [
-        { "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } }
-      ],
-      "responses": {
-        "200": { "description": "Dashboard data fetched successfully" },
-        "401": { "description": "Unauthorized - Valid JWT required" }
-      }
+      "parameters": [{ "name": "ngoID", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "responses": { "200": { "description": "Success" } }
     }
   },
   "/api/ngo-dashboard/{ngoID}/create-fundraiser": {
     "post": {
-      "tags": ["NGO Management"],
-      "summary": "Create a new Fundraiser",
-      "description": "Allows an authenticated NGO to initiate a fundraising campaign. Includes image upload for campaign visibility.",
+      "tags": ["NGO Actions"],
+      "summary": "Create Fundraiser",
       "security": [{ "bearerAuth": [] }],
-      "parameters": [
-        { "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } }
-      ],
+      "parameters": [{ "name": "ngoID", "in": "path", "required": true, "schema": { "type": "integer" } }],
       "requestBody": {
         "content": {
           "multipart/form-data": {
             "schema": {
               "type": "object",
               "properties": {
-                "carehomeId": { "type": "string" },
+                "id_carehome": { "type": "integer" },
                 "fundraiser_name": { "type": "string" },
                 "goal_amount": { "type": "number" },
                 "deadline": { "type": "string", "format": "date" },
                 "description": { "type": "string" },
+                "tag": { "type": "string" },
                 "image": { "type": "string", "format": "binary" }
               }
             }
           }
         }
       },
-      "responses": {
-        "201": { "description": "Fundraiser created successfully" }
-      }
+      "responses": { "200": { "description": "Success" } }
     }
   },
   "/api/ngo/{ngoID}/create-event": {
     "post": {
-      "tags": ["NGO Management"],
-      "summary": "Schedule a Community Event",
-      "description": "Creates a public event tied to the NGO. Handles image storage for event posters.",
+      "tags": ["NGO Actions"],
+      "summary": "Create Event",
       "security": [{ "bearerAuth": [] }],
-      "parameters": [
-        { "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } }
-      ],
+      "parameters": [{ "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } }],
       "requestBody": {
         "content": {
           "multipart/form-data": {
@@ -80,7 +77,7 @@
               "properties": {
                 "event_name": { "type": "string" },
                 "event_location": { "type": "string" },
-                "event_date": { "type": "string", "format": "date" },
+                "deadline": { "type": "string", "format": "date", "description": "Mapped to event_date" },
                 "event_time": { "type": "string" },
                 "description": { "type": "string" },
                 "image": { "type": "string", "format": "binary" }
@@ -89,45 +86,92 @@
           }
         }
       },
-      "responses": {
-        "201": { "description": "Event scheduled" }
-      }
+      "responses": { "200": { "description": "Success" } }
     }
   },
-  "/api/NGO-dashboard/{ngoID}/details/{type}/{id}": {
+  "/api/NGO-dashboard/{ngoID}/edit": {
+    "put": {
+      "tags": ["NGO Dashboard"],
+      "summary": "Update Profile",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [{ "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } }],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fullname": { "type": "string" },
+                "phone": { "type": "string" },
+                "bank": { "type": "string" },
+                "accnum": { "type": "string" },
+                "ifsc": { "type": "string" },
+                "darpan": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "responses": { "200": { "description": "Success" } }
+    }
+  },
+  "/api/NGO-dashboard/{ngoID}/details": {
     "get": {
       "tags": ["NGO Dashboard"],
-      "summary": "Get Campaign or Event Details",
-      "description": "Fetches in-depth details for a specific fundraiser or event identified by its type and unique ID.",
+      "summary": "Get Profile for Editing",
       "security": [{ "bearerAuth": [] }],
-      "parameters": [
-        { "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } },
-        { "name": "type", "in": "path", "required": true, "schema": { "type": "string", "enum": ["fundraiser", "event"] } },
-        { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-      ],
-      "responses": {
-        "200": { "description": "Resource details retrieved" }
-      }
+      "parameters": [{ "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } }],
+      "responses": { "200": { "description": "Success" } }
     }
   },
   "/api/ngos": {
     "get": {
-      "tags": ["NGO Public"],
-      "summary": "List all registered NGOs",
-      "description": "A public directory service for donors to find and research NGOs.",
-      "responses": {
-        "200": { "description": "List of NGOs retrieved" }
-      }
+      "tags": ["Public Services"],
+      "summary": "NGO Directory",
+      "responses": { "200": { "description": "Success" } }
     }
   },
-  "/api/carehomes-list": {
+  "/fundraisers": {
     "get": {
-      "tags": ["Resources"],
-      "summary": "Fetch Care Home Directory",
-      "description": "Provides IDs and names of all care homes for selection when creating fundraisers.",
-      "responses": {
-        "200": { "description": "Directory list returned" }
-      }
+      "tags": ["Public Services"],
+      "summary": "Global Fundraisers",
+      "responses": { "200": { "description": "Success" } }
+    }
+  },
+  "/api/events": {
+    "get": {
+      "tags": ["Public Services"],
+      "summary": "Global Events",
+      "responses": { "200": { "description": "Success" } }
+    }
+  },
+  "/registerUser/{ngoID}": {
+    "post": {
+      "tags": ["Donor Actions"],
+      "summary": "Event Registration",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [{ "name": "ngoID", "in": "path", "required": true, "schema": { "type": "string" } }],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "event": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "responses": { "200": { "description": "Success" } }
+    }
+  },
+  "/api/NGOs/profile/{id}": {
+    "get": {
+      "tags": ["Public Services"],
+      "summary": "NGO Public Profile",
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "responses": { "200": { "description": "Success" } }
     }
   }
 }

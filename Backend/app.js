@@ -51,6 +51,7 @@ const NGORoutes = require("./routes/NGO.routes.js");
 const adminRoutes = require("./routes/admin.routes.js");
 const impactStoriesRoutes = require("./routes/impactStories.routes.js");
 
+app.use(require("./routes/corporate.routes"));
 app.use(baseRoutes);
 app.use(authRoutes);
 app.use(carehomeRoutes);
@@ -64,7 +65,6 @@ try {
   const openApiSelector = path.join(__dirname, "docs", "openapi.json");
   const swaggerDoc = JSON.parse(fs.readFileSync(openApiSelector, "utf8"));
   
-  // Reset paths and schemas to ensure no circular refs from openapi.json
   swaggerDoc.paths = {};
   swaggerDoc.components.schemas = {};
 
@@ -94,14 +94,12 @@ try {
   mergeDocs("paths");
   mergeDocs("schemas");
 
-  // This line serves the UI
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
   console.log("✅ Swagger UI mounted at http://localhost:3000/api-docs");
 
 } catch (err) {
   console.error("❌ Critical Swagger Setup Error:", err.message);
 }
-// --- SWAGGER SETUP END ---
 
 
 // 404 Catch-all

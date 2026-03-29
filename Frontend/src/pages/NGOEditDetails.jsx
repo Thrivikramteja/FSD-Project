@@ -55,7 +55,7 @@ const NGOEditDetails = () => {
         e.preventDefault();
         try {
             const res = await fetch(`http://localhost:3000/api/NGO-dashboard/${ngoID}/edit`, {
-                method: 'POST',
+                method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

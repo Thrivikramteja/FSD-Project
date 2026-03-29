@@ -36,20 +36,20 @@ router.post(
   NGOController.createEvent
 );
 
-router.post(
-  "/api/ngo/:ngoID/fundraisers",
-  authenticate,
-  authorizeRoles("NGO"),
-  upload.single("image"),
-  NGOController.createFundraiser
-);
+// router.post(
+//   "/api/ngo/:ngoID/fundraisers",
+//   authenticate,
+//   authorizeRoles("NGO"),
+//   upload.single("image"),
+//   NGOController.createFundraiser
+// );
 
-router.put(
-  "/api/ngo/:ngoID",
-  authenticate,
-  authorizeRoles("NGO"),
-  NGOController.editNGOProfile
-);
+// router.put(
+//   "/api/ngo/:ngoID",
+//   authenticate,
+//   authorizeRoles("NGO"),
+//   NGOController.editNGOProfile
+// );
 
 router.get("/api/ngos", NGOController.get_allngo);
 
@@ -76,7 +76,7 @@ router.get(
   NGOController.getCampaignDetails
 );
 
-router.post(
+router.put(
   "/api/NGO-dashboard/:ngoID/edit",
   authenticate,
   authorizeRoles("NGO"),

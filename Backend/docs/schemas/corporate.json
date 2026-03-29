@@ -1,0 +1,29 @@
+{
+  "CorporateDonation": {
+    "type": "object",
+    "required": ["companyName", "ngoId", "amount"],
+    "properties": {
+      "companyName": {
+        "type": "string",
+        "description": "Name of the company making the donation"
+      },
+      "ngoId": {
+        "type": "integer",
+        "description": "Unique NGO ID (must exist in system)"
+      },
+      "amount": {
+        "type": "number",
+        "description": "Donation amount"
+      },
+      "purpose": {
+        "type": "string",
+        "description": "Purpose of donation"
+      },
+      "donatedAt": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp of donation"
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "/api/b2b/corporate/donate": {
+    "post": {
+      "tags": ["B2B Services"],
+      "summary": "Corporate bulk donation",
+      "description": "Allows companies to make bulk donations via API without frontend interaction. NGO must exist.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CorporateDonation"
+            },
+            "example": {
+              "companyName": "Infosys",
+              "ngoId": 5,
+              "amount": 500000,
+              "purpose": "Healthcare support"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Corporate donation recorded successfully"
+        },
+        "400": {
+          "description": "Missing required fields"
+        },
+        "404": {
+          "description": "NGO not found"
+        }
+      }
+    }
+  }
+}

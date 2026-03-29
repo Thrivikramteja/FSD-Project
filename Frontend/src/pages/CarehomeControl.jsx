@@ -21,12 +21,13 @@ const CarehomeControl = () => {
 
     const confirmDelete = async () => {
         if (!reason) return alert("Reason is required.");
-        await fetch('http://localhost:3000/api/admin/delete-carehome', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ carehomeId: deleteTarget.carehomeId, email: deleteTarget.email, name: deleteTarget.care_home_name, reason }),
-            credentials: 'include'
-        });
+        await fetch(
+                     `http://localhost:3000/api/admin/delete-carehome?carehomeId=${deleteTarget.carehomeId}&email=${deleteTarget.email}&name=${deleteTarget.care_home_name}&reason=${encodeURIComponent(reason)}`,
+                        {
+                            method: 'DELETE',
+                            credentials: 'include'
+                        }
+                        );
         setHomes(homes.filter(h => h.carehomeId !== deleteTarget.carehomeId));
         setDeleteTarget(null);
     };

@@ -271,7 +271,7 @@ async function createEvent(req, res) {
   }
 }
 
-async function createFundraiser(req, res) {
+async function createFundraiser(req, res,next) {
   const ngoID = parseInt(req.params.ngoID, 10);
 
   if (req.user.role !== "NGO" || req.user.id !== ngoID) {
@@ -288,6 +288,13 @@ async function createFundraiser(req, res) {
   } = req.body;
 
   try {
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Fundraiser image is required" 
+      });
+    }
+
     let imagePath = null;
     if (req.file) {
       imagePath = `/uploads/Fundraisers/${req.file.filename}`;

@@ -5,15 +5,14 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let folder = "uploads";
-
-    if (req.body.userRole === "Carehome") {
+    
+    const routePath = req.path || '';
+    if (routePath.includes('event')) {
+      folder = path.join(folder, "Events");
+    } else if (routePath.includes('fundraiser')) {
+      folder = path.join(folder, "Fundraisers");
+    } else if (routePath.includes('carehome')) {
       folder = path.join(folder, "Carehomes");
-    } else if (req.body.userRole === "NGO") {
-      if (req.body.type === "event") {
-        folder = path.join(folder, "Events");
-      } else if (req.body.type === "fundraiser") {
-        folder = path.join(folder, "Fundraisers");
-      }
     }
 
     const targetDir = path.join(__dirname, "public", folder);
