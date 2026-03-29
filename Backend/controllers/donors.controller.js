@@ -146,16 +146,32 @@ async function getEditDonorProfile(req, res) {
   }
 }
 
-async function editDonorProfile(req, res) {
-  const { fullname, phone, mail } = req.body;
+async function editDonorProfile(req, res, next) {
   const userId = parseInt(req.params.userId, 10);
+  const fullname = req.body.fullname || req.body.name;
+  const phone = req.body.phone || req.body.mobile_number;
+  const mail = req.body.mail || req.body.email;
 
   try {
+    if (!req.user || Number(req.user.id) !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to edit this donor profile.",
+      });
+    }
+
     const updatedUser = await User.findOneAndUpdate(
       { userId: userId },
       { name: fullname, mobile_number: phone, email: mail },
       { new: true }
     );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Donor profile not found.",
+      });
+    }
 
     res.status(200).json({
       success: true,
