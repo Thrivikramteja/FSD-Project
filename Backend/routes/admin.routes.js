@@ -39,7 +39,7 @@ router.get('/api/admin/all-donors',authenticate,
 router.get('/api/admin/donor-stats/:userId',authenticate,
   authorizeRoles("Admin"), admin_con.getDonorManagementStats);
 
-router.post('/api/admin/delete-donor',authenticate,
+router.delete('/api/admin/delete-donor',authenticate,
   authorizeRoles("Admin"), admin_con.deleteDonorWithEmail);
 
 router.get('/api/admin/all-ngos-manage',authenticate,
@@ -48,7 +48,7 @@ router.get('/api/admin/all-ngos-manage',authenticate,
 router.get('/api/admin/ngo-manage-stats/:ngoId',authenticate,
   authorizeRoles("Admin"), admin_con.getNgoManagementStats);
 
-router.post('/api/admin/delete-ngo',authenticate,
+router.delete('/api/admin/delete-ngo', authenticate,
   authorizeRoles("Admin"), admin_con.deleteNgoWithEmail);
 
 router.get('/api/admin/all-carehomes-manage',authenticate,
@@ -57,7 +57,7 @@ router.get('/api/admin/all-carehomes-manage',authenticate,
 router.get('/api/admin/carehome-manage-stats/:carehomeId',authenticate,
   authorizeRoles("Admin"), admin_con.getCarehomeManagementStats);
   
-router.post('/api/admin/delete-carehome',authenticate,
+router.delete('/api/admin/delete-carehome', authenticate,
   authorizeRoles("Admin"), admin_con.deleteCarehomeWithEmail);
 
 module.exports = router;

@@ -1,1 +1,214 @@
-{}
+{
+  "/api/donor/{userId}": {
+    "put": {
+      "tags": ["Donor Dashboard"],
+      "summary": "Update donor profile",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "example": {
+              "fullname": "John Doe",
+              "phone": "9876543210",
+              "mail": "john@example.com"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Profile updated successfully"
+        }
+      }
+    }
+  },
+
+  "/api/donate/{ngoId}/{fundraiser_name}": {
+    "post": {
+      "tags": ["Donor Contributions"],
+      "summary": "Contribute to a fundraiser",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "ngoId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        },
+        {
+          "name": "fundraiser_name",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "example": {
+              "your_amount": 1000
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Contribution recorded successfully"
+        }
+      }
+    }
+  },
+
+  "/api/applications/apply": {
+    "post": {
+      "tags": ["Donor Job Portal"],
+      "summary": "Apply for a carehome job",
+      "security": [{ "bearerAuth": [] }],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "example": {
+              "jobId": "64f1abc123",
+              "carehomeId": "64f1def456"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Application submitted"
+        }
+      }
+    }
+  },
+
+  "/api/activity/{userId}": {
+    "get": {
+      "tags": ["Donor Dashboard"],
+      "summary": "Get donor activity history",
+      "description": "Includes events, fundraisers, money donations, and item donations.",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Activity data retrieved",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "data": {
+                  "events_participated": [],
+                  "events_upcoming": [],
+                  "contributedFundraisers": [],
+                  "donations_money": [],
+                  "donations_items": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/ticker-data": {
+    "get": {
+      "tags": ["Public Services"],
+      "summary": "Get live donation ticker data",
+      "responses": {
+        "200": {
+          "description": "Ticker data retrieved",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "data": [
+                  {
+                    "name": "John",
+                    "amount": 500,
+                    "date": "2025-03-20T10:00:00Z"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/my-applications": {
+    "get": {
+      "tags": ["Donor Job Portal"],
+      "summary": "Get donor job applications",
+      "security": [{ "bearerAuth": [] }],
+      "responses": {
+        "200": {
+          "description": "Applications retrieved",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "applications": []
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "/api/receipts/{type}/{id}": {
+    "get": {
+      "tags": ["Donor Dashboard"],
+      "summary": "Download receipt (PDF)",
+      "security": [{ "bearerAuth": [] }],
+      "parameters": [
+        {
+          "name": "type",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" },
+          "description": "fundraiser or donation"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "PDF file returned",
+          "content": {
+            "application/pdf": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,1 +1,80 @@
-{}
+{
+  "Donor": {
+    "type": "object",
+    "required": ["email", "password"],
+    "properties": {
+      "userId": { "type": "integer", "example": 101 },
+      "name": { "type": "string", "example": "Karthik" },
+      "email": { "type": "string", "format": "email" },
+      "mobile_number": { "type": "string", "example": "9876543210" },
+      "receive_notifications": { "type": "boolean", "default": false }
+    }
+  },
+  "JobApplication": {
+    "type": "object",
+    "required": ["jobId", "userId", "carehomeId", "experience", "applicantLocation", "whyMe"],
+    "properties": {
+      "jobId": { "type": "string", "description": "ObjectId of the CareHomeJob" },
+      "userId": { "type": "integer", "description": "userId of the Donor" },
+      "carehomeId": { "type": "string", "description": "ObjectId of the Carehome" },
+      "experience": { "type": "number", "example": 2 },
+      "applicantLocation": { "type": "string", "example": "Sri City" },
+      "whyMe": { "type": "string", "example": "I have experience in elderly care." },
+      "status": { 
+        "type": "string", 
+        "enum": ["Pending", "Accepted", "Rejected", "Completed"],
+        "default": "Pending"
+      },
+      "appliedAt": { "type": "string", "format": "date-time" }
+    }
+  },
+  "UserRegisteredEvent": {
+    "type": "object",
+    "required": ["userId", "ngoId", "event_name", "event_date", "event_location", "eventObjectId"],
+    "properties": {
+      "userId": { "type": "integer" },
+      "ngoId": { "type": "integer" },
+      "event_name": { "type": "string" },
+      "event_date": { "type": "string", "format": "date-time" },
+      "event_location": { "type": "string" },
+      "eventObjectId": { "type": "string" }
+    }
+  },
+  "UserContributedFundraiser": {
+    "type": "object",
+    "required": ["userId", "fundraiser_name", "amount_contributed", "fundraiserObjectId"],
+    "properties": {
+      "userId": { "type": "integer" },
+      "ngoId": { "type": "integer" },
+      "fundraiser_name": { "type": "string" },
+      "amount_contributed": { "type": "number", "example": 500 },
+      "contributed_at": { "type": "string", "format": "date-time" },
+      "deadline": { "type": "string", "format": "date-time" },
+      "fundraiserObjectId": { "type": "string" }
+    }
+  },
+  "DonateItemMessage": {
+    "type": "object",
+    "required": ["carehomeId", "userId", "category", "delivery_date", "location"],
+    "properties": {
+      "carehomeId": { "type": "integer" },
+      "userId": { "type": "integer" },
+      "category": { "type": "string" },
+      "delivery_date": { "type": "string", "format": "date" },
+      "location": { "type": "string" },
+      "description": { "type": "string" }
+    }
+  },
+  "UserNotificationMessage": {
+    "type": "object",
+    "required": ["message", "when_date"],
+    "properties": {
+      "carehomeId": { "type": "integer" },
+      "userId": { "type": "integer" },
+      "message": { "type": "string", "example": "Your donation was accepted!" },
+      "category": { "type": "string" },
+      "delivery": { "type": "string", "format": "date" },
+      "when_date": { "type": "string", "format": "date-time" }
+    }
+  }
+}

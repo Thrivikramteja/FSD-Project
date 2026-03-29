@@ -1,1 +1,32 @@
-{}
+{
+  "Admin": {
+    "type": "object",
+    "description": "An empty schema as per the model...",
+    "properties": {}
+  },
+  "AdminAnalytics": {
+    "type": "object",
+    "properties": {
+      "totalRevenue": { "type": "string", "example": "1250.50" },
+      "totalNGOs": { "type": "integer", "example": 15 },
+      "totalCareHomes": { "type": "integer", "example": 8 },
+      "totalMoneyRaised": { "type": "number", "example": 15000 },
+      "totalUpcomingEvents": { "type": "integer", "example": 5 },
+      "highestSingleDonation": { "type": "number", "example": 2000 },
+      "highestContributor": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "name": { "type": "string", "example": "Karthik" },
+          "total_contributed": { "type": "number", "example": 5000 }
+        }
+      },
+      "topFundraisers": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Fundraiser"
+        }
+      }
+    }
+  }
+}

@@ -318,7 +318,8 @@ const getDonorManagementStats = async (req, res) => {
 
 
 const deleteDonorWithEmail = async (req, res) => {
-    const { userId, email, reason, name } = req.body;
+    const { userId, email, reason, name } = req.query;
+
     try {
         await User.deleteOne({ userId: Number(userId) });
 
@@ -332,7 +333,9 @@ const deleteDonorWithEmail = async (req, res) => {
                     <p><b>Reason:</b> ${reason}</p>
                    </div>`
         });
+
         res.status(200).json({ success: true });
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -385,7 +388,8 @@ const getNgoManagementStats = async (req, res) => {
 };
 
 const deleteNgoWithEmail = async (req, res) => {
-    const { ngoId, email, reason, name } = req.body;
+    const { ngoId, email, reason, name } = req.query;
+
     try {
         await NGO.deleteOne({ ngoId: Number(ngoId) });
 
@@ -401,12 +405,13 @@ const deleteNgoWithEmail = async (req, res) => {
                     <p style="padding: 15px; background: #F8FAF9; border-left: 4px solid #D63031;">${reason}</p>
                 </div>`
         });
+
         res.status(200).json({ success: true });
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
 
 const getAllCarehomeManagement = async (req, res) => {
     try {
@@ -457,7 +462,8 @@ const getCarehomeManagementStats = async (req, res) => {
 
 
 const deleteCarehomeWithEmail = async (req, res) => {
-    const { carehomeId, email, reason, name } = req.body;
+    const { carehomeId, email, reason, name } = req.query;
+
     try {
         await Carehome.deleteOne({ carehomeId: Number(carehomeId) });
 
@@ -470,12 +476,14 @@ const deleteCarehomeWithEmail = async (req, res) => {
                     <h2 style="color: #1B4332;">Hello Management, ${name},</h2>
                     <p>Your carehome profile has been removed from our active database.</p>
                     <p><b>Official Reason:</b></p>
-                    <div style="padding: 15px; background: #F8FAF9; border-left: 4px solid #D63031; color: #333;">
+                    <div style="padding: 15px; background: #F8FAF9; border-left: 4px solid #D63031;">
                         ${reason}
                     </div>
                 </div>`
         });
+
         res.status(200).json({ success: true });
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
