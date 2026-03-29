@@ -69,8 +69,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("role");
   };
 
+  const updateUser = (userUpdates) => {
+    setAuth((prev) => ({
+      ...prev,
+      user: prev.user ? { ...prev.user, ...userUpdates } : prev.user,
+    }));
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, setAuth, login, logout }}>
+    <AuthContext.Provider value={{ auth, setAuth, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
