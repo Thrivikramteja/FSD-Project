@@ -5,9 +5,9 @@ body {
 }
 
 .nonprofit-section {
-  text-align: center;
+  text-align: center; 
   max-width: 800px;
-  margin: 30px;
+  margin: 30px auto;
 }
 
 h2 {
@@ -15,21 +15,16 @@ h2 {
   font-weight: bold;
 }
 
-p {
-  color: #606060;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
 .nonprofit-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+  grid-template-columns: repeat(3, 1fr); 
   gap: 20px;
-  margin-top: 20px;
+  margin: 30px;
 }
 
 .nonprofit-card {
   background: white;
+  margin-bottom: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 20px;

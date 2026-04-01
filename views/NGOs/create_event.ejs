@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event</title>
+    <link href="/styles/ngo_das.css" rel="stylesheet">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Create New Event</h2>
+        <form id="eventform" action="/NGO-dashboard/<%= ngoID %>/create-event" method="post" >
+            <input type="hidden" name="id_NGO" id="ngoId" value="<%= ngoID %>">
+            <div class="form-group">
+                <label>Title:</label>
+                <input type="text" id="title" name="event_name" required>
+            </div>
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea id="description"  name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Location:</label>
+                <input type="text" id="location" name="event_location" required>
+            </div>
+            <div class="form-group">
+                <label>Time:</label>
+                <input type="text" id="time" name="event_time" required>
+            </div>
+            <div class="form-group">
+                <label>Date:</label>
+                <input type="date" id="date" name="deadline" required>
+                <span id="dateerror" style="color: red; display: none;">Date must be valid (>=today)</span>
+            </div>
+            <div class="form-group">
+                <label>Image:</label>
+                <input type="file" id="image" accept="image/*" required>
+            </div>
+
+            <button type="submit" class="gradient-btn">Create Event</button>
+        </form>
+    </div>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>About CareConnect</h3>
+                <p>CareConnect bridges NGOs, care homes, and generous donors. We empower individuals to support meaningful initiatives and create lasting impact in the lives of those in need.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Discover NGOs</a></li>
+                    <li><a href="#">Find Care Homes</a></li>
+                    <li><a href="#">Current Fundraisers</a></li>
+                    <li><a href="#">Donate Food/Clothes</a></li>
+                    <li><a href="#">User Dashboard</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Stay updated with our latest fundraisers and success stories.</p>
+                <div class="newsletter-signup">
+                    <input type="email" placeholder="Your email" >
+                    <button>Subscribe</button>
+                </div>
+                <p>Join our community of 10,000+ donors making a difference every day.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <form class="contact-form" method="POST" action="/contact">
+                    <input type="text" placeholder="Name" name="name" required>
+                    <input type="email" placeholder="Email" name="email" required>
+                    <textarea placeholder="Message" rows="3" name="message" required></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 CareConnect. All rights reserved.</p>
+            
+        </div>
+    </footer>
+    <script src="/scripts/new_event.js"></script>
+</body>
+</html>

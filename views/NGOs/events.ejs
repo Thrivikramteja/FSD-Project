@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Events</title>
+    <link rel="stylesheet" href="/styles/events.css" />
+    <link rel="stylesheet" href="/styles/footer.css" />
+    <link rel="stylesheet" href="/styles/landing_page.css" />
+    <link rel="stylesheet" href="/styles/slide.css" />
+  </head>
+  <body>
+    <%- include('../shared/includes/header') %>
+    <section class="nonprofit-container">
+      <% upcoming_eve.forEach(event => { %>
+      <div class="nonprofit-card">
+        <h3><%= event.event_name %></h3>
+        <div class="info">
+          <div>
+            <h4><%= event.number_of_registrations.toLocaleString() %></h4>
+            <p>Supporters</p>
+          </div>
+        </div>
+        <div class="buttons">
+          <!-- <button class="details-btn">View details</button> -->
+          <a href="/registerUser/<%= event.ngoId %>/<%= event.event_name %>">
+            <button class="select-btn" style="justify-content: center;">Register</button>
+          </a>
+        </div>
+      </div>
+      <% }) %>
+    </section>
+
+    <%- include('../shared/includes/footer') %>
+  </body>
+</html>

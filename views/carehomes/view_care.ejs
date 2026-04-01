@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= details.care_home_name %></title>
+        <link href="/styles/view_care.css" rel="stylesheet">
+    </head>
+    <body>
+
+        <h2 class="name_care"><%= details.care_home_name %></h2>
+        <hr>
+        <div class="description">
+            <h3>Description:</h3>
+            <p><%= details.description %></p>
+        </div>
+        <div class="stat_content">
+
+            
+            <div class="care_stats">
+                <h3>Stats</h3>
+                <ul>
+                    
+
+                    <li><span class="left">Residents: </span><span class="right"><%= details.num_residents %></span></li>
+                    <li><span class="left">Monthly Expense: </span><span class="right"><%= details.avg_expense %></span></li>
+                    <li><span class="left">Avg resident Expense: </span><span class="right"><%= (details.avg_expense/details.num_residents).toFixed(2) %></span></li>
+                    
+                    
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

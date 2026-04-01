@@ -1,74 +1,267 @@
-const db = require("../data/sqlite3");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
-class User {
-  constructor(name, email, password, contact, checkbox) {
-    (this.email = email), (this.password = password), (this.name = name);
-    this.contact = contact;
-    this.checkbox = checkbox;
+const donorSchema = new mongoose.Schema({
+  userId: { type: Number, unique: true },
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  mobile_number: {
+    type: String,
+    required: true,
+  },
+  receive_notifications: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+donorSchema.plugin(AutoIncrement, { inc_field: "userId" });
+
+donorSchema.statics.getUserByEmail = async function (email) {
+  const user = await this.findOne({ email });
+  return user;
+};
+
+donorSchema.statics.getUserByUserId = function (userId) {
+  return this.findOne({ userId });
+};
+
+donorSchema.methods.signup = async function () {
+  const hashedPassword = await bcrypt.hash(this.password, 12);
+  this.password = hashedPassword;
+
+  await this.save();
+};
+
+donorSchema.statics.getname = async function (userId) {
+  const user = await this.findOne({ userId });
+  console.log(user.name);
+  return user.name;
+};
+
+const userRegisteredEventsSchema = new mongoose.Schema({
+  userId: {
+    type: Number,
+    required: true,
+  },
+  ngoId: {
+    type: Number,
+    required: true,
+  },
+  event_name: {
+    type: String,
+    required: true,
+  },
+  event_date: {
+    type: Date,
+    required: true,
+  },
+  event_location: {
+    type: String,
+    required: true,
+  },
+});
+
+donorSchema.statics.participatedEvents = async function (userId) {
+  const currentDate = new Date();
+  const events = await UserRegisteredEvent.find({
+    userId: userId,
+    event_date: { $lt: currentDate },
+  });
+  return events;
+};
+
+donorSchema.statics.upcomingEvents = async function (userId) {
+  const currentDate = new Date();
+
+  const upcoming = await UserRegisteredEvent.find({
+    event_date: { $gt: currentDate },
+    userId: userId,
+  });
+  return upcoming;
+};
+
+const userContributedFundraisersSchema = new mongoose.Schema({
+  userId: {
+    type: Number,
+    required: true,
+  },
+  ngoId: {
+    type: Number,
+    required: true,
+  },
+  fundraiser_name: {
+    type: String,
+    required: true,
+  },
+  amount_contributed: {
+    type: Number,
+    required: true,
+  },
+  contributed_at: {
+    type: Date,
+    default: Date.now,
+  },
+  deadline: {
+    type: Date,
+    required: true,
+  },
+});
+
+donorSchema.statics.contributedFundraisers = async function (userId) 
+{
+  const currentDate = new Date();
+  const fundraisers = await UserContributedFundraiser.find({
+    userId: userId,
+    deadline: {$lt: currentDate},
+  }).sort({ contributed_at: -1 });
+  return fundraisers;
+};
+
+const createdFundraisersSchema = new mongoose.Schema({
+  carehomeId: {
+    type: Number,
+    required: true,
+  },
+  fundraiser_name: {
+    type: String,
+    required: true,
+  },
+  ngoId: {
+    type: Number,
+    required: true,
+  },
+
+  goal_amount: {
+    type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  amount_raised_so_far: {
+    type: Number,
+    default: 0,
+  },
+  deadline: {
+    type: Date,
+    required: true,
+  },
+});
+
+const donate_it_message = new mongoose.Schema({
+  carehomeId: {
+    type: Number,
+    required: true
+  },
+  userId: {
+    type: Number,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  delivery_date: {
+    type: Date,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
   }
+});
 
-  // getUserWithSameEmail() {
-  //   return db.get(
-  //     "SELECT * FROM donors WHERE email = ?",
-  //     [this.email],
-  //     (err, row) => {
-  //       if (err) return callback(err, null);
-  //       return callback(null, row);
-  //     }
-  //   );
-  // }
-
-  existsAlready(email) {
-    return new Promise((resolve, reject) => {
-      console.log("Checking existence for email:", email);
-      const sqlQuery = "SELECT * FROM donors WHERE email = ?";
-
-      db.get(sqlQuery, [email], (err, row) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log("Query result:", row);
-          resolve(!!row);
-        }
-      });
-    });
+const accept_or_rejct = new mongoose.Schema({
+  carehomeId: {
+    type: Number,
+    require: true
+  },
+  userId: {
+    type: Number,
+    require: true
+  },
+  message: {
+    type: String,
+    reuiqre: true
+  },
+  category: {
+    type: String,
+    require: true
+  },
+  delivery:{
+    type: Date,
+    require: true
+  },
+  when_date: {
+    type: Date,
+    require: true
   }
+});
 
-  async signup() {
-    const hashedPassword = await bcrypt.hash(this.password, 12);
+accept_or_rejct.statics.get_newmessages = async function(userId) {
+  const messages = await user_message
+    .find({ userId: userId })
+    .sort({ when_date: -1 }) // Sort by `when_date` in descending order
+    .limit(4); // Limit to the latest 4 messages
+  return messages;
+};
 
-    const sqlQuery =
-      "INSERT INTO donors (name, email, password, mobile_number, receive_notifications) VALUES (?, ?, ?, ?, ?)";
-    console.log(this.email);
-    console.log(this.contact);
-    console.log(this.name);
-    console.log(this.checkbox);
-    db.run(
-      sqlQuery,
-      [this.name, this.email, hashedPassword, this.contact, this.checkbox ? this.checkbox : 'off'],
-      (err) => {
-        if (err) {
-          console.error("error in signup: ", err);
-        } else {
-          console.log("signup done.");
-        }
-      }
-    );
+donorSchema.statics.ongoingfund = async function (userId) {
+  const currentDate = new Date();
+  const fundraisers = await UserContributedFundraiser.find({
+    userId: userId,
+    deadline: {$gte: currentDate},
+  });
+  return fundraisers;
+};
 
-    db.get("SELECT * FROM donors WHERE email = ?", [this.email], (err, row) => {
-      if (err) {
-        console.error(err);
-      }
-      if (row) {
-        console.log(row);
-      }
-    });
-  }
+const User = mongoose.model("Donor", donorSchema);
+const CreatedFundraiser = mongoose.model(
+  "CreatedFundraiser",
+  createdFundraisersSchema
+);
+const UserRegisteredEvent = mongoose.model(
+  "UserRegisteredEvent",
+  userRegisteredEventsSchema
+);
+const UserContributedFundraiser = mongoose.model(
+  "UserContributedFundraiser",
+  userContributedFundraisersSchema
+);
 
-  hasMatchingPassword(hashedPassword) {
-    return bcrypt.compare(this.password, hashedPassword);
-  }
-}
+const donate_items_mes = mongoose.model(
+  "donate_items_mes",
+  donate_it_message
+);
 
-module.exports = User;
+const user_message = mongoose.model(
+  "user_message",
+  accept_or_rejct
+);
+
+module.exports = {
+  User,
+  CreatedFundraiser,
+  UserContributedFundraiser,
+  UserRegisteredEvent,
+  donate_items_mes,
+  user_message
+};

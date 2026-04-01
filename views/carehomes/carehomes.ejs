@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Care Homes</title>
+
+    <link rel="stylesheet" href="/styles/carehome.css" />
+    <link rel="stylesheet" href="/styles/landing_page.css" />
+    <link rel="stylesheet" href="/styles/slide.css">
+    <link rel="stylesheet" href="/styles/footer.css" />
+  </head>
+  <body>
+    <%- include('../shared/includes/header') %>
+    <h1 style="text-align: center; font-size: 1.75rem">
+      List of Care Homes Associated with CareConnect
+    </h1>
+    <div class="nonprofit-container">
+      <% carehomes.forEach(carehome => { %>
+      <div class="card">
+        <div class="content">
+          <h2 style="padding: 1rem;"><%= carehome.care_home_name %></h2>
+          <div class="location">
+            <a href="#city"><%= carehome.city %></a> |
+            <a href="#state"><%= carehome.state %></a>
+          </div>
+          <p style="padding: 0.1rem;"><%= carehome.description %></p>
+          <div class="buttons">
+            <a
+              href="/carehomes/viewcare/<%= carehome.carehomeId %>"
+              class="details-btn"
+              >View Details</a
+            >
+            <a
+              href="/donate_money?carehome_id=<%= carehome.carehomeId %>"
+              class="donate-btn"
+              >Donate</a
+            >
+          </div>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+    <%- include('../shared/includes/footer') %>
+  </body>
+</html>

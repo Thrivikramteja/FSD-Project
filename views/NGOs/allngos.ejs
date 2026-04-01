@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizations List</title>
+    <link rel="stylesheet" href="/styles/allngos.css">
+    <link rel="stylesheet" href="/styles/landing_page.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+</head>
+<body>
+    <%- include('../shared/includes/header') %>
+    <h1>NGOs awarded Trusted Organization Certification by CareConnect</h1>
+
+    <% ngos.forEach(ngo => { %>
+        <div class="organization">
+            
+            <div class="org-details">
+                <h2><%= ngo.Ngoname %></h2> 
+                <p><%= ngo.phone %></p>
+                <p><%= ngo.email %></p>
+            </div>
+
+            <div class="revenue">
+                <p>FY  YOE - 2025</p>
+                <p><strong>Total Revenue</strong><br>Rs. <%= ngo.totalFundsRaised %></p>
+                <p><strong>Total Registrations</strong><br><%= ngo.totalRegistrations %></p>
+                <p><strong>Fundraisers Created</strong><br><%= ngo.fundraisersCreated %></p>
+                <p><strong>Care Homes Benefited</strong><br><%= ngo.careHomesBenefited %></p>
+            </div>
+        </div>
+    <% }) %>
+    <%- include('../shared/includes/footer') %>
+</body>
+</html>

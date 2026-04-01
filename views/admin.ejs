@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Charity Admin Dashboard</h1>
+            <div class="header-stats">
+                <span>Last Updated: May 7, 2025</span>
+            </div>
+            <div class="header-stats"><a href="/">Home</a> </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Highest Donation</h3>
+                <p class="stat-value"><%= highest_Donation %></p>
+                <p class="stat-subtext">Anonymous Donor</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Highest Contributor</h3>
+                <p class="stat-value"><%= high_con_name.name %></p>
+                <p class="stat-subtext">₹<%= high_con_name.total_contributed %></p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Revenue</h3>
+                <p class="stat-value"><%= total_revenue %></p>
+                <p class="stat-subtext">All Time</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total NGOs</h3>
+                <p class="stat-value"><%= total_ngo %></p>
+                <p class="stat-subtext">Active Partners</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Care Homes</h3>
+                <p class="stat-value"><%= total_care %></p>
+                <p class="stat-subtext">Supported</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Money Moved</h3>
+                <p class="stat-value"><%= total_money %></p>
+                <p class="stat-subtext">Through Platform</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Active Events</h3>
+                <p class="stat-value"><%= total_events %></p>
+                <p class="stat-subtext">Ongoing</p>
+            </div>
+        </div>
+
+        <div class="fundraisers-section">
+            <h2>Top Performing Fundraisers</h2>
+            <div class="fundraisers-list">
+                <% if (top_fund && top_fund.length > 0) { %>
+                    <% top_fund.forEach(fundraiser => { %>
+                        <div class="fundraiser-card">
+                            <h4><%= fundraiser.fundraiser_name %></h4>
+                            <p>Raised: <span>₹<%= fundraiser.amount_raised_so_far.toLocaleString() %></span></p>
+                            <p>Goal: ₹<%= fundraiser.goal_amount.toLocaleString() %></p>
+                            <div class="progress-bar">
+                                <div 
+                                    class="progress" 
+                                    style="width: <%= (fundraiser.amount_raised_so_far / fundraiser.goal_amount * 100).toFixed(2) %>%;">
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="no-data">No fundraisers available at the moment.</p>
+                <% } %>
+            </div>
+        </div>
+        
+        </div>
+    </div>
+</body>
+<style>
+ * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    padding-bottom: 40px;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 40px auto;
+    padding: 30px;
+}
+
+.dashboard-header {
+    background: linear-gradient(135deg, #2c6e49 0%, #4e9f76 51%, #66ed4c 100%);
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.header-stats span {
+    color: #e1f5d6;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-left: 3px solid #66ed4c;
+}
+
+.stat-card h3 {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c6e49;
+    margin: 10px 0;
+}
+
+.stat-subtext {
+    font-size: 14px;
+    color: #666;
+}
+
+.fundraisers-section {
+    margin-top: 20px;
+}
+
+.fundraisers-section h2 {
+    color: #2c6e49;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 20px 0;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.fundraisers-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    height: 3px;
+    width: 60px;
+    background: #66ed4c;
+    border-radius: 3px;
+}
+
+.fundraisers-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.fundraiser-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.fundraiser-card:hover {
+    transform: translateY(-5px);
+    border-left: 3px solid #66ed4c;
+}
+
+.fundraiser-card h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c6e49;
+    margin-bottom: 10px;
+}
+
+.fundraiser-card p {
+    font-size: 16px;
+    color: #666;
+    margin: 5px 0;
+}
+
+.fundraiser-card p span {
+    font-weight: 700;
+    color: #2c6e49;
+}
+
+.progress-bar {
+    background: #eaeaea;
+    border-radius: 10px;
+    height: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    background: linear-gradient(to right, #2c6e49, #4e9f76);
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+/* Tablet Responsiveness (768px to 1024px) */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    .fundraisers-list {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+/* Phone Responsiveness (up to 767px) */
+@media (max-width: 767px) {
+    .dashboard-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 22px;
+    }
+
+    .header-stats span {
+        margin-top: 10px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fundraisers-list {
+        grid-template-columns: 1fr;
+    }
+
+    .fundraiser-card {
+        padding: 15px;
+    }
+}
+
+/* Small Phone Screens (up to 480px) */
+@media (max-width: 480px) {
+    .dashboard-header h1 {
+        font-size: 20px;
+    }
+
+    .stats-grid {
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+    }
+
+    .fundraisers-section h2 {
+        font-size: 18px;
+    }
+}
+</style>
+</html>

@@ -3,36 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help Age India Carehome</title>
-    <link rel="stylesheet" href="/carehome_dashboard.css">
-    <script src="/carehome_dashboard.js" defer></script>
+    <title><%= name %></title>
+    <link rel="stylesheet" href="/styles/carehome_dashboard.css">
+    <link href="/styles/ngo_das.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="stylesheet" href="/styles/landing_page.css">
 </head>
+<script>
+    function setAction(button, action) {
+        const form = button.closest('form');
+        form.querySelector('input[name="action"]').value = action;
+    }
+</script>
 <body>
+    
+    <header id="header">
+        <a href="/" style="font-size: large;">CareConnect</a>
+        <nav >
+            <ul class="header_right">
+                <a href="/logout" style="margin-right: 3rem;">Logout</a>
+                <a href="/carehome-dashboard/<%= careid %>/edit" style="margin-right: 3rem;">Edit Profile</a>
+            </ul>  
+        </nav>
+    </header>
+      
+      <h1><%= name %></h1>
 
-    <h1>Help Age India Carehome</h1>
-
-    <!-- Sidebar Wishlist -->
     <aside class="wishlist">
         <h2>Wishlist of Needs</h2>
         <ul>
-            <% if (Array.isArray(wishlist) && wishlist.length > 0) { %>
-                <% wishlist.forEach(item => { %>
-                    <li><%= item.replace(/</g, "&lt;").replace(/>/g, "&gt;") %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No items in wishlist. Please go to the edit page to update.</li>
-            <% } %>
+                    <% let wishlistArray = []; %>
+        <% if (wishlist && typeof wishlist === 'string') { %>
+            <% wishlistArray = wishlist.split(',').map(item => item.trim()); %>
+        <% } else if (Array.isArray(wishlist)) { %>
+            <% wishlistArray = wishlist; %>
+        <% } %>
+
+        <% if (wishlistArray.length > 0) { %>
+            <% wishlistArray.forEach(item => { %>
+                <li><%= item.replace(/</g, "&lt;").replace(/>/g, "&gt;") %></li>
+            <% }); %>
+        <% } else { %>
+            <li>No items in wishlist. Please go to the edit page to update.</li>
+        <% } %>
+
         </ul>
     </aside>
 
-    <!-- Main Dashboard -->
     <main class="dashboard">
-        <!-- Toggle Dashboard Stats -->
-        <button class="toggle-button" onclick="toggleStats()">Show Dashboard Stats</button>
         
-        <!-- Dashboard Stats -->
+        <button class="toggle-button" onclick="toggleStats()">Show Dashboard Stats</button>
         <section class="dashboard-stats" id="dashboard-stats">
             <div class="stats-row">
+                <div class="stat-card">
+                    <h3>Active Fundraisers</h3>
+                    <p class="stat-value"><%= ongoing_fund.length %></p>
+                </div>
                 <% if (Array.isArray(stats) && stats.length > 0) { %>
                     <% stats.forEach(stat => { %>
                         <div class="stat-card">
@@ -46,101 +72,103 @@
             </div>
         </section>
 
-        <!-- Fundraisers -->
         <section class="fundraisers">
-            <h2>Current Fundraisers</h2>
+            <h2>Current Associated Fundraisers</h2>
             <div class="fundraiser-list">
-                <% if (Array.isArray(fundraisers) && fundraisers.length > 0) { %>
-                    <% fundraisers.forEach((fundraiser, index) => { %>
+                <% if (Array.isArray(ongoing_fund) && ongoing_fund.length > 0) { %>
+                    <% ongoing_fund.forEach((fundraiser, index) => { %>
                         <div class="fundraiser-card <%= index > 0 ? 'hidden' : '' %>">
-                            <h3><%= fundraiser.title.replace(/</g, "&lt;").replace(/>/g, "&gt;") %></h3>
-                            <p>Raised: ₹<%= fundraiser.raised %> / ₹<%= fundraiser.goal %></p>
+                            <h3><%= fundraiser.fundraiser_name.replace(/</g, "&lt;").replace(/>/g, "&gt;") %></h3>
+                            <p>Raised: ₹<%= fundraiser.amount_raised_so_far %> / ₹<%= fundraiser.goal_amount %></p>
                             <div class="progress-bar">
-<<<<<<< HEAD
-                                <div class="progress" style=`width: <%= ((fundraiser.raised / fundraiser.goal) * 100) + '%' %>`></div>
-=======
->>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a
+                                <div class="progress" style="width:<%= (fundraiser.amount_raised_so_far / fundraiser.goal_amount) * 100 %>%"></div>
                             </div>
                         </div>
                     <% }); %>
                 <% } else { %>
-                    <p>No active fundraisers.</p>
+                    <p>No active ongoingfund.</p>
                 <% } %>
             </div>
-        
-            <% if (fundraisers.length > 1) { %>
-                <button id="viewMoreBtn" class="view-toggle-btn">View More</button>
-                <button id="viewLessBtn" class="view-toggle-btn hidden">View Less</button>
+
+            <% if (ongoing_fund.length >1) { %>
+                <button id="viewMoreFundraisers" class="view-toggle-btn">View More</button>
+                <button id="viewLessFundraisers" class="view-toggle-btn hidden">View Less</button>
             <% } %>
-        </section>
-        
-        <!-- Donations from Users -->
-        <section class="donations">
-            <h2>Recent Donations from Users</h2>
-            <div class="donation-list">
-                <% if (Array.isArray(donations) && donations.length > 0) { %>
-                    <% donations.forEach(donation => { %>
-                        <div class="donation-card">
-                            <p><%= donation.donor.replace(/</g, "&lt;").replace(/>/g, "&gt;") %> donated ₹<%= donation.amount %></p>
-                        </div>
-                    <% }); %>
-                <% } else { %>
-                    <p>No recent donations.</p>
-                <% } %>
-            </div>
         </section>
     </main>
 
-    <script src="/carehome_dashboard.js" defer></script>
+    <div class="donations-section">
+        <h2>Recent Donations from Users</h2>
+        <div id="donations-list">
+            <% if (recentDonations && recentDonations.length > 0) { %>
+                <% recentDonations.slice(0, 3).forEach(donation => { %>
+                    <div class="donation"> 
+                        <strong><%= donation.donor_name.replace(/</g, "&lt;").replace(/>/g, "&gt;") %></strong> donated ₹<%= donation.amount %>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No recent donations available.</p>
+            <% } %>
+        </div>
+    </div>
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>About CareConnect</h3>
-                <p>CareConnect bridges NGOs, care homes, and generous donors. We empower individuals to support meaningful initiatives and create lasting impact.</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul class="footer-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/discover/ngos">Discover NGOs</a></li>
-                    <li><a href="/carehomes">Find Care Homes</a></li>
-                    <li><a href="/fundraisers">Current Fundraisers</a></li>
-                    <li><a href="/donate/items">Donate Food/Clothes</a></li>
-                    <li><a href="/dashboard">User Dashboard</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Newsletter</h3>
-                <p>Stay updated with our latest fundraisers and success stories.</p>
-                <div class="newsletter-signup">
-                    <input type="email" placeholder="Your email" name="email">
-                    <button>Subscribe</button>
-                </div>
-                <p>Join our community of 10,000+ donors making a difference every day.</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <form class="contact-form" method="POST" action="/contact">
-                    <input type="text" placeholder="Name" name="name" required>
-                    <input type="email" placeholder="Email" name="email" required>
-                    <textarea placeholder="Message" rows="3" name="message" required></textarea>
-                    <button type="submit">Send Message</button>
-                </form>
-            </div>
+    <div class="message-section">
+        <h2>Decide these Items Donations</h2>
+        <div class="message-list">
+            <% if (messages && messages.length > 0) { %>
+                <% messages.forEach(message => { %>
+                    <div class="message-item">
+                        <form method="POST" action="/donate_item/action">
+                            <input type="hidden" name="userId" value="<%= message.userId %>">
+                            <input type="hidden" name="carehomeId" value="<%= message.carehomeId %>">
+                            <input type="hidden" name="category" value="<%= message.category %>">
+                            <input type="hidden" name="delivery_date" value="<%= message.delivery_date %>">
+                            <input type="hidden" name="location" value="<%= message.location %>">
+                            <input type="hidden" name="description" value="<%= message.description %>">
+                            <input type="hidden" name="action" value="">
+                            
+                            <p><strong>Category:</strong> <%= message.category %></p>
+                            <p><strong>Location:</strong> <%= message.location %></p>
+                            <p><strong>Delivery Date:</strong> <%= new Date(message.delivery_date).toLocaleDateString() %></p>
+                            <div class="button-group">
+                                <button type="submit" class="accept-button" onclick="setAction(this, 'accept')">Accept</button>
+                                <button type="submit" class="reject-button" onclick="setAction(this, 'reject')">Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No recent item messages available.</p>
+            <% } %>
         </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2025 CareConnect. All rights reserved.</p>
-            <p>Created by <%= typeof teamMembers !== 'undefined' ? teamMembers.replace(/</g, "&lt;").replace(/>/g, "&gt;") : 'Our Team' %></p>
-        </div>
-    </footer>
+    </div>
+    
+
+    <div class="donation-items-container">
+        <h4 class="donation-header">Donation Items</h4>
+        <% if (items.length > 0) { %>
+          <% items.forEach(item => { %>
+            <div class="donation-item">
+              <h5 class="donation-category">Category: <%= item.category %></h5>
+              <p class="donation-detail"><strong>Location:</strong> <%= item.location %></p>
+              <p class="donation-detail"><strong>Delivery Date:</strong> <%= new Date(item.delivery).toLocaleDateString() %></p>
+              <p class="donation-detail"><strong>Donated At:</strong> <%= new Date(item.donated_at).toLocaleDateString() %></p>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <p class="no-items">No items available.</p>
+        <% } %>
+      </div>
+      
+      
+    <%- include('../shared/includes/footer') %>
+
+    <script src="/scripts/carehomes_dashboard.js"></script>
+    <script>
+        const profile = document.getElementById("profile");
+        if (profile) {
+          profile.style.display = "none";
+        }
+      </script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> e34b7e5966b4d9e5cec4d38abac4a0a92aa5132a

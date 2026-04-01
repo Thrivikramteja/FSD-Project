@@ -1,0 +1,207 @@
+.edits1{
+    background-image:url(greenbackground.avif);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 5%;
+    
+}
+
+.carehomes{
+    display: flex;
+}
+
+.carehome1,.carehome2{
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(100px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex: 1;
+    max-width: 65%;
+    flex-direction: row;
+    justify-content: center;
+    margin-left: 5%;
+    border: 1.5px solid blue;
+    margin-top: 40px;
+    padding: 20px;
+    border-radius: 20px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 18px;
+    }
+
+    #fullname,#phne,#mail,#gvtid,#pinc,#wishlist,#state,#city{
+        height: 26px;
+        width: 600px;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: rgb(224, 205, 254);
+        border: none;
+        color: blue;
+        font-size: 15px;
+    }
+
+    label{
+        color: rgb(144, 11, 106);
+    }
+
+    #Save{
+        background-color: #e74c3c;
+        color: white;
+        padding: 10px;
+        height: 40px;
+        width: 80px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 400;
+        font-family: Arial, Helvetica, sans-serif;
+        margin-left: 60%;
+    }
+    .cancelbut{
+        padding: 10px;
+        height: 40px;
+        width: 80px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 400;
+        font-family: Arial, Helvetica, sans-serif;
+        
+        background-color: white;
+    }
+
+    .need{
+        border-radius: 15px;
+        margin-left: 15%;
+        margin-top: 50px;
+        width: 350px;
+    }
+    
+    .toppart{
+        justify-content: center;
+        margin-left: 5%;
+        margin-top: 15px;
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    }
+    input[type="text"]:hover, input[type="email"]:hover, input[type="tel"]:hover, input[type="number"]:hover, input[type="file"]:hover {
+        background-color: rgb(235, 225, 255);
+        border: 2px solid blue;
+        box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.5);
+    }
+    
+    #Save:hover {
+        transform: scale(1.2);
+    }
+    .cancelbut:hover{
+        transform: scale(1.2);
+    }
+    
+    .need:hover {
+        transform: scale(1.1); 
+        opacity: 0.7; 
+    }
+    
+    .carehome2{
+        margin-left: 13%;
+    
+    }
+    
+    #bank,#accnum,#ifsc,#accname{
+        height: 26px;
+        width: 300px;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: rgb(224, 205, 254);
+        border: none;
+        color: blue;
+        font-size: 12px;
+    }
+    
+    #careSave{
+        background-color: #e74c3c;
+        color: white;
+        padding: 10px;
+        height: 40px;
+        width: 80px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 400;
+        font-family: Arial, Helvetica, sans-serif;
+        margin-left: 50%;
+    }
+    .carecancelbut{
+        padding: 10px;
+        height: 40px;
+        width: 80px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 400;
+        font-family: Arial, Helvetica, sans-serif;
+        
+        background-color: white;
+    }
+    
+    #careSave:hover {
+        transform: scale(1.2);
+    }
+    .carecancelbut:hover{
+        transform: scale(1.2);
+    }
+    
+    .logofit{
+        margin-left: 15%;
+        margin-top: 15%;
+        height: 330px;
+        width: 380px;
+    }
+
+    @media screen and (max-width: 1024px) {
+        .carehomes, .ngos, .formedit {
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .carehome1, .carehome2, .ngo1, .ngo2, .personaldetails, .form2 {
+            max-width: 90%;
+            margin: 20px auto;
+        }
+    
+        #fullname, #phne, #mail, #gvtid, #pinc, #wishlist, #darpan, #desc, 
+        #address, #panc, #gstnum, #gstaddress, #gstpinc {
+            width: 90%;
+        }
+    
+        .need {
+            width: 80%;
+            margin: 20px auto;
+        }
+    
+        #Save, #careSave, #gstSave {
+            width: 100%;
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 768px) {
+        .carehomes, .ngos, .formedit {
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .toppart {
+            text-align: center;
+        }
+    
+        .carehome1, .carehome2, .ngo1, .ngo2, .personaldetails, .form2 {
+            width: 95%;
+        }
+    
+        .need {
+            width: 100%;
+        }
+    
+        .logofit {
+            width: 100%;
+            height: auto;
+            margin: 10px auto;
+        }
+    }
+    

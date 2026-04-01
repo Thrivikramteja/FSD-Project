@@ -1,0 +1,135 @@
+body {
+    background-color: #f5f7fa;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-left: 20%;
+    margin-top: 5%;
+    margin-right: 20%;
+    min-height: 500px;
+    height: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    flex-wrap: wrap;
+}
+
+.container:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+form {
+    flex: 1;
+    max-width: 50%;
+    margin-left: 10%;
+    padding-bottom: 20px;
+}
+
+#fullname, #mail, #pass, #repass, #pannum {
+    border: 1px solid #e1e5eb;
+    border-radius: 6px;
+    height: 40px;
+    width: 270px;
+    font-size: 15px;
+    padding: 0 10px;
+    margin-bottom: 5px;
+    background-color: #f8fafc;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#fullname:focus, #mail:focus, #pass:focus, #repass:focus, #pannum:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+}
+
+.logophoto {
+    margin-top: 15%;
+    margin-right: 5%;
+    margin-left: 5%;
+    height: 300px;
+    width: 330px;
+    object-fit: contain;
+    position: relative;
+}
+
+label 
+{
+    font-size: 14px;
+    color: #4a6cf7;
+    font-weight: 600;
+}
+
+button[type="submit"] {
+    background-color: #4a6cf7;
+    color: white;
+    height: 40px;
+    width: 120px;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button[type="submit"]:hover 
+{
+    transform: scale(1.05);
+    background-color: #3a5cda;
+}
+
+button[type="submit"]:active 
+{
+    transform: scale(0.98);
+    background-color: #2c4aac;
+}
+
+
+/* Error display styling */
+span[id$="-error"] {
+    display: block;
+    font-size: 12px;
+    margin-top: -2px;
+    margin-bottom: 8px;
+    height: 15px;
+    color: #e74c3c;
+}
+
+h1 {
+    color: #4a6cf7;
+    margin-bottom: 25px;
+}
+
+input[type="checkbox"] {
+    accent-color: #4a6cf7;
+    margin-right: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        margin-left: 5%;
+        margin-right: 5%;
+        flex-direction: column;
+    }
+    
+    form {
+        max-width: 100%;
+        margin-left: 0;
+    }
+    
+    .logophoto {
+        margin-top: 0;
+        margin-bottom: 20px;
+        order: -1;
+    }
+}

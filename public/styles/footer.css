@@ -1,6 +1,6 @@
 /* Main Footer Styles */
 .footer {
-  background-color: black;
+  background-color: #4e9f76;;
   color: #ffffff;
   padding: 40px 20px;
   margin-top: 50px;
@@ -118,11 +118,11 @@
 
 /* Copyright Section */
 .footer-bottom {
+  color: #ffffff;
   text-align: center;
   margin-top: 30px;
   padding-top: 20px;
   border-top: 1px solid #66ed4c;
-  color: #e1f5d6;
 }
 
 /* Newsletter Signup */

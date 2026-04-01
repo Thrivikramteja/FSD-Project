@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Your dashboard</title>
+    <link href="/styles/ngo_das.css" rel="stylesheet" />
+    <link href="/styles/footer.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="header">
+      <a href="/">CareConnect</a>
+      <div id="header_right">
+        <a href="/NGO-dashboard/<%= ngoID %>/create-fundraiser">Create Fundraiser</a>
+        <a href="/NGO-dashboard/<%= ngoID %>/create-event">Create Event</a>
+        <a href="/NGO-dashboard/<%= ngoID %>/edit">Edit your profile</a>
+      </div>
+    </div>
+
+    <div class="dashboard-overview">
+      <div class="profile-card">
+        <div class="org-name"><%= name %></div>
+      </div>
+      <button id="toggle-stats-btn" title="for more details">Statistics</button>
+      <div id="stats-container" style="display: none">
+        <div class="stats-card">
+          <div class="stats-number"><%= stats.totalFundsRaised %></div>
+          <div class="stats-label">Total Raised</div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-number"><%= upcoming_eve.length %></div>
+          <div class="stats-label">Active Campaigns</div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-number"><%= stats.totalRegistrations %></div>
+          <div class="stats-label">Volunteers</div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-number"><%= stats.careHomesBenefited %></div>
+          <div class="stats-label">Care homes Associated</div>
+        </div>
+      </div>
+    </div>
+    <h3 class="page_headi">Ongoing Fundraisers</h3>
+    <div id="ongoing_fund">
+      <% if (ongoing_fund.length === 0) { %>
+      <div class="no-data">No ongoing fundraisers available at the moment.</div>
+      <% } else { %>
+      <table>
+        <tr>
+          <th>Fundraiser Name</th>
+          <th>Last Date</th>
+        </tr>
+        <% for (let i = 0; i < ongoing_fund.length; ++i) { %>
+        <tr>
+          <td><%= ongoing_fund[i].fundraiser_name %></td>
+          <td><%= ongoing_fund[i].deadline %></td>
+        </tr>
+        <% } %>
+      </table>
+      <% } %>
+    </div>
+
+    <h3 class="page_headi">Completed Fundraisers and Events</h3>
+    <div id="completed_fund">
+      <% if (completed_fund.length === 0 && completed_event.length === 0) { %>
+      <div class="no-data">No completed fundraisers or events available.</div>
+      <% } else { %>
+      <table>
+        <% for (let i = 0; i < completed_fund.length; ++i) { %>
+        <tr>
+          <td><%= completed_fund[i].fundraiser_name %></td>
+        </tr>
+        <% } %> <% for (let i = 0; i < completed_event.length; ++i) { %>
+        <tr>
+          <td><%= completed_event[i].event_name %></td>
+        </tr>
+        <% } %>
+      </table>
+      <% } %>
+    </div>
+
+    <h3 class="page_headi">Upcoming Events</h3>
+    <div id="upcoming_ev">
+      <% if (upcoming_eve.length === 0) { %>
+      <div class="no-data">No upcoming events are scheduled.</div>
+      <% } else { %>
+      <table>
+        <tr>
+          <th>Event Name</th>
+          <th>Happening On</th>
+        </tr>
+        <% for (let i = 0; i < upcoming_eve.length; ++i) { %>
+        <tr>
+          <td><%= upcoming_eve[i].event_name %></td>
+          <td><%= upcoming_eve[i].event_date %></td>
+        </tr>
+        <% } %>
+      </table>
+      <% } %>
+    </div>
+    <div class="edit-events-link">
+      <a href="/NGO-dashboard/<%= ngoID %>/edit-event">Edit Events</a>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>About CareConnect</h3>
+          <p>
+            CareConnect bridges NGOs, care homes, and generous donors. We
+            empower individuals to support meaningful initiatives and create
+            lasting impact in the lives of those in need.
+          </p>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Discover NGOs</a></li>
+            <li><a href="#">Find Care Homes</a></li>
+            <li><a href="#">Current Fundraisers</a></li>
+            <li><a href="#">Donate Food/Clothes</a></li>
+            <li><a href="#">User Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contact Us</h3>
+          <form class="contact-form" method="POST" action="/contact">
+            <input type="text" placeholder="Name" name="name" required />
+            <input type="email" placeholder="Email" name="email" required />
+            <textarea
+              placeholder="Message"
+              rows="3"
+              name="message"
+              required
+            ></textarea>
+            <button type="submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 CareConnect. All rights reserved.</p>
+      </div>
+    </footer>
+    <script src="/scripts/ngo_dash_a.js"></script>
+    <script src="/scripts/new_event.js"></script>
+    <script>
+      const profile = document.getElementById("profile");
+      if (profile) {
+        profile.style.display = "none";
+      }
+    </script>
+  </body>
+</html>

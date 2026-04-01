@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Personal Details</title>
+    <link rel="stylesheet" href="/styles/donor_edit.css" />
+  </head>
+  <body class="edits1">
+    <div>
+      <form
+      style="margin-top: 7rem;"
+        class="form-floating-modern"
+        method="POST"
+        action="/user-dashboard/<%= user.userId %>/edit"
+      >
+        <h2 style="text-align: center; padding-bottom: 1rem;">Edit your Details</h2>
+        <div class="form-group">
+          <label for="fullname">Full name</label>
+          <input
+            type="text"
+            id="fullname"
+            name="fullname"
+            value="<%= user.name %>"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="phne">Mobile number</label>
+          <input
+            type="tel"
+            id="phne"
+            name="phone"
+            value="<%= user.mobile_number %>"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="mail">Email</label>
+          <input type="email" id="mail" name="mail" value="<%= user.email %>" />
+        </div>
+
+        <button type="submit" id="Save" value="Save">Save</button>
+      </form>
+    </div>
+    <script src="/scripts/edit_user.js"></script>
+  </body>
+</html>
