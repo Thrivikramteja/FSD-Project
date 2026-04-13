@@ -9,37 +9,76 @@ const {
 const { Carehome } = require("../models/carehome.model");
 const { nextTick } = require("process");
 
-function getRegister(req, res) {
-  res.render("NGOs/ngo_registration");
-}
-
-async function get_allngo(req, res) {
+//We eliminated the N+1 query problem by using MongoDB aggregation with $lookup and optimized joins using projection pipelines.”
+async function get_allngo(req, res, next) {
   try {
-    const NGOs = await NGO.get_all_ngos();
+    // 1. Setup Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    const enrichedNGOs = await Promise.all(
-      NGOs.map(async (ngo) => {
-        const totalFundsRaised = await NGO.get_rev(ngo.ngoId);
-        const totalRegistrations = await NGO.tot_reg(ngo.ngoId);
-        const fundraisersCreated = await NGO.fund_created(ngo.ngoId);
-        const careHomesBenefited = await NGO.benifit_care(ngo.ngoId);
+    const enrichedNGOs = await NGO.aggregate([
+      // A. Pagination
+      { $skip: skip },
+      { $limit: limit },
 
-        return {
-          ...ngo.toObject(),
-          totalFundsRaised:
-            totalFundsRaised.length > 0 ? totalFundsRaised[0].total : 0,
-          totalRegistrations:
-            totalRegistrations.length > 0 ? totalRegistrations[0].total : 0,
-          fundraisersCreated,
-          careHomesBenefited,
-        };
-      })
-    );
+      {
+        $project: {
+          password: 0,
+          otpCode: 0,
+          otpExpires: 0,
+          __v: 0
+        }
+      },
 
-    res.json(enrichedNGOs);
+      {
+        $lookup: {
+          from: "createdfundraisers", 
+          localField: "ngoId",
+          foreignField: "ngoId",
+          as: "fundraiserData"
+        }
+      },
+
+
+      {
+        $lookup: {
+          from: "events",
+          localField: "ngoId",
+          foreignField: "ngoId",
+          as: "eventData"
+        }
+      },
+
+      {
+        $addFields: {
+          totalFundsRaised: { $sum: "$fundraiserData.amount_raised_so_far" },
+          fundraisersCreated: { $size: "$fundraiserData" },
+          totalRegistrations: { $sum: "$eventData.number_of_registrations" },
+          careHomesBenefited: { 
+            $size: { $setUnion: ["$fundraiserData.carehomeId", []] } 
+          }
+        }
+      },
+
+      {
+        $project: {
+          fundraiserData: 0,
+          eventData: 0
+        }
+      }
+    ]);
+
+    res.json({
+      success: true,
+      page,
+      count: enrichedNGOs.length,
+      data: enrichedNGOs
+    });
+
   } catch (err) {
-    err.message = "Failed to fetch NGOs";
-    nextTick(err);
+    console.error("Fetch NGOs Error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch NGOs" });
   }
 }
 
@@ -75,28 +114,24 @@ async function register(req, res, next) {
 }
 
 async function getEditNGOProfile(req, res, next) {
-  const ngoID = req.params.ngoID;
-  console.log("hi myy name is ngo " + ngoID);
-  // 1. THE DRILL: Force string comparison to avoid type mismatch
+  const { ngoID } = req.params;
+
   if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
-    return res.status(403).json({
-      success: false,
-      message: "Forbidden: Identity mismatch.",
-    });
+    return res.status(403).json({ success: false, message: "Forbidden: Identity mismatch." });
   }
 
   try {
-    const ngoArray = await NGO.getNGOById(ngoID);
-    console.log("hi i am from controller " + ngoArray);
-
-    const ngo = ngoArray && ngoArray.length > 0 ? ngoArray[0] : null;
+    // 2. Optimization: findOne + Select + Lean
+    // This stops the query immediately on finding a match and excludes sensitive data
+    const ngo = await NGO.findOne({ ngoId: ngoID })
+      .select("Ngoname phone account_holder_name account_number ifsc darpan_id")
+      .lean();
 
     if (!ngo) {
-      const err = new Error("NGO profile not found.");
-      err.statusCode = 404;
-      return next(err);
+      return res.status(404).json({ success: false, message: "NGO profile not found." });
     }
 
+    // 3. Clean Response
     res.status(200).json({
       success: true,
       ngo: ngo,
@@ -107,16 +142,30 @@ async function getEditNGOProfile(req, res, next) {
   }
 }
 
-async function getEvents(req, res) {
+async function getEvents(req, res, next) {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9; 
+    const skip = (page - 1) * limit;
+
     const cur = new Date();
     cur.setHours(0, 0, 0, 0);
-    const events = await Event.find({ event_date: { $gte: cur } });
 
-    res.json(events);
+    // Optimization: find + select + sort + lean
+    const events = await Event.find({ event_date: { $gte: cur } })
+      .select("-description -event_time -__v") 
+      .sort({ event_date: 1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    res.json({
+      success: true,
+      data: events
+    });
   } catch (error) {
-    error.message = "Failed to load events";
-    nextTick(error);
+    console.error("Fetch Events Error:", error);
+    next(error); 
   }
 }
 
@@ -153,22 +202,47 @@ async function getFundraisers(req, res) {
   }
 }
 
-async function getallFundraisers(req, res) {
+// async function getallFundraisers(req, res) {
+//   try {
+//     const today = new Date();
+//     const isoCurrentDate = today.toISOString().split("T")[0];
+
+//     const fundraisers = await CreatedFundraiser.find({});
+
+//     const ongoing_fund = fundraisers.filter((fundraiser) => {
+//       const deadline =
+//         fundraiser.deadline instanceof Date
+//           ? fundraiser.deadline.toISOString().split("T")[0]
+//           : fundraiser.deadline;
+//       return deadline >= isoCurrentDate;
+//     });
+
+//     res.json(ongoing_fund);
+//   } catch (error) {
+//     error.message = "Failed to load fundraisers";
+//     next(error);
+//   }
+// }
+
+async function getallFundraisers(req, res, next) {
   try {
     const today = new Date();
-    const isoCurrentDate = today.toISOString().split("T")[0];
 
-    const fundraisers = await CreatedFundraiser.find({});
+    //New DB optimization : Projection , fetching the only fields which are required
+    const fundraisers = await CreatedFundraiser.find(
+      { deadline: { $gte: today } },   // filter in DB
+      {
+        fundraiser_name: 1,
+        goal_amount: 1,
+        amount_raised_so_far: 1,
+        deadline: 1,
+        imagePath: 1,
+        tag: 1,
+        ngoId: 1
+      } // projection
+    );
 
-    const ongoing_fund = fundraisers.filter((fundraiser) => {
-      const deadline =
-        fundraiser.deadline instanceof Date
-          ? fundraiser.deadline.toISOString().split("T")[0]
-          : fundraiser.deadline;
-      return deadline >= isoCurrentDate;
-    });
-
-    res.json(ongoing_fund);
+    res.json(fundraisers);
   } catch (error) {
     error.message = "Failed to load fundraisers";
     next(error);
@@ -389,26 +463,6 @@ async function registerUser(req, res) {
   }
 }
 
-async function rendercreatefundraiser(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
-
-  if (req.user.role !== "NGO" || req.user.id !== ngoID) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-
-  try {
-    const carehomes = await Carehome.find({});
-
-    res.render("NGOs/create_fundraiser", {
-      ngoID,
-      care: carehomes,
-    });
-  } catch (error) {
-    error.message = "Failed to load the Create Fundraiser form";
-    next(error);
-  }
-}
-
 async function render_donate_fundraiser(req, res) {
   const ngoId = parseInt(req.params.ngoId, 10);
   const name_fund = req.params.fundraiser_name;
@@ -421,7 +475,7 @@ async function render_donate_fundraiser(req, res) {
   });
 }
 
-async function getNGO(req, res) {
+async function getNGO(req, res, next) {
   const ngoID = parseInt(req.params.ngoID, 10);
 
   if (req.user.role !== "NGO" || req.user.id !== ngoID) {
@@ -429,72 +483,89 @@ async function getNGO(req, res) {
   }
 
   try {
-    const ngo = await NGO.findOne({ ngoId: ngoID });
+    const today = new Date();
+
+    // NGO basic info
+    const ngo = await NGO.findOne(
+      { ngoId: ngoID },
+      { Ngoname: 1 }
+    );
 
     if (!ngo) {
       return res.status(404).json({ message: "NGO not found" });
     }
+    //projection at high level
+    // Fundraisers (split at DB level)
+    const [ongoing_fund, completed_fund] = await Promise.all([
+      CreatedFundraiser.find(
+        { ngoId: ngoID, deadline: { $gte: today } },
+        {
+          fundraiser_name: 1,
+          deadline: 1,
+          tag: 1,
+          goal_amount: 1,
+          amount_raised_so_far: 1,
+          carehomeId: 1
+        }
+      ),
+      CreatedFundraiser.find(
+        { ngoId: ngoID, deadline: { $lt: today } },
+        {
+          fundraiser_name: 1,
+          deadline: 1,
+          tag: 1
+        }
+      )
+    ]);
 
-    const name = ngo.Ngoname;
+    // Events (split at DB level)
+    const [upcoming_eve, completed_event] = await Promise.all([
+      Event.find(
+        { ngoId: ngoID, event_date: { $gte: today } },
+        {
+          event_name: 1,
+          event_date: 1,
+          number_of_registrations: 1
+        }
+      ),
+      Event.find(
+        { ngoId: ngoID, event_date: { $lt: today } },
+        {
+          event_name: 1,
+          event_date: 1
+        }
+      )
+    ]);
 
-    const today = new Date();
-    const isoCurrentDate = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
-    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
-
-    const ongoing_fund = fundraisers.filter((f) => {
-      const d =
-        f.deadline instanceof Date
-          ? f.deadline.toISOString().split("T")[0]
-          : f.deadline;
-      return d >= isoCurrentDate;
-    });
-
-    const completed_fund = fundraisers.filter((f) => {
-      const d =
-        f.deadline instanceof Date
-          ? f.deadline.toISOString().split("T")[0]
-          : f.deadline;
-      return d < isoCurrentDate;
-    });
-
-    const events = await Event.find({ ngoId: ngoID });
-
-    const upcoming_eve = events.filter((e) => {
-      const d =
-        e.event_date instanceof Date
-          ? e.event_date.toISOString().split("T")[0]
-          : e.event_date;
-      return d >= isoCurrentDate;
-    });
-
-    const completed_event = events.filter((e) => {
-      const d =
-        e.event_date instanceof Date
-          ? e.event_date.toISOString().split("T")[0]
-          : e.event_date;
-      return d < isoCurrentDate;
-    });
+    // Stats (minimal fetch)
+    const [fundStats, eventStats] = await Promise.all([
+      CreatedFundraiser.find(
+        { ngoId: ngoID },
+        { amount_raised_so_far: 1, carehomeId: 1 }
+      ),
+      Event.find(
+        { ngoId: ngoID },
+        { number_of_registrations: 1 }
+      )
+    ]);
 
     const stats = {
-      totalFundsRaised: fundraisers.reduce(
-        (s, f) => s + (f.funds_raised || 0),
+      totalFundsRaised: fundStats.reduce(
+        (s, f) => s + (f.amount_raised_so_far || 0),
         0
       ),
-      totalRegistrations: events.reduce(
+      totalRegistrations: eventStats.reduce(
         (s, e) => s + (e.number_of_registrations || 0),
         0
       ),
-      fundraisersCreated: fundraisers.length,
+      fundraisersCreated: fundStats.length,
       careHomesBenefited: new Set(
-        fundraisers.map((f) => f.id_carehome).filter(Boolean)
+        fundStats.map((f) => f.carehomeId).filter(Boolean)
       ).size,
     };
 
     res.json({
-      name,
+      name: ngo.Ngoname,
       ongoing_fund,
       completed_fund,
       completed_event,
@@ -504,6 +575,7 @@ async function getNGO(req, res) {
       user: req.user,
       userRole: req.user.role,
     });
+
   } catch (error) {
     error.message = "An error occurred while loading the dashboard";
     next(error);
@@ -690,10 +762,8 @@ async function getCampaignDetails(req, res, next) {
   }
 }
 module.exports = {
-  getRegister,
   register,
   getNGO,
-  rendercreatefundraiser,
   createFundraiser,
   createEvent,
   getEditNGOProfile,

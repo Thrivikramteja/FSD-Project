@@ -224,6 +224,11 @@ const createdFundraisersSchema = new mongoose.Schema({
   },
 });
 
+//indices
+createdFundraisersSchema.index({ ngoId: 1, deadline: 1 });
+createdFundraisersSchema.index({ ngoId: 1 }); 
+createdFundraisersSchema.index({ carehomeId: 1 });
+
 const donate_it_message = new mongoose.Schema({
   carehomeId: {
     type: Number,

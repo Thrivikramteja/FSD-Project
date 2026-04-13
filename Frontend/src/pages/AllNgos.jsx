@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Added this
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import { headerConfig } from "../config/headerConfig"; 
@@ -14,10 +14,14 @@ const AllNgos = () => {
   useEffect(() => {
     const fetchNgos = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/NGOs");
+        const response = await fetch("http://localhost:3000/api/ngos");
         if (!response.ok) throw new Error(`Error: ${response.status}`);
-        const data = await response.json();
-        setNgos(data);
+        
+        const result = await response.json();
+        
+        // MINIMAL CHANGE: Access the 'data' array inside the response object
+        setNgos(result.data || []); 
+        
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -36,7 +40,6 @@ const AllNgos = () => {
         {!loading && !error && ngos.length > 0 && (
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {ngos.map((ngo) => (
-              /* Added onClick to trigger navigation to the profile page */
               <div className="ngo-card" key={ngo._id} onClick={() => navigate(`/ngo-profile/${ngo.ngoId}`)} style={{ cursor: 'pointer' }}>
                 <div className="ngo-details">
                   <h2>{ngo.Ngoname}</h2>

@@ -5,7 +5,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { headerConfig } from "../config/headerConfig";
 
-import styles from "../styles/events.module.css"; // Use Module
+import styles from "../styles/events.module.css"; 
 
 const AllEvents = () => {
   const [events, setEvents] = useState([]);
@@ -15,13 +15,23 @@ const AllEvents = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/events");
+        // Fetching with the page parameter to support our backend optimization
+        const response = await fetch("http://localhost:3000/api/events?page=1");
+        
         if (!response.ok) {
           const errData = await response.json();
           throw new Error(errData.message || "Failed to fetch events");
         }
-        const data = await response.json();
-        setEvents(data);
+        
+        const result = await response.json();
+
+        // CHANGE: Access result.data because the optimized backend sends an object
+        if (result.success) {
+          setEvents(result.data || []);
+        } else {
+          setEvents([]);
+        }
+        
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -70,7 +80,7 @@ const AllEvents = () => {
         {!loading &&
           !error &&
           events.map((event) => (
-            <div className={styles.eventCard} key={event._id || event.id}>
+            <div className={styles.eventCard} key={event._id}>
               <div className={styles.imageBox}>
                 <img
                   src={getImageUrl(event.imagePath)}
@@ -98,6 +108,7 @@ const AllEvents = () => {
                 </div>
 
                 <div className={styles.eventButtons}>
+                  {/* Keep links intact using the ngoId and event_name from our optimized query */}
                   <Link to={`/register-event/${event.ngoId}/${event.event_name}`} className={styles.linkFull}>
                     <button className={styles.eventSelectBtn}>Register Now</button>
                   </Link>
