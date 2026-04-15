@@ -1,5 +1,6 @@
 const path = require("path");
 const bcrypt = require("bcrypt");
+const redisClient = require('../redis'); // Path to the file you just created
 
 const { NGO, Event } = require("../models/NGO.model");
 const {
@@ -12,35 +13,47 @@ const { nextTick } = require("process");
 //We eliminated the N+1 query problem by using MongoDB aggregation with $lookup and optimized joins using projection pipelines.”
 async function get_allngo(req, res, next) {
   try {
-    // 1. Setup Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const { q, page = 1, limit = 10 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const cacheKey = `ngos:${q || 'all'}:p${page}`;
 
-    const enrichedNGOs = await NGO.aggregate([
-      // A. Pagination
+    // Redis Check
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      return res.json(JSON.parse(cached));
+    }
+
+    // Initialize Pipeline
+    let pipeline = [];
+
+    // 1. Search Logic (Must be first in pipeline)
+    if (q) {
+      if (q.length < 3) {
+        pipeline.push({ $match: { Ngoname: { $regex: q, $options: 'i' } } });
+      } else {
+        pipeline.push({ $match: { $text: { $search: q } } });
+        // Add score for relevance sorting
+        pipeline.push({ $addFields: { score: { $meta: "textScore" } } });
+        pipeline.push({ $sort: { score: -1 } });
+      }
+    } else {
+      pipeline.push({ $sort: { Ngoname: 1 } });
+    }
+
+    // 2. Existing Optimized Aggregation Logic
+    pipeline.push(
       { $skip: skip },
-      { $limit: limit },
-
-      {
-        $project: {
-          password: 0,
-          otpCode: 0,
-          otpExpires: 0,
-          __v: 0
-        }
-      },
-
+      { $limit: parseInt(limit) },
+      { $project: { password: 0, otpCode: 0, otpExpires: 0, __v: 0 } },
       {
         $lookup: {
-          from: "createdfundraisers", 
+          from: "createdfundraisers",
           localField: "ngoId",
           foreignField: "ngoId",
           as: "fundraiserData"
         }
       },
-
-
       {
         $lookup: {
           from: "events",
@@ -49,7 +62,6 @@ async function get_allngo(req, res, next) {
           as: "eventData"
         }
       },
-
       {
         $addFields: {
           totalFundsRaised: { $sum: "$fundraiserData.amount_raised_so_far" },
@@ -60,25 +72,25 @@ async function get_allngo(req, res, next) {
           }
         }
       },
+      { $project: { fundraiserData: 0, eventData: 0 } }
+    );
 
-      {
-        $project: {
-          fundraiserData: 0,
-          eventData: 0
-        }
-      }
-    ]);
+    const enrichedNGOs = await NGO.aggregate(pipeline);
 
-    res.json({
+    const response = {
       success: true,
-      page,
+      page: parseInt(page),
       count: enrichedNGOs.length,
       data: enrichedNGOs
-    });
+    };
 
+    // Cache results
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
+
+    res.setHeader('X-Cache', 'MISS');
+    res.json(response);
   } catch (err) {
-    console.error("Fetch NGOs Error:", err);
-    res.status(500).json({ success: false, message: "Failed to fetch NGOs" });
+    next(err);
   }
 }
 
@@ -144,110 +156,100 @@ async function getEditNGOProfile(req, res, next) {
 
 async function getEvents(req, res, next) {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 9; 
-    const skip = (page - 1) * limit;
+    const { q, page = 1, limit = 9 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const cur = new Date();
-    cur.setHours(0, 0, 0, 0);
+    const cacheKey = `events:${q || 'all'}:p${page}`;
 
-    // Optimization: find + select + sort + lean
-    const events = await Event.find({ event_date: { $gte: cur } })
-      .select("-description -event_time -__v") 
-      .sort({ event_date: 1 })
+    // Redis
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      return res.json(JSON.parse(cached));
+    }
+
+    let query = { event_date: { $gte: today } };
+    let projection = { description: 0, event_time: 0, __v: 0 };
+    let sort = { event_date: 1 };
+
+    // Hybrid Search Logic
+    if (q) {
+      if (q.length < 3) {
+        query.event_name = { $regex: q, $options: 'i' };
+      } else {
+        query.$text = { $search: q };
+        projection.score = { $meta: "textScore" };
+        sort = { score: { $meta: "textScore" } };
+      }
+    }
+
+    const events = await Event.find(query, projection)
+      .sort(sort)
       .skip(skip)
-      .limit(limit)
+      .limit(parseInt(limit))
       .lean();
 
-    res.json({
-      success: true,
-      data: events
-    });
+    // Cache for 5 mins
+    await redisClient.setEx(cacheKey, 300, JSON.stringify({ success: true, data: events }));
+
+    res.setHeader('X-Cache', 'MISS');
+    res.json({ success: true, data: events });
   } catch (error) {
-    console.error("Fetch Events Error:", error);
-    next(error); 
-  }
-}
-
-async function getFundraisers(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
-
-  if (req.user.role !== "NGO" || req.user.id !== ngoID) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-
-  try {
-    const today = new Date();
-    const isoCurrentDate = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
-    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-    const fundraisers = await CreatedFundraiser.find({ ngoId: ngoID });
-    const ongoing_fund = fundraisers.filter((fundraiser) => {
-      const deadline =
-        fundraiser.deadline instanceof Date
-          ? fundraiser.deadline.toISOString().split("T")[0]
-          : fundraiser.deadline;
-      return deadline >= isoCurrentDate;
-    });
-
-    res.render("NGOs/fundraisers", {
-      ongoing_fund,
-      user: req.user,
-      userRole: req.user.role,
-    });
-  } catch (error) {
-    error.message = "Failed to load fundraisers";
     next(error);
   }
 }
-
-// async function getallFundraisers(req, res) {
-//   try {
-//     const today = new Date();
-//     const isoCurrentDate = today.toISOString().split("T")[0];
-
-//     const fundraisers = await CreatedFundraiser.find({});
-
-//     const ongoing_fund = fundraisers.filter((fundraiser) => {
-//       const deadline =
-//         fundraiser.deadline instanceof Date
-//           ? fundraiser.deadline.toISOString().split("T")[0]
-//           : fundraiser.deadline;
-//       return deadline >= isoCurrentDate;
-//     });
-
-//     res.json(ongoing_fund);
-//   } catch (error) {
-//     error.message = "Failed to load fundraisers";
-//     next(error);
-//   }
-// }
 
 async function getallFundraisers(req, res, next) {
   try {
+    const { q, tags } = req.query; // Inputs
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    //New DB optimization : Projection , fetching the only fields which are required
-    const fundraisers = await CreatedFundraiser.find(
-      { deadline: { $gte: today } },   // filter in DB
-      {
-        fundraiser_name: 1,
-        goal_amount: 1,
-        amount_raised_so_far: 1,
-        deadline: 1,
-        imagePath: 1,
-        tag: 1,
-        ngoId: 1
-      } // projection
-    );
+    const cacheKey = `fund:${q || 'all'}:${tags || 'none'}`; // Key
 
+    const cached = await redisClient.get(cacheKey); // Cache-Check
+    if (cached) {
+      res.setHeader('X-Response-Source', 'Redis');
+      return res.json(JSON.parse(cached));
+    }
+
+    let query = { deadline: { $gte: today } }; // Base
+    let projection = { 
+      fundraiser_name: 1, goal_amount: 1, amount_raised_so_far: 1, 
+      deadline: 1, imagePath: 1, tag: 1, ngoId: 1 
+    }; // Selection
+    let sort = { deadline: 1 }; // Order
+
+    if (q) {
+      // Hybrid-Search
+      if (q.length < 3) {
+        query.fundraiser_name = { $regex: q, $options: 'i' }; // Partial
+      } else {
+        query.$text = { $search: q }; // Inverted-Index
+        projection.score = { $meta: "textScore" };
+        sort = { score: { $meta: "textScore" } }; // Ranking
+      }
+    }
+
+    if (tags) {
+      query.tag = { $in: tags.split(',') }; // Filtering
+    }
+
+    const fundraisers = await CreatedFundraiser.find(query, projection)
+      .sort(sort)
+      .lean(); // Performance
+
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(fundraisers)); // Store-Cache
+
+    res.setHeader('X-Response-Source', 'Database');
     res.json(fundraisers);
   } catch (error) {
-    error.message = "Failed to load fundraisers";
     next(error);
   }
 }
+
 
 async function editNGOProfile(req, res, next) {
   const ngoID = req.params.ngoID;
@@ -399,16 +401,35 @@ async function createFundraiser(req, res,next) {
   }
 }
 
-function getRegisterUser(req, res) {
-  const event = req.params.eventName;
-  const ngoId = req.params.ngoID;
+async function getEventDetails(req, res, next) {
+  try {
+    const { ngoID, eventName } = req.params;
 
-  res.render("users/donor_reg", {
-    event,
-    ngoId,
-    user: req.user,
-    userRole: req.user.role,
-  });
+    // 1. Find the event
+    const event = await Event.findOne({ 
+      ngoId: parseInt(ngoID, 10), 
+      event_name: decodeURIComponent(eventName) 
+    }).lean();
+
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // 2. Optimization: Fetch only the NGO Name using the ID from the event
+    const ngo = await NGO.findOne({ ngoId: event.ngoId })
+      .select("Ngoname")
+      .lean();
+
+    res.status(200).json({ 
+      success: true, 
+      event: {
+        ...event,
+        ngoName: ngo ? ngo.Ngoname : "Trusted Partner" // Fallback if name is missing
+      } 
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function registerUser(req, res) {
@@ -461,18 +482,6 @@ async function registerUser(req, res) {
     error.message = "Internal server error.";
     next(error);
   }
-}
-
-async function render_donate_fundraiser(req, res) {
-  const ngoId = parseInt(req.params.ngoId, 10);
-  const name_fund = req.params.fundraiser_name;
-
-  res.render("NGOs/donate_fundraiser", {
-    ngoId,
-    name_fund,
-    user: req.user,
-    userRole: req.user.role,
-  });
 }
 
 async function getNGO(req, res, next) {
@@ -615,35 +624,6 @@ async function editEvent(req, res) {
   }
 }
 
-async function renderEditEvent(req, res) {
-  const ngoID = parseInt(req.params.ngoID, 10);
-
-  if (req.user.role !== "NGO" || req.user.id !== ngoID) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-
-  try {
-    const events = await Event.specific_events(ngoID);
-    const eventDetails = {};
-
-    for (const event of events) {
-      const details = await Event.event_load(ngoID, event.event_name);
-      eventDetails[event.event_name] = details;
-    }
-
-    res.render("NGOs/edit_events", {
-      ngoID,
-      events,
-      eventDetails: JSON.stringify(eventDetails),
-      user: req.user,
-      userRole: req.user.role,
-    });
-  } catch (error) {
-    error.message = "Failed to load the Edit Event form";
-    next(error);
-  }
-}
-
 const getNGOProfileDetails = async (req, res) => {
   const { id } = req.params;
 
@@ -768,15 +748,12 @@ module.exports = {
   createEvent,
   getEditNGOProfile,
   editNGOProfile,
-  renderEditEvent,
   editEvent,
   getEvents,
-  getFundraisers,
   get_allngo,
-  getRegisterUser,
+  getEventDetails,
   registerUser,
   getallFundraisers,
-  render_donate_fundraiser,
   getNGOProfileDetails,
   getCampaignDetails
 };

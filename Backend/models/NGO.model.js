@@ -28,6 +28,10 @@ const ngoSchema = new mongoose.Schema({
 });
 
 ngoSchema.plugin(AutoIncrement, { inc_field: "ngoId" });
+ngoSchema.index(
+  { Ngoname: "text", email: "text" },
+  { weights: { Ngoname: 10, email: 5 } }
+);
 
 const eventSchema = new mongoose.Schema({
   ngoId: {
@@ -66,6 +70,10 @@ const eventSchema = new mongoose.Schema({
 eventSchema.index({ ngoId: 1, event_date: 1 });
 eventSchema.index({ ngoId: 1 });
 eventSchema.index({ event_date: 1 });
+eventSchema.index(
+  { event_name: "text", event_location: "text" },
+  { weights: { event_name: 10, event_location: 5 } }
+);
 
 // NGO Schema Methods
 ngoSchema.methods.storeNGO = async function storeNGO() {

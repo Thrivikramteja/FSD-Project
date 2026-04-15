@@ -29,6 +29,10 @@ const carehomeSchema = new mongoose.Schema({
 });
 
 carehomeSchema.plugin(AutoIncrement, { inc_field: "carehomeId" });
+carehomeSchema.index(
+  { care_home_name: "text", city: "text", state: "text" },
+  { weights: { care_home_name: 10, city: 5, state: 5 } }
+); // Index
 
 carehomeSchema.statics.getCareHomes = async function () {
   const carehomes = await Carehome.find({});

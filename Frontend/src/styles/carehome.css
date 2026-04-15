@@ -144,6 +144,28 @@
         margin: auto;
     }
 }
+.care-search-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+.care-search-input {
+    width: 100%;
+    max-width: 600px;
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.care-search-input:focus {
+    border-color: #ff7f27; /* Match details button */
+}
 
 /* Mobile (up to 767px) */
 @media screen and (max-width: 767px) {

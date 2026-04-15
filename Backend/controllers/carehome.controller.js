@@ -1,6 +1,6 @@
 const path = require("path");
 const bcrypt = require("bcrypt");
-
+const redisClient = require('../redis'); // Path to the file you just created
 const { Carehome } = require("../models/carehome.model");
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
@@ -18,12 +18,43 @@ async function getMongoIdFromNumericId(numericId) {
   return carehome ? carehome._id : null;
 }
 
-async function getCareHomesApi(req, res,next) {
+async function getCareHomesApi(req, res, next) {
   try {
-    const carehomes = await Carehome.getCareHomes();
+    const { q } = req.query; 
+    const cacheKey = `carehomes:${q || 'all'}`;
+
+    const cached = await redisClient.get(cacheKey); // Redis
+    if (cached) {
+      res.setHeader('X-Cache-Source', 'Redis');
+      return res.json(JSON.parse(cached));
+    }
+
+    let query = {};
+    let projection = { 
+      care_home_name: 1, city: 1, state: 1, 
+      description: 1, imagePath: 1, carehomeId: 1 
+    }; // Projection
+    let sort = { care_home_name: 1 };
+
+    if (q) {
+      if (q.length < 3) {
+        query.care_home_name = { $regex: q, $options: 'i' }; // Partial
+      } else {
+        query.$text = { $search: q };
+        projection.score = { $meta: "textScore" };
+        sort = { score: { $meta: "textScore" } };
+      }
+    }
+
+    const carehomes = await Carehome.find(query, projection)
+      .sort(sort)
+      .lean(); // Lean
+
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(carehomes)); // Cache
+
+    res.setHeader('X-Cache-Source', 'Database');
     res.json(carehomes);
   } catch (error) {
-    error.message = "Failed to fetch carehomes";
     next(error);
   }
 }

@@ -79,4 +79,7 @@ router.post(
 
 router.get("/api/NGOs/profile/:id", NGOController.getNGOProfileDetails);
 
+// GET single event details for registration context
+router.get("/api/event-details/:ngoID/:eventName", NGOController.getEventDetails);
+
 module.exports = router;
