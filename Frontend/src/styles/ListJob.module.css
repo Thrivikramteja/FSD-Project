@@ -214,3 +214,64 @@
 .applyBtn:hover svg {
   transform: translateX(5px);
 }
+
+.searchFilterContainer {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  display: flex;
+  gap: 15px;
+  padding: 0 20px;
+}
+
+.filterSection {
+  position: relative;
+}
+
+.filterBtn {
+  padding: 12px 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #444;
+}
+
+.filterDropdown {
+  position: absolute;
+  top: 55px;
+  left: 0;
+  width: 200px;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  z-index: 100;
+  border: 1px solid #eee;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.searchSection {
+  flex: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.searchInput:focus {
+  border-color: #10b981;
+}

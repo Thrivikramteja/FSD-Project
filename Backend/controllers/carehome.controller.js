@@ -1,13 +1,13 @@
 const path = require("path");
 const bcrypt = require("bcrypt");
 const redisClient = require('../redis'); // Path to the file you just created
+const mongoose = require('mongoose');
 const { Carehome } = require("../models/carehome.model");
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
 const { CareHomeJob } = require("../models/carehome.model");
 const Application = require("../models/Application");
 const { User } = require("../models/user.model");
-
 const {
   sendAcceptedEmail,
   sendRejectedEmail,
@@ -121,70 +121,66 @@ async function register(req, res,next) {
 }
 
 async function rejectApplication(req, res, next) {
-  const { id } = req.params; 
+  const { id } = req.params;
   try {
     const application = await Application.findByIdAndUpdate(
       id,
       { status: "Rejected" },
       { new: true }
-    );
+    )
+    .populate("jobId", "title")
+    .populate("carehomeId", "carehomeId")
+    .lean();
 
-    if (!application) {
-      return res.status(404).json({ error: "Application not found" });
-    }
+    if (!application) return res.status(404).json({ error: "Application not found" });
 
-    const user = await User.findOne({ userId: Number(application.userId) });
-    const job = await CareHomeJob.findById(application.jobId);
+    const user = await User.findOne({ userId: application.userId }, { email: 1, name: 1 }).lean();
+    if (!user?.email) return res.status(400).json({ error: "User details not found" });
 
-    if (!user || !user.email || !job) {
-      return res.status(400).json({ error: "User email or job details not found" });
-    }
+    // --- Targeted Cache Purge: Only for Dashboard routes ---
+    const numericCareId = application.carehomeId?.carehomeId;
+    await Promise.all([
+      redisClient.del(`user:apps:${application.userId}`),
+      redisClient.del(`dash:carehome:${numericCareId}`)
+    ]);
 
-    try {
-      const info = await sendRejectedEmail(user.email, user.name, job.title);
-      console.log("Rejection Email sent:", info.messageId);
-    } catch (err) {
-      console.error("Rejection Email failed:", err);
-    }
+    // Background Email
+    sendRejectedEmail(user.email, user.name, application.jobId?.title)
+      .catch(err => console.error("Background Email Error:", err));
 
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error("Reject Action Error:", err);
-    err.message = "Failed to process application rejection.";
-    next(err); 
+    next(err);
   }
 }
 
 async function acceptApplication(req, res, next) {
   const { id } = req.params;
-
   try {
     const application = await Application.findByIdAndUpdate(
       id,
       { status: "Accepted" },
       { new: true }
-    );
+    )
+    .populate("jobId", "title")
+    .populate("carehomeId", "carehomeId")
+    .lean();
 
-    if (!application) {
-      return res.status(404).json({ error: "Application not found" });
-    }
+    if (!application) return res.status(404).json({ error: "Application not found" });
 
-    const user = await User.findOne({ userId: Number(application.userId) });
-    
-    if (!user || !user.email) {
-      return res.status(400).json({ error: "User email not found" });
-    }
+    const user = await User.findOne({ userId: application.userId }, { email: 1, name: 1 }).lean();
+    if (!user?.email) return res.status(400).json({ error: "User email not found" });
 
-    const job = await CareHomeJob.findById(application.jobId);
-    if (!job) {
-      return res.status(400).json({ error: "Job not found" });
-    }
+    // --- Targeted Cache Purge ---
+    const numericCareId = application.carehomeId?.carehomeId;
+    await Promise.all([
+      redisClient.del(`user:apps:${application.userId}`),
+      redisClient.del(`dash:carehome:${numericCareId}`)
+    ]);
 
-    try {
-      await sendAcceptedEmail(user.email, user.name, job.title);
-    } catch (err) {
-      console.error("Email failed but status was updated:", err);
-    }
+    // Background Email
+    sendAcceptedEmail(user.email, user.name, application.jobId?.title)
+      .catch(err => console.error("Background Email Error:", err));
 
     res.status(200).json({ success: true });
   } catch (err) {
@@ -317,41 +313,67 @@ const enrichMessagesWithUser = async (messages) => {
 async function getCarehome(req, res, next) {
   const careid = parseInt(req.params.carehomeId, 10);
 
+  // Security Check
   if (req.user.role !== "Carehome" || req.user.id !== careid) {
     return res.status(403).json({ message: "Forbidden" });
   }
 
   try {
-    const ongoing_fund = await Carehome.ongoing_fund(careid);
-    const completed_fund = await Carehome.completed_fund(careid);
-    const recentDonations = await Carehome.recentDonations(careid);
-    const getname = await Carehome.getname(careid);
-    const wishlist = await Carehome.getWishlist(careid);
-    const stats = await Carehome.get_carehome_stats(careid);
-    const items = await donate_items.get_item_donations(careid);
+    const cacheKey = `dash:carehome:${careid}`;
 
-    const rawMessages = await Carehome.getMessages(careid);
-    
-    const messages = await enrichMessagesWithUser(rawMessages);
+    // 1. Redis Check
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      res.setHeader('X-Cache-Status', 'HIT');
+      return res.json(JSON.parse(cachedData));
+    }
 
-    res.json({
-      name: getname.care_home_name,
+    // 2. Parallel Execution (Optimization: No Waterfall)
+    const [
+      careData,
       ongoing_fund,
       completed_fund,
       recentDonations,
-      wishlist,
+      stats,
+      items,
+      rawMessages
+    ] = await Promise.all([
+      Carehome.findOne({ carehomeId: careid }, { care_home_name: 1, wishlist: 1 }).lean(),
+      Carehome.ongoing_fund(careid),
+      Carehome.completed_fund(careid),
+      Carehome.getRecentDonationsOptimized(careid), // New Optimized Static
+      Carehome.get_carehome_stats_optimized(careid), // New Optimized Static
+      donate_items.get_item_donations(careid),
+      Carehome.getMessages(careid)
+    ]);
+
+    // 3. Enrichment (Keeping your existing logic)
+    const messages = await enrichMessagesWithUser(rawMessages);
+
+    const dashboardResponse = {
+      name: careData?.care_home_name || "Carehome",
+      ongoing_fund,
+      completed_fund,
+      recentDonations,
+      wishlist: careData?.wishlist || "",
       careid,
       stats,
       messages,
       items,
       user: req.user,
       userRole: req.user.role,
-    });
+    };
+
+    // 4. Cache for 2 minutes (Dashboards change often, so short TTL)
+    await redisClient.setEx(cacheKey, 120, JSON.stringify(dashboardResponse));
+
+    res.setHeader('X-Cache-Status', 'MISS');
+    res.json(dashboardResponse);
   } catch (err) {
-    err.message = "Dashboard load failed";
     next(err);
   }
 }
+
 async function accpet_item_doantions(req, res,next) {
   try {
     // Safety Check: Identity & Role
@@ -555,30 +577,75 @@ async function post_createjob(req, res,next) {
   }
 }
 
-async function get_alljobs(req, res,next) {
+async function get_alljobs(req, res, next) {
   try {
-    const jobs = await CareHomeJob.find()
-      .populate("postedBy", "care_home_name city state")
-      .sort({ createdAt: -1 });
+    const { q, types } = req.query; // types is a comma-separated string
+    const cacheKey = `jobs:search:${q || 'none'}:types:${types || 'all'}`;
 
-    res.json({
-      success: true,
-      jobs,
-    });
+    // 1. Redis Cache Check
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      return res.json(JSON.parse(cached));
+    }
+
+    let query = {};
+    let projection = { __v: 0 };
+    let sort = { createdAt: -1 };
+
+    // 2. Hybrid Search Logic
+    if (q) {
+      if (q.length < 3) {
+        query.title = { $regex: q, $options: 'i' };
+      } else {
+        query.$text = { $search: q };
+        projection.score = { $meta: "textScore" };
+        sort = { score: { $meta: "textScore" } };
+      }
+    }
+
+    // 3. Multi-Select Filtering
+    if (types) {
+      query.type = { $in: types.split(',') }; 
+    }
+
+    // 4. Execution with Projections and Lean
+    const jobs = await CareHomeJob.find(query, projection)
+      .populate("postedBy", "care_home_name city state")
+      .sort(sort)
+      .lean();
+
+    const response = { success: true, jobs };
+
+    // 5. Set Cache (5 minutes)
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
+
+    res.setHeader('X-Cache', 'MISS');
+    res.json(response);
   } catch (err) {
-    console.error(err);
-    err.message = "Server error";
     next(err);
   }
 }
 
 
 // Add this to carehome.controller.js
-async function getCarehomePublic(req, res,next) {
+async function getCarehomePublic(req, res, next) {
   try {
     const careId = parseInt(req.params.carehomeId, 10);
-    // Find by the numeric carehomeId
-    const carehome = await Carehome.findOne({ carehomeId: careId });
+
+    const carehome = await Carehome.findOne(
+      { carehomeId: careId },
+      {
+        care_home_name: 1,
+        imagePath: 1,
+        description: 1,
+        num_residents: 1,
+        avg_expense: 1,
+        city: 1,
+        state: 1,
+        _id: 0 
+      }
+    ).lean();
 
     if (!carehome) {
       return res.status(404).json({ error: "Care home not found" });
@@ -632,35 +699,50 @@ async function getCareHome_Jobs(req, res,next) {
   }
 }
 
-async function getJobApplicants(req, res,next) {
+async function getJobApplicants(req, res, next) {
   try {
     const { jobId } = req.params;
-
     const mongoId = await getMongoIdFromNumericId(req.user.id);
 
     if (!mongoId) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Carehome not found" });
+      return res.status(404).json({ success: false, message: "Carehome not found" });
     }
 
-    const applications = await Application.find({
-      jobId: jobId,
-      carehomeId: mongoId,
-    }).lean();
-
-    const detailedApplicants = await Promise.all(
-      applications.map(async (app) => {
-        const user = await User.findOne({ userId: app.userId })
-          .select("name email")
-          .lean();
-        return {
-          ...app,
-          userName: user ? user.name : "Unknown User",
-          userEmail: user ? user.email : "N/A",
-        };
-      })
-    );
+    // Single Aggregation Pipeline to avoid N+1 queries
+    const detailedApplicants = await Application.aggregate([
+      {
+        $match: {
+          jobId: new mongoose.Types.ObjectId(jobId),
+          carehomeId: mongoId,
+        },
+      },
+      {
+        $lookup: {
+          from: "donors",
+          localField: "userId",
+          foreignField: "userId",
+          as: "userDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$userDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          status: 1,
+          experience: 1,
+          whyMe: 1,
+          appliedAt: 1,
+          userName: { $ifNull: ["$userDetails.name", "Unknown User"] },
+          userEmail: { $ifNull: ["$userDetails.email", "N/A"] },
+        },
+      },
+      { $sort: { appliedAt: -1 } },
+    ]);
 
     res.status(200).json({
       success: true,
@@ -672,28 +754,34 @@ async function getJobApplicants(req, res,next) {
     next(error);
   }
 }
+
 async function getMyApplications(req, res, next) {
   try {
-    if (!req.user) {
-      return res.status(401).json({ success: false });
+    const userId = req.user.id;
+    const cacheKey = `user:apps:${userId}`;
+    const cached = await redisClient.get(cacheKey);
+
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      return res.json(JSON.parse(cached));
     }
 
-    const userId = req.user.id;
-
-    const applications = await Application.find({ userId })
+    const applications = await Application.find({ userId }, { __v: 0 })
       .populate("jobId", "title")
       .populate("carehomeId", "care_home_name carehomeId")
-      .sort({ appliedAt: -1 });
+      .sort({ appliedAt: -1 })
+      .lean();
 
-    const formatted = applications.map((app) => ({
-      ...app.toObject(),
-      carehomeName: app.carehomeId?.care_home_name || "Unknown",
+    const formatted = applications.map(app => ({
+      ...app,
+      carehomeName: app.carehomeId?.care_home_name || "Unknown"
     }));
 
-    res.json({
-      success: true,
-      applications: formatted,
-    });
+    const response = { success: true, applications: formatted };
+    await redisClient.setEx(cacheKey, 180, JSON.stringify(response));
+
+    res.setHeader('X-Cache', 'MISS');
+    res.json(response);
   } catch (err) {
     next(err);
   }

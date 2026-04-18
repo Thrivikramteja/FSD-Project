@@ -34,6 +34,7 @@ carehomeSchema.index(
   { weights: { care_home_name: 10, city: 5, state: 5 } }
 ); // Index
 
+
 carehomeSchema.statics.getCareHomes = async function () {
   const carehomes = await Carehome.find({});
   return carehomes;
@@ -160,94 +161,65 @@ donationMoneySchema.statics.saveDonation = async function ({ userId, amount_dona
   await donation.save();
 };
 
-carehomeSchema.statics.get_carehome_stats = async function (carehomeId) {
-  const stats = [];
-
-  const totalFundsResult = await DonationMoney.aggregate([
-    { $match: { carehomeId: carehomeId } },
-    {
-      $group: {
-        _id: null,
-        totalFundsReceived: { $sum: "$amount_donated" },
-      },
-    },
+carehomeSchema.statics.get_carehome_stats_optimized = async function (carehomeId) {
+  const [moneyStats, careDetails] = await Promise.all([
+    mongoose.model("DonationMoney").aggregate([
+      { $match: { carehomeId: carehomeId } },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount_donated" },
+          highest: { $max: "$amount_donated" }
+        }
+      }
+    ]),
+    this.findOne({ carehomeId }, { avg_expense: 1, num_residents: 1 }).lean()
   ]);
-  const totalFundsReceived = totalFundsResult[0]?.totalFundsReceived || 0;
-  stats.push({ title: "Total Funds Received", value: totalFundsReceived });
 
-
-  const carehomeDetails = await this.findOne(
-    { carehomeId: carehomeId },
-    { avg_expense: 1, num_residents: 1, _id: 0 }
-  );
-
-  const avgMonthlyExpense = carehomeDetails?.avg_expense || 0;
-  const numberOfResidents = carehomeDetails?.num_residents || 0;
-  const avgCostPerResident = numberOfResidents
-    ? (avgMonthlyExpense / numberOfResidents).toFixed(2)
+  const mStats = moneyStats[0] || { total: 0, highest: 0 };
+  const avgCost = careDetails?.num_residents 
+    ? (careDetails.avg_expense / careDetails.num_residents).toFixed(2) 
     : 0;
 
-  stats.push(
-    { title: "Average Monthly Expense", value: avgMonthlyExpense },
-    { title: "Number of Residents", value: numberOfResidents },
-    { title: "Average Cost Per Resident", value: avgCostPerResident }
-  );
-
-
-  const highestDonationResult = await DonationMoney.aggregate([
-    { $match: { carehomeId: carehomeId } },
-    {
-      $group: {
-        _id: null,
-        highestDonation: { $max: "$amount_donated" },
-      },
-    },
-  ]);
-  const highestDonation = highestDonationResult[0]?.highestDonation || 0;
-  stats.push({ title: "Highest Donation", value: highestDonation });
-
-  return stats;
+  return [
+    { title: "Total Funds Received", value: mStats.total },
+    { title: "Average Monthly Expense", value: careDetails?.avg_expense || 0 },
+    { title: "Number of Residents", value: careDetails?.num_residents || 0 },
+    { title: "Average Cost Per Resident", value: avgCost },
+    { title: "Highest Donation", value: mStats.highest }
+  ];
 };
 
-carehomeSchema.statics.recentDonations = async function (careId) {
-  try {
-
-    const donations = await DonationMoney.find({ carehomeId: careId }).sort({
-      donated_at: -1,
-    });
-
-    if (donations.length === 0) {
-      return [];
-    }
-
-
-    const result = [];
-
-    for (const donation of donations) {
-      try {
-        console.log(" hi the doaniton id is " +  donation.userId);
-        const donor = await User.findOne({ userId: donation.userId });
-
-        result.push({
-          donor_name: donor ? donor.name : "Anonymous",
-          amount: donation.amount_donated,
-        });
-      } catch (err) {
-
-        result.push({
-          donor_name: "Anonymous",
-          amount: donation.amount_donated,
-        });
+carehomeSchema.statics.getRecentDonationsOptimized = async function (careId) {
+  return await mongoose.model("DonationMoney").aggregate([
+    { $match: { carehomeId: careId } },
+    { $sort: { donated_at: -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        from: "donors", 
+        localField: "userId",
+        foreignField: "userId",
+        as: "donorInfo"
+      }
+    },
+    {
+      $addFields: {
+        // Extracts the first element from the joined array
+        donor: { $arrayElemAt: ["$donorInfo", 0] }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        amount: "$amount_donated",
+        donated_at: 1,
+        // Fallback to "Anonymous" if no user is found
+        donor_name: { $ifNull: ["$donor.name", "Anonymous"] } 
       }
     }
-
-    return result;
-  } catch (err) {
-    console.error("Error fetching recent donations:", err);
-    throw err;
-  }
+  ]);
 };
-
 carehomeSchema.statics.getMessages = async function (carehomeId) {
   try {
     const messages = await donate_items_mes.find({ carehomeId: carehomeId });
@@ -272,6 +244,12 @@ const careHomeJobSchema = new mongoose.Schema({
   endDate: Date,
   createdAt: { type: Date, default: Date.now }
 });
+
+//indices
+careHomeJobSchema.index(
+  { title: "text", location: "text", description: "text" },
+  { weights: { title: 10, location: 5, description: 2 } }
+);
 
 
 //new feature : application for jobs

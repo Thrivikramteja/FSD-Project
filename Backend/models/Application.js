@@ -46,5 +46,7 @@ const applicationSchema = new mongoose.Schema({
     default: Date.now 
   }
 });
+// Add this to your Application.js file
+applicationSchema.index({ userId: 1, appliedAt: -1 });
 
 module.exports = mongoose.model('Application', applicationSchema);
