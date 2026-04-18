@@ -140,24 +140,6 @@ async function contributed_fund(req, res,next) {
   }
 }
 
-async function getEditDonorProfile(req, res) {
-  const userID = parseInt(req.params.userId, 10);
-
-  try {
-    const user = await User.getUserByUserId(userID);
-
-    console.log("fetched details ", user);
-    res.render("users/edit_profile", {
-      user,
-      userRole: req.session.userRole,
-    });
-  } catch (error) {
-    console.error("Error rendering the Create Event form:", error);
-    error.message = "Failed to load the Create Event form";
-    next(error);
-  }
-}
-
 async function editDonorProfile(req, res, next) {
   const userId = parseInt(req.params.userId, 10);
   const fullname = req.body.fullname || req.body.name;
@@ -184,6 +166,10 @@ async function editDonorProfile(req, res, next) {
         message: "Donor profile not found.",
       });
     }
+
+    // --- PURGE REDIS CACHE ---
+    // Clears the donor's dashboard/applications cache to ensure the new name shows up
+    await redisClient.del(`user:apps:${userId}`);
 
     res.status(200).json({
       success: true,

@@ -437,7 +437,7 @@ async function accpet_item_doantions(req, res,next) {
     next(err);
   }
 }
-async function editCarehomeProfile(req, res,next) {
+async function editCarehomeProfile(req, res, next) {
   const careId = parseInt(req.params.carehomeId, 10);
 
   if (req.user.role !== "Carehome" || req.user.id !== careId) {
@@ -480,6 +480,13 @@ async function editCarehomeProfile(req, res,next) {
         .status(404)
         .json({ message: "Care Home not found for update." });
     }
+
+    // --- PURGE REDIS CACHE ---
+    // Clears the private dashboard and the public directory list
+    await Promise.all([
+      redisClient.del(`dash:carehome:${careId}`),
+      redisClient.del(`carehomes:list`)
+    ]);
 
     res.status(200).json({
       success: true,
