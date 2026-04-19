@@ -120,12 +120,12 @@ async function register(req, res, next) {
       success: true,
       message: "NGO Registration successful",
     });
-  } catch (error) {
-    console.log(error);
-
+ } catch (error) {
+    // console.log(error);
+    if (error.code === 11000) error.statusCode = 409;  // ← add this line
     error.message = "Failed to register NGO";
     next(error);
-  }
+}
 }
 
 async function getEditNGOProfile(req, res, next) {
@@ -256,8 +256,7 @@ async function getallFundraisers(req, res, next) {
 
 async function editNGOProfile(req, res, next) {
   const ngoID = req.params.ngoID;
-  console.log(req.user.id);
-
+  //console.log(req.user.id);
   if (req.user.role !== "NGO" || String(req.user.id) !== String(ngoID)) {
     return res.status(403).json({
       success: false,

@@ -1,0 +1,277 @@
+<html><head><meta charset="utf-8"/><title>Test Report</title><style type="text/css">:root {
+  --text-primary: #111;
+  --text-secondary: #4f4f4f;
+  --success: #006633;
+  --success-bright: #80ffbf;
+  --danger: #cc071e;
+  --danger-bright: #fbdfe0;
+  --warning: #995c00;
+  --warning-bright: #ffeea8;
+  --panel: #eee;
+  --border: #949494;
+  --disabled: #6b6b6b;
+}
+
+html,
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+}
+body {
+  padding: 2rem 1rem;
+}
+.jesthtml-content {
+  margin: 0 auto;
+  max-width: 70rem;
+}
+header {
+  display: flex;
+  align-items: center;
+}
+#title {
+  margin: 0;
+  flex-grow: 1;
+}
+#logo {
+  height: 4rem;
+}
+#timestamp {
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+#metadata-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.additional-information-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/** SUMMARY */
+#summary {
+  color: var(--text-primary);
+  display: flex;
+  font-family: monospace;
+  font-size: 1rem;
+}
+#summary > div {
+  margin-right: 0.5rem;
+  background: var(--panel);
+  padding: 1rem;
+  min-width: 15rem;
+}
+#summary > div:last-child {
+  margin-right: 0;
+}
+@media only screen and (max-width: 720px) {
+  #summary {
+    flex-direction: column;
+  }
+  #summary > div {
+    margin-right: 0;
+    margin-top: 1rem;
+  }
+  #summary > div:first-child {
+    margin-top: 0;
+  }
+}
+
+.summary-total {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.summary-passed {
+  color: var(--success);
+  border-left: 0.4rem solid var(--success);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-failed,
+.summary-obsolete-snapshots {
+  color: var(--danger);
+  border-left: 0.4rem solid var(--danger);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-pending {
+  color: var(--warning);
+  border-left: 0.4rem solid var(--warning);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-empty {
+  color: var(--disabled);
+  border-left: 0.4rem solid var(--disabled);
+  margin-bottom: 0.15rem;
+}
+
+.test-result {
+  padding: 1rem;
+  margin-bottom: 0.25rem;
+}
+.test-result:last-child {
+  border: 0;
+}
+.test-result.passed {
+  background-color: var(--success-bright);
+  color: var(--success);
+}
+.test-result.failed {
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.test-result.pending {
+  background-color: var(--warning-bright);
+  color: var(--warning);
+}
+
+.test-info {
+  display: flex;
+  justify-content: space-between;
+}
+.test-suitename {
+  width: 20%;
+  text-align: left;
+  font-weight: bold;
+  word-break: break-word;
+}
+.test-title {
+  width: 40%;
+  text-align: left;
+  font-style: italic;
+}
+.test-status {
+  width: 20%;
+  text-align: right;
+}
+.test-duration {
+  width: 10%;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.failureMessages {
+  padding: 0 1rem;
+  margin-top: 1rem;
+  border-top: 1px dashed var(--danger);
+}
+.failureMessages.suiteFailure {
+  border-top: none;
+}
+.failureMsg {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.suite-container {
+  margin-bottom: 1rem;
+}
+.suite-info {
+  padding: 1rem;
+  background-color: var(--panel);
+  color: var(--text-secondary);
+  border: 0.15rem solid;
+  border-color: var(--panel);
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+.suite-info:hover {
+  border-color: var(--border);
+  cursor: pointer;
+}
+.suite-info .suite-path {
+  word-break: break-all;
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 1rem;
+}
+.suite-info .suite-time {
+  margin-left: 1rem;
+  padding: 0.2rem 0.3rem;
+  font-size: 0.85rem;
+}
+.suite-info .suite-time.warn {
+  background-color: var(--danger);
+  color: #fff;
+}
+.suite-info:before {
+  content: "\2303";
+  display: inline-block;
+  margin-right: 1rem;
+  transform: rotate(180deg) translateY(0.15rem);
+}
+.suite-container[open] .suite-info:before {
+  transform: rotate(0deg) translateY(0.15rem);
+}
+
+/* CONSOLE LOGS */
+.suite-consolelog {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--panel);
+}
+.suite-consolelog-header {
+  font-weight: bold;
+}
+.suite-consolelog-item {
+  padding: 0.5rem;
+}
+.suite-consolelog-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-consolelog-item-origin {
+  color: var(--text-secondary);
+  font-weight: bold;
+}
+.suite-consolelog-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* OBSOLETE SNAPSHOTS */
+.suite-obsolete-snapshots {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.suite-obsolete-snapshots-header {
+  font-weight: bold;
+}
+.suite-obsolete-snapshots-item {
+  padding: 0.5rem;
+}
+.suite-obsolete-snapshots-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-obsolete-snapshots-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+</style></head><body><main class="jesthtml-content"><header><h1 id="title">Test Report</h1></header><section id="metadata-container"><div id="timestamp">Started: 2026-04-19 18:05:29</div><div id="summary"><div id="suite-summary"><div class="summary-total">Suites (3)</div><div class="summary-passed ">3 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div><div id="test-summary"><div class="summary-total">Tests (56)</div><div class="summary-passed ">56 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div></div></section><details id="suite-1" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\chand\FSD-Project\Backend\tests\auth.test.js</div><div class="suite-time warn">11.811s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/signup → should create user successfully</div><div class="test-status">passed</div><div class="test-duration">0.449s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/signup → should fail for duplicate user</div><div class="test-status">passed</div><div class="test-duration">0.232s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/signup → fail if password is too short</div><div class="test-status">passed</div><div class="test-duration">0.013s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/signup → fail for invalid email format</div><div class="test-status">passed</div><div class="test-duration">0.014s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/login → should trigger OTP on valid login</div><div class="test-status">passed</div><div class="test-duration">3.973s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/login → fail with wrong password</div><div class="test-status">passed</div><div class="test-duration">0.528s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/login → fail for non-existing user</div><div class="test-status">passed</div><div class="test-duration">0.019s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/login → fail for invalid userRole</div><div class="test-status">passed</div><div class="test-duration">0.017s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/verify-otp → fail with incorrect OTP</div><div class="test-status">passed</div><div class="test-duration">3.972s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Auth API Tests (CareConnect)</div><div class="test-title">POST /api/verify-otp → fail for unregistered email</div><div class="test-status">passed</div><div class="test-duration">0.033s</div></div></div></div></details><details id="suite-2" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\chand\FSD-Project\Backend\tests\ngo.test.js</div><div class="suite-time">3.954s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">NGO Registration</div><div class="test-title">registers a new NGO and returns 201</div><div class="test-status">passed</div><div class="test-duration">0.521s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">NGO Registration</div><div class="test-title">rejects duplicate email</div><div class="test-status">passed</div><div class="test-duration">0.534s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/ngos</div><div class="test-title">returns empty array when no NGOs exist</div><div class="test-status">passed</div><div class="test-duration">0.067s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/ngos</div><div class="test-title">returns enriched NGO objects with stats fields</div><div class="test-status">passed</div><div class="test-duration">0.152s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/ngo-dashboard/:ngoID</div><div class="test-title">returns dashboard data for valid NGO</div><div class="test-status">passed</div><div class="test-duration">0.134s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/ngo-dashboard/:ngoID</div><div class="test-title">returns 403 when NGO accesses another NGO's dashboard</div><div class="test-status">passed</div><div class="test-duration">0.084s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/ngo-dashboard/:ngoID</div><div class="test-title">returns 401 when no token is provided</div><div class="test-status">passed</div><div class="test-duration">0.09s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/NGOs/profile/:id</div><div class="test-title">returns NGO profile with fundraiser and event buckets</div><div class="test-status">passed</div><div class="test-duration">0.116s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/NGOs/profile/:id</div><div class="test-title">returns 404 for a non-existent NGO id</div><div class="test-status">passed</div><div class="test-duration">0.056s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">PUT /api/NGO-dashboard/:ngoID/edit</div><div class="test-title">updates NGO profile and returns updated data</div><div class="test-status">passed</div><div class="test-duration">0.093s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">PUT /api/NGO-dashboard/:ngoID/edit</div><div class="test-title">returns 403 when editing another NGO's profile</div><div class="test-status">passed</div><div class="test-duration">0.136s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /api/ngo/:ngoID/create-event</div><div class="test-title">returns 400 when image is missing</div><div class="test-status">passed</div><div class="test-duration">0.089s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /api/ngo/:ngoID/create-event</div><div class="test-title">returns 403 when a different NGO tries to create an event</div><div class="test-status">passed</div><div class="test-duration">0.043s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /api/ngo/:ngoID/create-event</div><div class="test-title">returns 401 when unauthenticated</div><div class="test-status">passed</div><div class="test-duration">0.042s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /api/ngo-dashboard/:ngoID/create-fundraiser</div><div class="test-title">returns 400 when image is missing</div><div class="test-status">passed</div><div class="test-duration">0.044s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /api/ngo-dashboard/:ngoID/create-fundraiser</div><div class="test-title">returns 403 when a Donor tries to create a fundraiser</div><div class="test-status">passed</div><div class="test-duration">0.037s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /fundraisers</div><div class="test-title">returns only ongoing (non-expired) fundraisers</div><div class="test-status">passed</div><div class="test-duration">0.051s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/events</div><div class="test-title">returns only upcoming events</div><div class="test-status">passed</div><div class="test-duration">0.034s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /registerUser/:ngoID</div><div class="test-title">returns 404 when event does not exist</div><div class="test-status">passed</div><div class="test-duration">0.033s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /registerUser/:ngoID</div><div class="test-title">returns 400 on duplicate registration</div><div class="test-status">passed</div><div class="test-duration">0.084s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">POST /registerUser/:ngoID</div><div class="test-title">returns 403 when NGO tries to register (not a Donor)</div><div class="test-status">passed</div><div class="test-duration">0.032s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/NGO-dashboard/:ngoID/details/:type/:id</div><div class="test-title">returns 400 for undefined id parameter</div><div class="test-status">passed</div><div class="test-duration">0.031s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/NGO-dashboard/:ngoID/details/:type/:id</div><div class="test-title">returns 403 for identity mismatch</div><div class="test-status">passed</div><div class="test-duration">0.027s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/NGO-dashboard/:ngoID/details/:type/:id</div><div class="test-title">returns 404 for non-existent event</div><div class="test-status">passed</div><div class="test-duration">0.037s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">GET /api/NGO-dashboard/:ngoID/details/:type/:id</div><div class="test-title">returns event details with participant list</div><div class="test-status">passed</div><div class="test-duration">0.069s</div></div></div></div></details><details id="suite-3" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\chand\FSD-Project\Backend\tests\carehome.test.js</div><div class="suite-time">1.695s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">🏠 Public Routes</div><div class="test-title">GET /api/carehomes → returns empty array when no carehomes exist</div><div class="test-status">passed</div><div class="test-duration">0.281s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">🏠 Public Routes</div><div class="test-title">GET /api/carehomes → returns all registered carehomes</div><div class="test-status">passed</div><div class="test-duration">0.031s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">🏠 Public Routes</div><div class="test-title">GET /api/carehomes/viewcare/:id → returns carehome for valid id</div><div class="test-status">passed</div><div class="test-duration">0.055s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">🏠 Public Routes</div><div class="test-title">GET /api/carehomes/viewcare/:id → returns 404 for non-existing id</div><div class="test-status">passed</div><div class="test-duration">0.018s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">🏠 Public Routes</div><div class="test-title">GET /api/jobs → returns jobs list successfully</div><div class="test-status">passed</div><div class="test-duration">0.02s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">🏠 Public Routes</div><div class="test-title">GET /api/impact-stories → returns stories list successfully</div><div class="test-status">passed</div><div class="test-duration">0.046s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">📋 Carehome Registration</div><div class="test-title">POST /api/registerCarehome → registers successfully</div><div class="test-status">passed</div><div class="test-duration">0.149s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">📋 Carehome Registration</div><div class="test-title">POST /api/registerCarehome → duplicate email fails</div><div class="test-status">passed</div><div class="test-duration">0.097s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">📊 Carehome Dashboard</div><div class="test-title">GET /api/carehome-dashboard/:id → 401 with no token</div><div class="test-status">passed</div><div class="test-duration">0.032s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">📊 Carehome Dashboard</div><div class="test-title">GET /api/carehome-dashboard/:id → 403 for donor role</div><div class="test-status">passed</div><div class="test-duration">0.029s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">📊 Carehome Dashboard</div><div class="test-title">GET /api/carehome-dashboard/:id → 403 when accessing another carehome's dashboard</div><div class="test-status">passed</div><div class="test-duration">0.034s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">📊 Carehome Dashboard</div><div class="test-title">GET /api/carehome-dashboard/:id → 200 with correct owner token</div><div class="test-status">passed</div><div class="test-duration">0.087s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">👤 Carehome Profile</div><div class="test-title">GET /api/carehome/profile/:id → 200 returns correct profile fields</div><div class="test-status">passed</div><div class="test-duration">0.027s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">👤 Carehome Profile</div><div class="test-title">PUT /api/carehome/:id → 403 when editing another carehome's profile</div><div class="test-status">passed</div><div class="test-duration">0.035s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">👤 Carehome Profile</div><div class="test-title">PUT /api/carehome/:id → 200 updates profile successfully</div><div class="test-status">passed</div><div class="test-duration">0.044s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">💰 Donate Money</div><div class="test-title">POST /api/carehome/:id/donate-money → 403 for carehome role</div><div class="test-status">passed</div><div class="test-duration">0.038s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">💰 Donate Money</div><div class="test-title">POST /api/carehome/:id/donate-money → 400 for negative amount</div><div class="test-status">passed</div><div class="test-duration">0.051s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">💰 Donate Money</div><div class="test-title">POST /api/carehome/:id/donate-money → 200 on valid donation</div><div class="test-status">passed</div><div class="test-duration">0.057s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">💼 Job Posting &amp; Listing</div><div class="test-title">POST /carehome-dashboard/post-job → 403 for donor role</div><div class="test-status">passed</div><div class="test-duration">0.028s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">💼 Job Posting &amp; Listing</div><div class="test-title">POST /carehome-dashboard/post-job → 201 on successful job post</div><div class="test-status">passed</div><div class="test-duration">0.035s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">💼 Job Posting &amp; Listing</div><div class="test-title">GET /api/carehome/my-jobs → 200 returns jobs array for carehome</div><div class="test-status">passed</div><div class="test-duration">0.029s</div></div></div></div></details></main></body></html>
