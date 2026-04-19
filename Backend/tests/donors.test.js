@@ -16,20 +16,38 @@ jest.mock('../middlewares/auth.middleware', () => (req, res, next) => {
     next();
 });
 
-const { app, server } = require('../app');
+const { app, server, io } = require('../app');
 
 const { User } = require('../models/user.model');
 jest.mock('../models/user.model');
 
 afterAll(async () => {
-    if (server) {
-        await new Promise((resolve) => server.close(resolve));
-        console.log("🛑 Test Environment: Captured Server Closed");
+    try {
+        if (io) {
+            io.disconnectSockets();
+            io.close();
+        }
+        if (server) {
+            server.closeAllConnections && server.closeAllConnections();
+            await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Server close timeout'));
+                }, 3000);
+                server.close(() => {
+                    clearTimeout(timeout);
+                    resolve();
+                });
+            }).catch(() => {
+                // Ignore timeout errors
+            });
+        }
+        if (mongoose.connection.readyState !== 0) {
+            await mongoose.disconnect();
+        }
+    } catch (err) {
+        // Ignore cleanup errors
     }
-    if (mongoose.connection.readyState !== 0) {
-        await mongoose.connection.close();
-    }
-});
+}, 6000);
 
 describe('CareConnect: Donor Dashboard Diagnostics', () => {
 

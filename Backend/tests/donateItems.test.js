@@ -25,21 +25,39 @@ jest.mock('../models/user.model');
 jest.mock('../models/NGO.model');
 
 // 5. LOAD APP
-const { app, server } = require('../app');
+const { app, server, io } = require('../app');
 
 // 6. IMPORT MOCKED MODELS
 const { Carehome } = require('../models/carehome.model');
 const { donate_items_mes } = require('../models/user.model');
 
 afterAll(async () => {
-    if (server) {
-        await new Promise((resolve) => server.close(resolve));
-        console.log("🛑 Test Environment: Captured Server Closed");
+    try {
+        if (io) {
+            io.disconnectSockets();
+            io.close();
+        }
+        if (server) {
+            server.closeAllConnections && server.closeAllConnections();
+            await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Server close timeout'));
+                }, 3000);
+                server.close(() => {
+                    clearTimeout(timeout);
+                    resolve();
+                });
+            }).catch(() => {
+                // Ignore timeout errors
+            });
+        }
+        if (mongoose.connection.readyState !== 0) {
+            await mongoose.disconnect();
+        }
+    } catch (err) {
+        // Ignore cleanup errors
     }
-    if (mongoose.connection.readyState !== 0) {
-        await mongoose.connection.close();
-    }
-});
+}, 6000);
 
 describe('CareConnect: Donate Items (get_don_items)', () => {
 
