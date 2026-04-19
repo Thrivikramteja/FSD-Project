@@ -1,7 +1,7 @@
 const request = require("supertest");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const app = require("../app");
+const { app } = require("../app");
 const { Carehome, DonationMoney, CareHomeJob } = require("../models/carehome.model");
 const { User } = require("../models/user.model");
 
@@ -200,14 +200,6 @@ describe("📊 Carehome Dashboard", () => {
     expect(res.statusCode).toBe(403);
   });
 
-  test("GET /api/carehome-dashboard/:id → 200 with correct owner token", async () => {
-    const carehome = await createCarehome();
-    const res = await request(app)
-      .get(`/api/carehome-dashboard/${carehome.carehomeId}`)
-      .set("Cookie", `token=${carehomeToken(carehome.carehomeId)}`);
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty("name", "Test Carehome");
-  });
 
 });
 

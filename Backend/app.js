@@ -6,7 +6,6 @@ const morgan = require("morgan");
 const rfs = require("rotating-file-stream");
 const fs = require("fs"); 
 const swaggerUi = require("swagger-ui-express"); 
-//mail errors to the team
 const sendErrorEmail = require("./services/errorMailer.js");
 require("./data/database.js");
 require("dotenv").config();
@@ -26,8 +25,6 @@ const errorLogStream = rfs.createStream("error.log", {
 
 const app = express();
 const server = http.createServer(app);
-
-
 
 app.use(morgan("combined", { stream: accessLogStream }));
 app.use(
@@ -49,6 +46,7 @@ app.use(cors({
   credentials: true 
 }));
 
+// Routes
 const baseRoutes = require("./routes/base.routes.js");
 const authRoutes = require("./routes/auth.routes.js");
 const carehomeRoutes = require("./routes/carehomes.routes.js");
@@ -68,7 +66,7 @@ app.use(adminRoutes);
 app.use(impactStoriesRoutes);
 app.use(notificationRoutes);
 
-// --- SWAGGER SETUP START ---
+// --- SWAGGER SETUP ---
 try {
   const openApiSelector = path.join(__dirname, "docs", "openapi.json");
   const swaggerDoc = JSON.parse(fs.readFileSync(openApiSelector, "utf8"));
@@ -83,7 +81,6 @@ try {
     fs.readdirSync(fullPath).forEach(file => {
       const filePath = path.join(fullPath, file);
       const rawData = fs.readFileSync(filePath, "utf8").trim();
-
       if (!rawData || rawData === "{}" || rawData === "") return;
 
       try {
@@ -103,12 +100,13 @@ try {
   mergeDocs("schemas");
 
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-  console.log("✅ Swagger UI mounted at http://localhost:3000/api-docs");
+  if (process.env.NODE_ENV !== 'test') {
+    console.log("✅ Swagger UI mounted at http://localhost:3000/api-docs");
+  }
 
 } catch (err) {
   console.error("❌ Critical Swagger Setup Error:", err.message);
 }
-
 
 // 404 Catch-all
 app.use((req, res, next) => {
@@ -117,21 +115,20 @@ app.use((req, res, next) => {
   next(err);
 });
 
-//global ERROR handler
+// Global ERROR handler
 app.use((err, req, res, next) => {
   const status = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
 
-  // console.error(`[ERROR ${status}]:`, message);
-if (process.env.NODE_ENV !== 'test') {
-  console.error(`[ERROR ${status}]:`, message);
-}
-  sendErrorEmail({
-    message,
-    stack: err.stack,
-    route: req.originalUrl,
-    method: req.method
-  });
+  if (process.env.NODE_ENV !== 'test') {
+    console.error(`[ERROR ${status}]:`, message);
+    sendErrorEmail({
+      message,
+      stack: err.stack,
+      route: req.originalUrl,
+      method: req.method
+    });
+  }
 
   res.status(status).json({
     success: false,
@@ -139,13 +136,7 @@ if (process.env.NODE_ENV !== 'test') {
   });
 });
 
-<<<<<<< HEAD
-// app.listen(3000, () => console.log("Server running on port 3000"));
-if (process.env.NODE_ENV !== "test") {
-  app.listen(3000, () => console.log("Server running on port 3000"));
-}
-module.exports = app;
-=======
+// Socket.io Setup
 const io = new Server(server, {
     cors: {
         origin: function(origin) {
@@ -163,15 +154,16 @@ io.on('connection', (socket) => {
     socket.on('join', ({ userId, role }) => {
         socket.join(`user_${role}_${userId}`);
     });
-    socket.on('disconnect', () => {});
 });
 
-server.listen(3000, () => console.log("Server running on port 3000"));
-
-// Only listen if not in test environment
+// --- THE FIX ---
+// This ensures the server only listens when you run it normally, NOT during tests.
 if (process.env.NODE_ENV !== 'test') {
-    server.listen(3000, () => console.log("Server running on port 3000"));
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
 }
 
+// Export the objects so tests can use them
 module.exports = { app, server, io };
->>>>>>> 901782bf1d4ba2c7de3a9fd30e1723b0532bf59f

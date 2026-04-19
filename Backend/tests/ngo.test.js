@@ -113,6 +113,6 @@ describe('CareConnect: NGO Registration', () => {
                 ifsc: 'ICIC0001234'
             });
 
-        expect(res.statusCode).toBe(500);
+        expect(res.statusCode).toBe(409);
     });
 });

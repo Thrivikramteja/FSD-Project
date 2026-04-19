@@ -15,10 +15,10 @@ const {
   sendRejectedEmail,
 } = require("../services/otpService");
 
-// async function getMongoIdFromNumericId(numericId) {
-//   const carehome = await Carehome.findOne({ carehomeId: numericId });
-//   return carehome ? carehome._id : null;
-// }
+async function getMongoIdFromNumericId(numericId) {
+  const carehome = await Carehome.findOne({ carehomeId: numericId });
+  return carehome ? carehome._id : null;
+}
 
 async function getCareHomesApi(req, res,next) {
   try {
@@ -187,13 +187,12 @@ async function donateItems(req, res,next) {
   }
 }
 
-async function get_don_items(req, res,next) {
+async function get_don_items(req, res, next) {
   try {
     if (!req.user || req.user.role !== "Donor") {
       return res.status(403).json({
         success: false,
-        message:
-          "Access Denied: Only registered donors can submit item donation requests.",
+        message: "Access Denied: Only registered donors can submit item donation requests.",
       });
     }
 
@@ -210,6 +209,15 @@ async function get_don_items(req, res,next) {
       });
     }
 
+    // --- LOGIC ADDED HERE TO PASS 404 AND 500 TESTS ---
+    // Check if the carehome exists before saving the donation
+    const carehome = await Carehome.findOne({ carehomeId });
+    
+    if (!carehome) {
+      return res.status(404).json({ message: "Carehome not found" });
+    }
+    // --------------------------------------------------
+
     const newDonationMessage = new donate_items_mes({
       carehomeId,
       userId,
@@ -222,20 +230,21 @@ async function get_don_items(req, res,next) {
     await newDonationMessage.save();
 
     // Notify the carehome that an item donation request arrived
-const io = req.app.get('io');
-await sendNotification(io, {
-    recipientId:   carehomeId,
-    recipientRole: 'Carehome',
-    type:          'item_donation',
-    message:       `New item donation request — ${category} at ${location}`,
-    link: `/carehome-dashboard/${carehomeId}#pending-items`
-});
+    const io = req.app.get('io');
+    await sendNotification(io, {
+      recipientId: carehomeId,
+      recipientRole: 'Carehome',
+      type: 'item_donation',
+      message: `New item donation request — ${category} at ${location}`,
+      link: `/carehome-dashboard/${carehomeId}#pending-items`
+    });
 
     res.status(200).json({
       success: true,
       message: "Your donation request has been sent successfully.",
     });
   } catch (err) {
+    // If the Carehome.findOne database call crashes, it will trigger this block
     err.message = "Failed to save the donation message.";
     next(err);
   }

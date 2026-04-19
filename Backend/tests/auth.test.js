@@ -94,7 +94,7 @@
 // });
 const request = require("supertest");
 const mongoose = require("mongoose");
-const app = require("../app");
+const { app } = require("../app");
 const { User } = require("../models/user.model");
 
 describe("Auth API Tests (CareConnect)", () => {

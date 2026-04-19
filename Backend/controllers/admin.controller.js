@@ -61,6 +61,10 @@ function monthLabel(year, month) {
   return new Date(year, month - 1, 1).toLocaleString("default", { month: "short" });
 }
 
+function setCacheHeader(res, status) {
+  res.set("X-Cache", status);
+}
+
 function validateObjectId(value, label) {
   if (!mongoose.Types.ObjectId.isValid(value)) {
     const error = new Error(`Invalid ${label}`);
@@ -77,7 +81,12 @@ async function Getadmin(req, res, next) {
   const cacheKey = "admin:main-stats";
   try {
     const cached = await getCached(cacheKey);
-    if (cached) return res.status(200).json(cached);
+    if (cached) {
+      setCacheHeader(res, "HIT");
+      return res.status(200).json(cached);
+    }
+
+    setCacheHeader(res, "MISS");
 
     const [
       highestDonationAgg,
@@ -141,7 +150,12 @@ const getAdminEventAnalytics = async (req, res) => {
   const cacheKey = "admin:events-analytics";
   try {
     const cached = await getCached(cacheKey);
-    if (cached) return res.status(200).json(cached);
+    if (cached) {
+      setCacheHeader(res, "HIT");
+      return res.status(200).json(cached);
+    }
+
+    setCacheHeader(res, "MISS");
 
     const now = new Date();
     const [groups, influentialNgoAgg, topEvent] = await Promise.all([
@@ -179,7 +193,12 @@ const getAdminFundraiserAnalytics = async (req, res) => {
   const cacheKey = "admin:fundraisers-analytics";
   try {
     const cached = await getCached(cacheKey);
-    if (cached) return res.status(200).json(cached);
+    if (cached) {
+      setCacheHeader(res, "HIT");
+      return res.status(200).json(cached);
+    }
+
+    setCacheHeader(res, "MISS");
 
     const now = new Date();
     const [fundraisers, ngoRevenue] = await Promise.all([
@@ -214,7 +233,12 @@ const getAdminDonationAnalytics = async (req, res) => {
   const cacheKey = "admin:donations-analytics";
   try {
     const cached = await getCached(cacheKey);
-    if (cached) return res.status(200).json(cached);
+    if (cached) {
+      setCacheHeader(res, "HIT");
+      return res.status(200).json(cached);
+    }
+
+    setCacheHeader(res, "MISS");
 
     const [carehomeImpact, donations] = await Promise.all([
       DonationMoney.aggregate([
@@ -440,3 +464,4 @@ module.exports = {
   getCarehomeManagementStats,
   getAllCarehomeManagement
 };
+

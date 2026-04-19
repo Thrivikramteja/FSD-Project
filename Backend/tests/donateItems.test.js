@@ -120,7 +120,7 @@ describe('CareConnect: Donate Items (get_don_items)', () => {
         const res = await request(app)
             .post('/donate_items_user')
             .send({
-                carehomes: '999',
+                carehomes: '9999',
                 category: 'Clothes',
                 address: '456 Park Ave, Mumbai',
                 date: '2099-12-31',

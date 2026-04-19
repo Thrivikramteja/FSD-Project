@@ -24,16 +24,19 @@ async function getdonor(req, res, next) {
       const cached = await redisClient.get(cacheKey);
       if (cached) {
         console.log("⚡ REDIS HIT: Serving Profile from cache");
-        return res.status(200).json(JSON.parse(cached));
+        return res
+          .setHeader('X-Cache', 'HIT')
+          .setHeader('X-Cache-Key', cacheKey)
+          .status(200)
+          .json(JSON.parse(cached));
       }
     }
 
     console.log("🐢 DB HIT: Fetching Profile from MongoDB...");
 
-    // 2. PROJECTION: Only fetch the 3 fields shown in your screenshot
-    // This is much faster than fetching the whole user object
+    // 2. PROJECTION
     const user = await User.findOne({ userId: user_ID })
-      .select('name email mobile_number userId') 
+      .select('name email mobile_number userId')
       .lean();
 
     if (!user) {
@@ -47,7 +50,12 @@ async function getdonor(req, res, next) {
       await redisClient.set(cacheKey, JSON.stringify(response), { EX: 600 });
     }
 
-    res.status(200).json(response);
+    return res
+      .setHeader('X-Cache', 'MISS')
+      .setHeader('X-Cache-Key', cacheKey)
+      .status(200)
+      .json(response);
+
   } catch (error) {
     next(error);
   }
@@ -202,19 +210,22 @@ async function getUserActivity(req, res, next) {
     const userId = Number(req.params.userId);
     const cacheKey = `user_activity:${userId}`;
 
-    // 1. REDIS CHECK (Skip the DB if we already know the answer)
+    // 1. REDIS CHECK
     if (redisClient.isReadyStatus) {
       const cached = await redisClient.get(cacheKey);
       if (cached) {
         console.log("⚡ REDIS HIT: Serving activity from cache");
-        return res.status(200).json(JSON.parse(cached));
+        return res
+          .setHeader('X-Cache', 'HIT')
+          .setHeader('X-Cache-Key', cacheKey)
+          .status(200)
+          .json(JSON.parse(cached));
       }
     }
 
     console.log("🐢 DB HIT: Crawling MongoDB for activity...");
 
-    // 2. OPTIMIZED FETCH: Use .populate() instead of manual loops!
-    // This fetches the CareHome names in the SAME query.
+    // 2. OPTIMIZED FETCH
     const [events, fundraisers, money, items] = await Promise.all([
       UserRegisteredEvent.find({ userId }).populate("eventObjectId", "event_name event_date").lean(),
       UserContributedFundraiser.find({ userId }).lean(),
@@ -238,10 +249,15 @@ async function getUserActivity(req, res, next) {
       await redisClient.set(cacheKey, JSON.stringify(response), { EX: 120 });
     }
 
-    return res.status(200).json(response);
+    return res
+      .setHeader('X-Cache', 'MISS')
+      .setHeader('X-Cache-Key', cacheKey)
+      .status(200)
+      .json(response);
+
   } catch (error) {
     console.error("Activity Fetch Error:", error);
-    next(error); 
+    next(error);
   }
 }
 
@@ -249,10 +265,16 @@ async function getTickerData(req, res, next) {
   const cacheKey = 'ticker_data_latest';
 
   try {
-    // 1. REDIS CHECK (This data is the same for everyone, so 1 cache key works!)
+    // 1. REDIS CHECK
     if (redisClient.isReadyStatus) {
       const cached = await redisClient.get(cacheKey);
-      if (cached) return res.status(200).json(JSON.parse(cached));
+      if (cached) {
+        return res
+          .setHeader('X-Cache', 'HIT')
+          .setHeader('X-Cache-Key', cacheKey)
+          .status(200)
+          .json(JSON.parse(cached));
+      }
     }
 
     // 2. PARALLEL FETCH
@@ -261,7 +283,7 @@ async function getTickerData(req, res, next) {
       UserContributedFundraiser.find().sort({ contributed_at: -1 }).limit(4).lean()
     ]);
 
-    // 3. OPTIMIZED JOIN: Instead of a loop, we get all unique user IDs at once
+    // 3. OPTIMIZED JOIN
     const userIds = [...new Set([
       ...recentMoney.map(d => d.userId),
       ...recentFundraiser.map(f => f.userId)
@@ -271,7 +293,6 @@ async function getTickerData(req, res, next) {
       .select('userId name')
       .lean();
 
-    // Create a map for O(1) lookup
     const userMap = users.reduce((acc, user) => {
       acc[user.userId] = user.name;
       return acc;
@@ -293,12 +314,17 @@ async function getTickerData(req, res, next) {
 
     const response = { success: true, data: tickerData };
 
-    // 5. CACHE (1 minute is enough for a "live" feed)
+    // 5. CACHE (1 minute)
     if (redisClient.isReadyStatus) {
       await redisClient.set(cacheKey, JSON.stringify(response), { EX: 60 });
     }
 
-    res.status(200).json(response);
+    return res
+      .setHeader('X-Cache', 'MISS')
+      .setHeader('X-Cache-Key', cacheKey)
+      .status(200)
+      .json(response);
+
   } catch (error) {
     next(error);
   }
@@ -323,11 +349,11 @@ async function getEditDonorProfile(req, res) {
 
 async function getUserApplications(req, res, next) {
   try {
-    const userId = req.user.id; // From JWT
-    
-    // 1. PAGINATION (Limit to latest 5 for the dashboard)
+    const userId = req.user.id;
+
+    // 1. PAGINATION
     const page = parseInt(req.query.page) || 1;
-    const limit = 5; 
+    const limit = 5;
     const skip = (page - 1) * limit;
 
     const cacheKey = `user_apps:${userId}:p${page}`;
@@ -337,23 +363,27 @@ async function getUserApplications(req, res, next) {
       const cached = await redisClient.get(cacheKey);
       if (cached) {
         console.log("⚡ REDIS HIT: Serving Job Applications from cache");
-        return res.status(200).json(JSON.parse(cached));
+        return res
+          .setHeader('X-Cache', 'HIT')
+          .setHeader('X-Cache-Key', cacheKey)
+          .status(200)
+          .json(JSON.parse(cached));
       }
     }
 
     console.log("🐢 DB HIT: Searching MongoDB for Job Applications...");
 
-    // 3. PROJECTION: Only fetch what we show on the card
+    // 3. PROJECTION
     const applications = await Application.find({ userId })
       .populate({
         path: "jobId",
         model: "CareHomeJob",
-        select: "title type pay" // <--- PROJECTION
+        select: "title type pay"
       })
       .populate({
         path: "carehomeId",
         model: "Carehome",
-        select: "care_home_name city state" // <--- PROJECTION
+        select: "care_home_name city state"
       })
       .sort({ appliedAt: -1 })
       .skip(skip)
@@ -367,7 +397,12 @@ async function getUserApplications(req, res, next) {
       await redisClient.set(cacheKey, JSON.stringify(response), { EX: 300 });
     }
 
-    res.status(200).json(response);
+    return res
+      .setHeader('X-Cache', 'MISS')
+      .setHeader('X-Cache-Key', cacheKey)
+      .status(200)
+      .json(response);
+
   } catch (error) {
     console.error("Error fetching user applications:", error);
     next(error);
