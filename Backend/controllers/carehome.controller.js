@@ -524,10 +524,7 @@ async function getCarehomeProfile(req, res,next) {
 }
 
 // Helper to resolve numeric Carehome ID to MongoDB ObjectId
-async function getMongoIdFromNumericId(numericId) {
-  const carehome = await Carehome.findOne({ carehomeId: numericId });
-  return carehome ? carehome._id : null;
-}
+
 
 async function post_createjob(req, res,next) {
   try {
@@ -669,10 +666,7 @@ async function getCarehomePublic(req, res, next) {
 // Remember to add getCarehomePublic to the module.exports at the end of the file!
 
 // Helper to resolve numeric IDs to MongoDB ObjectIds
-async function getMongoIdFromNumericId(numericId) {
-  const carehome = await Carehome.findOne({ carehomeId: numericId });
-  return carehome ? carehome._id : null;
-}
+
 
 async function getCareHome_Jobs(req, res,next) {
   try {
