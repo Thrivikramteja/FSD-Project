@@ -13,10 +13,10 @@ const {
   sendRejectedEmail,
 } = require("../services/otpService");
 
-async function getMongoIdFromNumericId(numericId) {
-  const carehome = await Carehome.findOne({ carehomeId: numericId });
-  return carehome ? carehome._id : null;
-}
+// async function getMongoIdFromNumericId(numericId) {
+//   const carehome = await Carehome.findOne({ carehomeId: numericId });
+//   return carehome ? carehome._id : null;
+// }
 
 async function getCareHomesApi(req, res,next) {
   try {
@@ -215,6 +215,10 @@ async function get_don_items(req, res,next) {
 }
 
 async function registerCarehome(req, res,next) {
+  const existing = await Carehome.findOne({ email: req.body.email });
+  if (existing) {
+    return res.status(409).json({ success: false, message: "Carehome already registered with this email" });
+  }
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
   let imagePath = null;
@@ -551,10 +555,10 @@ async function getCarehomePublic(req, res,next) {
 // Remember to add getCarehomePublic to the module.exports at the end of the file!
 
 // Helper to resolve numeric IDs to MongoDB ObjectIds
-async function getMongoIdFromNumericId(numericId) {
-  const carehome = await Carehome.findOne({ carehomeId: numericId });
-  return carehome ? carehome._id : null;
-}
+// async function getMongoIdFromNumericId(numericId) {
+//   const carehome = await Carehome.findOne({ carehomeId: numericId });
+//   return carehome ? carehome._id : null;
+// }
 
 async function getCareHome_Jobs(req, res,next) {
   try {
