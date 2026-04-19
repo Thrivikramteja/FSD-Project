@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">7.49% </span>
+                <span class="strong">7.77% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/267</span>
+                <span class='fraction'>21/270</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">7.78% </span>
+                <span class="strong">8.07% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/257</span>
+                <span class='fraction'>21/260</span>
             </div>
         
             
@@ -833,19 +833,29 @@
 <a name='L768'></a><a href='#L768'>768</a>
 <a name='L769'></a><a href='#L769'>769</a>
 <a name='L770'></a><a href='#L770'>770</a>
-<a name='L771'></a><a href='#L771'>771</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L771'></a><a href='#L771'>771</a>
+<a name='L772'></a><a href='#L772'>772</a>
+<a name='L773'></a><a href='#L773'>773</a>
+<a name='L774'></a><a href='#L774'>774</a>
+<a name='L775'></a><a href='#L775'>775</a>
+<a name='L776'></a><a href='#L776'>776</a>
+<a name='L777'></a><a href='#L777'>777</a>
+<a name='L778'></a><a href='#L778'>778</a>
+<a name='L779'></a><a href='#L779'>779</a>
+<a name='L780'></a><a href='#L780'>780</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1320,9 +1330,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1436,7 +1454,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1587,7 +1605,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1616,6 +1634,7 @@ const { Carehome } = require("../models/carehome.model");
 const { nextTick } = require("process");
 const {UserContributedFundraiser} = require('../models/user.model');
 const CorporateDonation = require("../models/corporateDonation.model");
+const { sendNotification } = require('../services/notificationService');
 &nbsp;
 //We eliminated the N+1 query problem by using MongoDB aggregation with $lookup and optimized joins using projection pipelines.”
 async function <span class="fstat-no" title="function not covered" >get_allngo(</span>req, res, next) {
@@ -2047,7 +2066,7 @@ async function <span class="fstat-no" title="function not covered" >getEventDeta
   }
 }
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >registerUser(</span>req, res) {
+async function <span class="fstat-no" title="function not covered" >registerUser(</span>req, res, next) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const { event } = <span class="cstat-no" title="statement not covered" >req.body;</span>
     const userId = <span class="cstat-no" title="statement not covered" >req.user.id;</span>
@@ -2090,9 +2109,17 @@ async function <span class="fstat-no" title="function not covered" >registerUser
       { $inc: { number_of_registrations: 1 } }
     );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    res</span>
-      .status(200)
-      .json({ message: "Registration successful!", success: true });
+    // Notify the NGO that a donor registered for their event
+    const io = <span class="cstat-no" title="statement not covered" >req.app.get('io');</span>
+<span class="cstat-no" title="statement not covered" >    await sendNotification(io, {</span>
+        recipientId:   Number(ngoId),
+        recipientRole: 'NGO',
+        type:          'event_registration',
+        message:       `A donor just registered for your event "${event}"`,
+        link:          `/NGO-dashboard/${ngoId}`
+    });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    res.status(200).json({ message: "Registration successful!", success: true });</span>
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    error.message = "Internal server error.";</span>
 <span class="cstat-no" title="statement not covered" >    next(error);</span>
@@ -2380,7 +2407,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T10:16:59.222Z
+                at 2026-04-19T12:34:16.669Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

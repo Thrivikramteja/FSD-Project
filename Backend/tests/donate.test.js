@@ -2,16 +2,6 @@ const express = require('express');
 const request = require('supertest');
 const mongoose = require('mongoose');
 
-// 1. INTERCEPT THE APP
-let capturedApp;
-let capturedServer;
-const originalListen = express.application.listen;
-
-express.application.listen = function (...args) {
-    capturedApp = this;
-    capturedServer = originalListen.apply(this, args);
-    return capturedServer;
-};
 
 // 2. MOCK EXTERNAL SERVICES
 jest.mock('../redis', () => ({
@@ -35,15 +25,14 @@ jest.mock('../models/carehome.model');
 jest.mock('../models/NGO.model');
 
 // 5. LOAD APP
-require('../app');
-const app = capturedApp;
+const { app, server } = require('../app');
 
 // 6. IMPORT MOCKED MODELS
 const { CreatedFundraiser, UserContributedFundraiser } = require('../models/user.model');
 
 afterAll(async () => {
-    if (capturedServer) {
-        await new Promise((resolve) => capturedServer.close(resolve));
+    if (server) {
+        await new Promise((resolve) => server.close(resolve));
         console.log("🛑 Test Environment: Captured Server Closed");
     }
     if (mongoose.connection.readyState !== 0) {
