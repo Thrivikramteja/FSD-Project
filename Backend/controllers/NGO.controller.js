@@ -11,6 +11,7 @@ const { Carehome } = require("../models/carehome.model");
 const { nextTick } = require("process");
 const {UserContributedFundraiser} = require('../models/user.model');
 const CorporateDonation = require("../models/corporateDonation.model");
+const { sendNotification } = require('../services/notificationService');
 
 //We eliminated the N+1 query problem by using MongoDB aggregation with $lookup and optimized joins using projection pipelines.”
 async function get_allngo(req, res, next) {
@@ -442,7 +443,7 @@ async function getEventDetails(req, res, next) {
   }
 }
 
-async function registerUser(req, res) {
+async function registerUser(req, res, next) {
   try {
     const { event } = req.body;
     const userId = req.user.id;
@@ -485,9 +486,17 @@ async function registerUser(req, res) {
       { $inc: { number_of_registrations: 1 } }
     );
 
-    res
-      .status(200)
-      .json({ message: "Registration successful!", success: true });
+    // Notify the NGO that a donor registered for their event
+    const io = req.app.get('io');
+    await sendNotification(io, {
+        recipientId:   Number(ngoId),
+        recipientRole: 'NGO',
+        type:          'event_registration',
+        message:       `A donor just registered for your event "${event}"`,
+        link:          `/NGO-dashboard/${ngoId}`
+    });
+
+    res.status(200).json({ message: "Registration successful!", success: true });
   } catch (error) {
     error.message = "Internal server error.";
     next(error);

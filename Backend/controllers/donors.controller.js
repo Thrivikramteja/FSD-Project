@@ -7,10 +7,12 @@ const {
   UserContributedFundraiser,
   user_message,
 } = require("../models/user.model");
+const { sendNotification } = require('../services/notificationService');
 
 const Application = require("../models/Application");
 
 const redisClient = require('../redis'); 
+
 
 async function getdonor(req, res, next) {
   const user_ID = parseInt(req.params.userId, 10);
@@ -123,6 +125,16 @@ async function contributed_fund(req, res,next) {
     });
 
     await newContribution.save();
+
+    // Notify the NGO that a donation was made
+const io = req.app.get('io');
+await sendNotification(io, {
+    recipientId:   Number(ngoId),
+    recipientRole: 'NGO',
+    type:          'donation',
+    message:       `A donor contributed ₹${amount_contributed} to "${fundraiser_name}"`,
+    link: `/NGO-dashboard/${ngoId}`
+});
 
     await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
