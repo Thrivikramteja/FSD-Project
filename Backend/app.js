@@ -11,6 +11,9 @@ const sendErrorEmail = require("./services/errorMailer.js");
 require("./data/database.js");
 require("dotenv").config();
 
+const http = require('http');
+const { Server } = require('socket.io');
+
 const accessLogStream = rfs.createStream("access.log", {
   interval: "1d",
   path: path.join(__dirname, "accessLogs"),
@@ -22,6 +25,9 @@ const errorLogStream = rfs.createStream("error.log", {
 });
 
 const app = express();
+const server = http.createServer(app);
+
+
 
 app.use(morgan("combined", { stream: accessLogStream }));
 app.use(
@@ -50,6 +56,7 @@ const donorRoutes = require("./routes/donors.routes.js");
 const NGORoutes = require("./routes/NGO.routes.js");
 const adminRoutes = require("./routes/admin.routes.js");
 const impactStoriesRoutes = require("./routes/impactStories.routes.js");
+const notificationRoutes = require('./routes/notification.routes.js');
 
 app.use(require("./routes/corporate.routes"));
 app.use(baseRoutes);
@@ -59,6 +66,7 @@ app.use(donorRoutes);
 app.use(NGORoutes);
 app.use(adminRoutes);
 app.use(impactStoriesRoutes);
+app.use(notificationRoutes);
 
 // --- SWAGGER SETUP START ---
 try {
@@ -129,14 +137,31 @@ app.use((err, req, res, next) => {
   });
 });
 
-// app.listen(3000, () => console.log("Server running on port 3000"));
+const io = new Server(server, {
+    cors: {
+        origin: function(origin) {
+            if (!origin) return true;
+            if (origin.startsWith('http://localhost:')) return true;
+            return false;
+        },
+        credentials: true
+    }
+});
 
-// Check if the file is being run directly (not required by Jest/Supertest)
-if (process.env.NODE_ENV !== 'test') {
-    app.listen(3000, () => {
-        console.log("🚀 Server running on port 3000");
+app.set('io', io);
+
+io.on('connection', (socket) => {
+    socket.on('join', ({ userId, role }) => {
+        socket.join(`user_${role}_${userId}`);
     });
+    socket.on('disconnect', () => {});
+});
+
+server.listen(3000, () => console.log("Server running on port 3000"));
+
+// Only listen if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(3000, () => console.log("Server running on port 3000"));
 }
 
-// Export the app so Supertest can use it
-module.exports = app;
+module.exports = { app, server, io };

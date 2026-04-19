@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { AuthContext } from "../components/authContext";
 import styles from "../styles/CareHeader.module.css"; 
+import NotificationBell from './NotificationBell';
+
 
 const Header = ({ navItems = [] }) => {
   const navigate = useNavigate();
@@ -97,7 +99,7 @@ const Header = ({ navItems = [] }) => {
                     </button>
                   </li>
                 )}
-
+                   <NotificationBell />
                 <li className={styles.userName}>{auth.user?.name}</li>
                 
                 <li>

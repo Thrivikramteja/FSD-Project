@@ -323,6 +323,7 @@ const CarehomeDashboard = () => {
 
               {/* --- SECTION 5: PENDING ITEM REQUESTS (NEW CLICKABLE FORMAT) --- */}
               <section className={styles.glassSection}>
+                <div id="pending-items">
                 <h2 className={styles.sectionTitle}>Pending Item Requests</h2>
                 <div className={styles.messageList}>
                   {data.messages?.length > 0 ? (
@@ -341,6 +342,7 @@ const CarehomeDashboard = () => {
                   ) : (
                     <p className={styles.emptyText}>No pending requests.</p>
                   )}
+                </div>
                 </div>
               </section>
 
