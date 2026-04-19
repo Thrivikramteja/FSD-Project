@@ -13,7 +13,6 @@ import ListJobPage from "../pages/ListJobPage";
 import CarehomeDashboard from "../pages/CarehomeDashboard";
 import EditProfile from "../pages/EditProfileCarehome";
 import CreateJob from "../pages/createJob";
-// import OrphanageDashboard from "../pages/OrphanageDashboard";
 import AdminDashboard from "../pages/AdminDashboard";
 import AllCarehomes from "../pages/AllCarehomes";
 import AllNgos from "../pages/AllNgos";
@@ -24,10 +23,12 @@ import ProtectedRoute from "./ProtectedRoute";
 import DonorRegistration from "../pages/DonorRegistration";
 import ViewCare from "../pages/ViewCare";
 import ErrorFace from "../components/ErrorFace";
-import NGOEditDetails from "../pages/NGOEditDetails"; // Import your new modular component
+import NGOEditDetails from "../pages/NGOEditDetails";
 import NGOProfile from "../pages/NGOProfile";
+import CorporateDonation from "../pages/CorporateDonation"; // ADDED IMPORT
 import ImpactStories from "../pages/ImpactStories";
-import DetailsPage from "../pages/DetailsPage"
+import DetailsPage from "../pages/DetailsPage";
+import CorporateDonationsList from "../pages/CorporateDonationsList";
 
 const AppRoutes = () => {
   return (
@@ -44,14 +45,11 @@ const AppRoutes = () => {
       <Route path="/all-ngos" element={<AllNgos />} />
       <Route path="/events" element={<AllEvents />} />
       <Route path="/fundraisers" element={<AllFundraisers />} />
+      
       <Route path="/donate_fundraiser/:ngoId/:name_fund" element={<DonateFundraiser />} />
       <Route path="/NGO-dashboard/:ngoID/details/:type/:id" element={<DetailsPage />} />
-      <Route
-        path="/register-event/:ngoId/:eventName"
-        element={<DonorRegistration />}
-      />
+      <Route path="/register-event/:ngoId/:eventName" element={<DonorRegistration />} />
       <Route path="/carehomes/viewcare/:carehomeId" element={<ViewCare />} />
-
       <Route path="/NGO-dashboard/:ngoID" element={<NGODashboard />} />
 
       <Route
@@ -71,7 +69,12 @@ const AppRoutes = () => {
 
       <Route path="/ngo-profile/:id" element={<NGOProfile />} />
 
+      {/* ADDED: Corporate B2B Route */}
+      <Route path="/corporate-donate/:id" element={<CorporateDonation />} />
+
       <Route path="/impact-stories" element={<ImpactStories />} />
+
+      <Route path="/NGO-dashboard/:ngoID/corporate-donations" element={<CorporateDonationsList />} />
 
       {/* Protected Routes */}
       <Route
@@ -82,36 +85,33 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      
       <Route
-  path="/carehome-dashboard/:careid"
-  element={
-    <ProtectedRoute allowedRoles={["Carehome"]}>
-      <CarehomeDashboard />
-    </ProtectedRoute>
-  }
-/>
+        path="/carehome-dashboard/:careid"
+        element={
+          <ProtectedRoute allowedRoles={["Carehome"]}>
+            <CarehomeDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/carehome-dashboard/:careid/edit"
-  element={
-    <ProtectedRoute allowedRoles={["Carehome"]}>
-      <EditProfile />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/carehome-dashboard/:careid/edit"
+        element={
+          <ProtectedRoute allowedRoles={["Carehome"]}>
+            <EditProfile />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/carehome-dashboard/get-job"
-  element={
-    <ProtectedRoute allowedRoles={["Carehome"]}>
-      <CreateJob />
-    </ProtectedRoute>
-  }
-/>
-<Route path="*" element={<ErrorFace message="Page not found" />} />
-
-
-      <Route path="/carehome-dashboard/get-job" element={<CreateJob />} />
+      <Route
+        path="/carehome-dashboard/get-job"
+        element={
+          <ProtectedRoute allowedRoles={["Carehome"]}>
+            <CreateJob />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/admin-dashboard"

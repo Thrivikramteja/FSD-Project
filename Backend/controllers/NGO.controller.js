@@ -10,6 +10,7 @@ const {
 const { Carehome } = require("../models/carehome.model");
 const { nextTick } = require("process");
 const {UserContributedFundraiser} = require('../models/user.model');
+const CorporateDonation = require("../models/corporateDonation.model");
 
 //We eliminated the N+1 query problem by using MongoDB aggregation with $lookup and optimized joins using projection pipelines.”
 async function get_allngo(req, res, next) {
@@ -502,7 +503,6 @@ async function getNGO(req, res, next) {
   }
 
   try {
-    // Check Redis for existing dashboard snapshot
     const cached = await redisClient.get(cacheKey);
     if (cached) {
       res.setHeader('X-Cache', 'HIT');
@@ -511,45 +511,38 @@ async function getNGO(req, res, next) {
 
     const today = new Date();
 
-    // NGO basic info (//projection at high level)
-    const ngo = await NGO.findOne({ ngoId: ngoID }, { Ngoname: 1 }).lean();
+    // Fetch NGO info, Fundraisers, Events, AND Corporate Donations in parallel
+    const [ngo, allFundraisers, allEvents, corporateDonations] = await Promise.all([
+      NGO.findOne({ ngoId: ngoID }, { Ngoname: 1 }).lean(),
+      CreatedFundraiser.find({ ngoId: ngoID }).lean(),
+      Event.find({ ngoId: ngoID }).lean(),
+      CorporateDonation.find({ ngoId: ngoID }).sort({ donatedAt: -1 }).lean()
+    ]);
+    console.log(corporateDonations + "HI");
+
     if (!ngo) return res.status(404).json({ message: "NGO not found" });
 
-    // Fundraisers (// Fundraisers (split at DB level) -> Now optimized to one trip)
-    const allFundraisers = await CreatedFundraiser.find(
-      { ngoId: ngoID }, 
-      { fundraiser_name: 1, deadline: 1, tag: 1, goal_amount: 1, amount_raised_so_far: 1, carehomeId: 1 }
-    ).lean();
-
-    // Events (// Events (split at DB level) -> Now optimized to one trip)
-    const allEvents = await Event.find(
-      { ngoId: ngoID }, 
-      { event_name: 1, event_date: 1, number_of_registrations: 1 }
-    ).lean();
-
-    // Stats (// Stats (minimal fetch) -> Calculated in-memory to save extra DB calls)
+    // --- LOGIC FOR SPLITTING DATA ---
     const ongoing_fund = [];
     const completed_fund = [];
-    let totalFundsRaised = 0;
-    const careHomeIds = new Set();
-
+    let fundraiserTotal = 0;
     allFundraisers.forEach(f => {
-      totalFundsRaised += (f.amount_raised_so_far || 0);
-      if (f.carehomeId) careHomeIds.add(f.carehomeId.toString());
-      
+      fundraiserTotal += (f.amount_raised_so_far || 0);
       if (new Date(f.deadline) >= today) ongoing_fund.push(f);
       else completed_fund.push(f);
     });
 
     const upcoming_eve = [];
     const completed_event = [];
-    let totalRegistrations = 0;
-
+    let eventRegistrations = 0;
     allEvents.forEach(e => {
-      totalRegistrations += (e.number_of_registrations || 0);
+      eventRegistrations += (e.number_of_registrations || 0);
       if (new Date(e.event_date) >= today) upcoming_eve.push(e);
       else completed_event.push(e);
     });
+
+    // Calculate Corporate Total
+    const corporateTotal = corporateDonations.reduce((sum, d) => sum + d.amount, 0);
 
     const response = {
       name: ngo.Ngoname,
@@ -557,24 +550,20 @@ async function getNGO(req, res, next) {
       completed_fund,
       completed_event,
       upcoming_eve,
-      ngoID,
+      corporate: corporateDonations,
       stats: {
-        totalFundsRaised,
-        totalRegistrations,
+        totalFundsRaised: fundraiserTotal + corporateTotal,
+        totalRegistrations: eventRegistrations,
         fundraisersCreated: allFundraisers.length,
-        careHomesBenefited: careHomeIds.size
-      },
-      user: req.user,
-      userRole: req.user.role
+        corporateGrants: corporateDonations.length
+      }
     };
 
-    // Cache the processed dashboard for 5 minutes (300s)
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
+    await redisClient.setEx(cacheKey, 120, JSON.stringify(response));
     res.setHeader('X-Cache', 'MISS');
     res.json(response);
 
   } catch (error) {
-    error.message = "An error occurred while loading the dashboard";
     next(error);
   }
 }

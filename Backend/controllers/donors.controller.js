@@ -291,6 +291,23 @@ async function getTickerData(req, res, next) {
     next(error);
   }
 }
+async function getEditDonorProfile(req, res) {
+  const userID = parseInt(req.params.userId, 10);
+
+  try {
+    const user = await User.getUserByUserId(userID);
+
+    console.log("fetched details ", user);
+    res.render("users/edit_profile", {
+      user,
+      userRole: req.session.userRole,
+    });
+  } catch (error) {
+    console.error("Error rendering the Create Event form:", error);
+    error.message = "Failed to load the Create Event form";
+    next(error);
+  }
+}
 
 async function getUserApplications(req, res, next) {
   try {

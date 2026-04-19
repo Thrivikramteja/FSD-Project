@@ -19,7 +19,10 @@ const corporateDonationSchema = new mongoose.Schema({
   donatedAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  email: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("CorporateDonation", corporateDonationSchema);
