@@ -129,4 +129,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+// app.listen(3000, () => console.log("Server running on port 3000"));
+
+// Check if the file is being run directly (not required by Jest/Supertest)
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(3000, () => {
+        console.log("🚀 Server running on port 3000");
+    });
+}
+
+// Export the app so Supertest can use it
+module.exports = app;
