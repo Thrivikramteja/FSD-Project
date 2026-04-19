@@ -8,7 +8,7 @@ const { Carehome } = require("../models/carehome.model");
 const { generateOTP, sendOTPEmail } = require("../services/otpService");
 
 // Admin Credentials
-const ADMIN_EMAIL = "chinnikarthik22@gmail.com";
+const ADMIN_EMAIL = "nitishbonthu10@gmail.com";
 const ADMIN_PASS = "123456";
 
 async function signup(req, res, next) {

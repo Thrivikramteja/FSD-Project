@@ -224,6 +224,16 @@ const createdFundraisersSchema = new mongoose.Schema({
   },
 });
 
+//indices
+createdFundraisersSchema.index({ ngoId: 1, deadline: 1 });
+createdFundraisersSchema.index({ ngoId: 1 }); 
+createdFundraisersSchema.index({ carehomeId: 1 });
+//for searching : inverted index
+createdFundraisersSchema.index(
+  { fundraiser_name: "text", description: "text" },
+  { weights: { fundraiser_name: 10, description: 5 } }
+);
+
 const donate_it_message = new mongoose.Schema({
   carehomeId: {
     type: Number,

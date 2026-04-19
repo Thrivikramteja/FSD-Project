@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../styles/CareHeader.module.css'; // Importing your shared styles
+import NotificationBell from './NotificationBell';
 
 const Header = ({ ngoID }) => {
     const logoWord1 = "Care";
@@ -57,6 +58,7 @@ const Header = ({ ngoID }) => {
                 Edit your profile
               </Link>
             </li>
+            <NotificationBell />
           </ul>
         </nav>
       </div>

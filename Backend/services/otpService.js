@@ -69,9 +69,36 @@ const sendRejectedEmail = async (email, userName, jobTitle) => {
   return await transporter.sendMail(mailOptions);
 };
 
+const sendCorporateDonationEmail = async (email, companyName, ngoName, amount) => {
+  const mailOptions = {
+    from: '"CareConnect Business" <no-reply@careconnect.com>',
+    to: email,
+    subject: `Donation Confirmation - ${companyName} x ${ngoName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
+          <h2 style="color: #059669;">Contribution Received </h2>
+          <p>Dear <strong>${companyName} Team</strong>,</p>
+          <p>Thank you for your generous contribution of <strong>₹${amount}</strong> to <strong>${ngoName}</strong> via CareConnect.</p>
+          <div style="background: #f0fdf4; padding: 15px; border-left: 4px solid #059669; margin: 20px 0;">
+              <p style="margin: 0; font-size: 14px; color: #064e3b;">
+                  <strong>Tax Benefit Notice:</strong> This donation is eligible for tax deduction under Section 80G. 
+                  Your formal certificate will be processed and sent to this email address within 7-10 business days.
+              </p>
+          </div>
+          <p>Your support helps us bridge the gap and create a lasting impact.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #666;">This is an automated confirmation from the CareConnect B2B Portal.</p>
+      </div>
+    `,
+  };
+
+  return await transporter.sendMail(mailOptions);
+};
+
 module.exports = {
   generateOTP,
   sendOTPEmail,
   sendAcceptedEmail,
   sendRejectedEmail,
+  sendCorporateDonationEmail
 };

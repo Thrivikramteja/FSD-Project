@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import { AuthContext } from '../components/authContext';
 import { headerConfig } from "../config/headerConfig"; 
-
 import '../styles/fundraisers.css'; 
 
 const AllFundraisers = () => {
@@ -13,7 +11,6 @@ const AllFundraisers = () => {
   const { auth } = useContext(AuthContext);
   
   const [fundraisers, setFundraisers] = useState([]); 
-  const [filteredFundraisers, setFilteredFundraisers] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,49 +20,30 @@ const AllFundraisers = () => {
 
   const tags = ["Health", "Education", "General", "Emergency", "Environment", "Animal Welfare", "Others"];
 
+  // Fetch
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch("http://localhost:3000/fundraisers");
+        const queryParams = new URLSearchParams();
+        if (searchTerm) queryParams.append("q", searchTerm);
+        if (selectedTags.length > 0) queryParams.append("tags", selectedTags.join(","));
 
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.message || "Failed to fetch fundraisers");
-        }
+        const response = await fetch(`http://localhost:3000/fundraisers?${queryParams.toString()}`);
+        if (!response.ok) throw new Error("Fetch failed");
 
         const data = await response.json();
         setFundraisers(data);
-        setFilteredFundraisers(data); 
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching fundraisers:", err);
-
-        setError(err.message || "Failed to load fundraisers");
+        setError(err.message);
         setLoading(false);
-
-        // Redirect after 5 seconds
-        setTimeout(() => {
-          window.location.href = "/error";
-        }, 5000);
       }
     };
-    fetchData();
-  }, []);
 
-  useEffect(() => {
-    let result = fundraisers;
-    if (searchTerm) {
-      result = result.filter(item => 
-        item.fundraiser_name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    if (selectedTags.length > 0) {
-      result = result.filter(item => 
-        selectedTags.some(tag => item.tag && item.tag.toLowerCase() === tag.toLowerCase())
-      );
-    }
-    setFilteredFundraisers(result);
-  }, [searchTerm, selectedTags, fundraisers]);
+    const delay = setTimeout(fetchData, 400); // Debounce
+    return () => clearTimeout(delay);
+  }, [searchTerm, selectedTags]);
 
   const handleTagChange = (e) => {
     const value = e.target.value;
@@ -78,24 +56,14 @@ const AllFundraisers = () => {
 
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x250?text=No+Image";
-
-    if (path.startsWith("http")) return path;
-
-    const cleanPath = path.startsWith("/") ? path : `/${path}`;
-    return `http://localhost:3000${cleanPath}`;
+    return path.startsWith("http") ? path : `http://localhost:3000${path.startsWith("/") ? path : `/${path}`}`;
   };
 
   const handleDonateClick = (fund) => {
-    if (!auth.user) {
-      alert("Please login first to donate");
+    if (!auth.user || auth.role !== 'Donor') {
+      alert("Donor login required");
       return;
     }
-
-    if (auth.role !== 'Donor') {
-      alert("Please login as a donor or create a donor account to donate");
-      return;
-    }
-
     navigate(`/donate_fundraiser/${fund.ngoId}/${fund.fundraiser_name}`);
   };
 
@@ -115,8 +83,7 @@ const AllFundraisers = () => {
               {tags.map(tag => (
                 <label key={tag} className="fund-checkbox-label">
                   <input 
-                    type="checkbox" 
-                    value={tag} 
+                    type="checkbox" value={tag} 
                     onChange={handleTagChange}
                     checked={selectedTags.includes(tag)}
                   />
@@ -128,33 +95,29 @@ const AllFundraisers = () => {
         </div>
 
         <input 
-          type="text" 
-          className="fund-search-input"
-          placeholder="Search fundraisers..."
+          type="text" className="fund-search-input"
+          placeholder="Search (Optimized)..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      {loading && <p style={{ textAlign: 'center' }}>Loading fundraisers...</p>}
-      {error && <p style={{ textAlign: 'center', color: 'red' }}>Error: {error}</p>}
+      {loading && <p style={{ textAlign: 'center' }}>Searching...</p>}
+      {error && <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>}
       
-      {!loading && !error && filteredFundraisers.length === 0 && (
-         <p style={{ textAlign: 'center', marginTop: '20px' }}>No fundraisers match your search.</p>
+      {!loading && fundraisers.length === 0 && (
+         <p style={{ textAlign: 'center', marginTop: '20px' }}>No matches.</p>
       )}
 
       <div className="fund-container">
-        {!loading && !error && filteredFundraisers.map((fund) => (
-          <div className="fund-card" key={fund._id || fund.id}>
+        {!loading && fundraisers.map((fund) => (
+          <div className="fund-card" key={fund._id}>
             <img 
-              src={getImageUrl(fund.imagePath)} 
-              alt={fund.fundraiser_name}
+              src={getImageUrl(fund.imagePath)} alt={fund.fundraiser_name}
               onError={(e) => { e.target.src = 'https://via.placeholder.com/400x200?text=No+Image'; }}
             />
-
             <h3>{fund.fundraiser_name}</h3>
             <p className="fund-tag">Tag: {fund.tag || "General"}</p>
-
             <div className="fund-info">
               <div>
                 <h4>₹{(fund.amount_raised_so_far || 0).toLocaleString()}</h4>
@@ -165,20 +128,12 @@ const AllFundraisers = () => {
                 <p>Goal</p>
               </div>
             </div>
-
             <div style={{ marginTop: '15px' }}>
-              <button 
-                type="button"
-                onClick={() => handleDonateClick(fund)}
-                className="fund-donate-btn"
-              >
-                Donate
-              </button>
+              <button onClick={() => handleDonateClick(fund)} className="fund-donate-btn">Donate</button>
             </div>
           </div>
         ))}
       </div>
-
       <Footer />
     </div>
   );

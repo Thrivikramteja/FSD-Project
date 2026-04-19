@@ -7,34 +7,48 @@ const {
   UserContributedFundraiser,
   user_message,
 } = require("../models/user.model");
+const { sendNotification } = require('../services/notificationService');
 
 const Application = require("../models/Application");
 
-async function getdonor(req, res) {
-  const user_ID = parseInt(req.params.userId, 10);
-  const userRole = req.params.userRole;
-  try {
-    const name = await User.getname(user_ID);
-    const participatedEvents = await User.participatedEvents(user_ID);
-    const contributedFundraisers = await User.contributedFundraisers(user_ID);
-    const ongoingfund = await User.ongoingfund(user_ID);
-    const upcomingEvents = await User.upcomingEvents(user_ID);
-    const recentMessages = await user_message.get_newmessages(user_ID);
+const redisClient = require('../redis'); 
 
-    res.render("users/user_dashboard", {
-      name: name || "Donor",
-      participatedEvents: participatedEvents || [],
-      contributedFundraisers: contributedFundraisers || [],
-      ongoingfund: ongoingfund || [],
-      upcomingEvents: upcomingEvents || [],
-      user: req.session.user,
-      recentMessages: recentMessages,
-      userRole: userRole,
-    });
+
+async function getdonor(req, res, next) {
+  const user_ID = parseInt(req.params.userId, 10);
+  const cacheKey = `user_profile:${user_ID}`;
+
+  try {
+    // 1. REDIS CHECK
+    if (redisClient.isReadyStatus) {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        console.log("⚡ REDIS HIT: Serving Profile from cache");
+        return res.status(200).json(JSON.parse(cached));
+      }
+    }
+
+    console.log("🐢 DB HIT: Fetching Profile from MongoDB...");
+
+    // 2. PROJECTION: Only fetch the 3 fields shown in your screenshot
+    // This is much faster than fetching the whole user object
+    const user = await User.findOne({ userId: user_ID })
+      .select('name email mobile_number userId') 
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const response = { success: true, user };
+
+    // 3. CACHE THE DATA
+    if (redisClient.isReadyStatus) {
+      await redisClient.set(cacheKey, JSON.stringify(response), { EX: 600 });
+    }
+
+    res.status(200).json(response);
   } catch (error) {
-    console.error("Error occurred while fetching user dashboard data:", error);
-    error.message =
-      "An error occurred while loading the dashboard. Please try again later.";
     next(error);
   }
 }
@@ -112,6 +126,16 @@ async function contributed_fund(req, res,next) {
 
     await newContribution.save();
 
+    // Notify the NGO that a donation was made
+const io = req.app.get('io');
+await sendNotification(io, {
+    recipientId:   Number(ngoId),
+    recipientRole: 'NGO',
+    type:          'donation',
+    message:       `A donor contributed ₹${amount_contributed} to "${fundraiser_name}"`,
+    link: `/NGO-dashboard/${ngoId}`
+});
+
     await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
       { $inc: { amount_raised_so_far: amount_contributed } },
@@ -128,6 +152,157 @@ async function contributed_fund(req, res,next) {
   }
 }
 
+async function editDonorProfile(req, res, next) {
+  const userId = parseInt(req.params.userId, 10);
+  const fullname = req.body.fullname || req.body.name;
+  const phone = req.body.phone || req.body.mobile_number;
+  const mail = req.body.mail || req.body.email;
+
+  try {
+    if (!req.user || Number(req.user.id) !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to edit this donor profile.",
+      });
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      { userId: userId },
+      { name: fullname, mobile_number: phone, email: mail },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Donor profile not found.",
+      });
+    }
+
+    // --- PURGE REDIS CACHE ---
+    // Clears the donor's dashboard/applications cache to ensure the new name shows up
+    await redisClient.del(`user:apps:${userId}`);
+
+    res.status(200).json({
+      success: true,
+      message: "Donor profile updated successfully.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating donor profile:", error);
+    error.message = "Failed to update profile due to a server error.";
+    next(error);
+  }
+}
+
+
+
+async function getUserActivity(req, res, next) {
+  try {
+    const userId = Number(req.params.userId);
+    const cacheKey = `user_activity:${userId}`;
+
+    // 1. REDIS CHECK (Skip the DB if we already know the answer)
+    if (redisClient.isReadyStatus) {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        console.log("⚡ REDIS HIT: Serving activity from cache");
+        return res.status(200).json(JSON.parse(cached));
+      }
+    }
+
+    console.log("🐢 DB HIT: Crawling MongoDB for activity...");
+
+    // 2. OPTIMIZED FETCH: Use .populate() instead of manual loops!
+    // This fetches the CareHome names in the SAME query.
+    const [events, fundraisers, money, items] = await Promise.all([
+      UserRegisteredEvent.find({ userId }).populate("eventObjectId", "event_name event_date").lean(),
+      UserContributedFundraiser.find({ userId }).lean(),
+      DonationMoney.find({ userId }).populate("carehomeId", "care_home_name imagePath").lean(),
+      donate_items.find({ userId }).populate("carehomeId", "care_home_name imagePath").lean()
+    ]);
+
+    // 3. PROJECTION & FORMATTING
+    const data = {
+      events_participated: events.filter(evt => new Date(evt.event_date) < new Date()),
+      events_upcoming: events.filter(evt => new Date(evt.event_date) > new Date()),
+      contributedFundraisers: fundraisers,
+      donations_money: money,
+      donations_items: items,
+    };
+
+    const response = { success: true, data };
+
+    // 4. SAVE TO REDIS (Cache for 2 minutes)
+    if (redisClient.isReadyStatus) {
+      await redisClient.set(cacheKey, JSON.stringify(response), { EX: 120 });
+    }
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Activity Fetch Error:", error);
+    next(error); 
+  }
+}
+
+async function getTickerData(req, res, next) {
+  const cacheKey = 'ticker_data_latest';
+
+  try {
+    // 1. REDIS CHECK (This data is the same for everyone, so 1 cache key works!)
+    if (redisClient.isReadyStatus) {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) return res.status(200).json(JSON.parse(cached));
+    }
+
+    // 2. PARALLEL FETCH
+    const [recentMoney, recentFundraiser] = await Promise.all([
+      DonationMoney.find().sort({ donated_at: -1 }).limit(4).lean(),
+      UserContributedFundraiser.find().sort({ contributed_at: -1 }).limit(4).lean()
+    ]);
+
+    // 3. OPTIMIZED JOIN: Instead of a loop, we get all unique user IDs at once
+    const userIds = [...new Set([
+      ...recentMoney.map(d => d.userId),
+      ...recentFundraiser.map(f => f.userId)
+    ])];
+
+    const users = await User.find({ userId: { $in: userIds } })
+      .select('userId name')
+      .lean();
+
+    // Create a map for O(1) lookup
+    const userMap = users.reduce((acc, user) => {
+      acc[user.userId] = user.name;
+      return acc;
+    }, {});
+
+    // 4. FORMAT DATA
+    const tickerData = [
+      ...recentMoney.map(item => ({
+        name: userMap[item.userId] || "Anonymous",
+        amount: item.amount_donated,
+        date: item.donated_at
+      })),
+      ...recentFundraiser.map(item => ({
+        name: userMap[item.userId] || "Anonymous",
+        amount: item.amount_contributed,
+        date: item.contributed_at
+      }))
+    ].sort((a, b) => b.date - a.date);
+
+    const response = { success: true, data: tickerData };
+
+    // 5. CACHE (1 minute is enough for a "live" feed)
+    if (redisClient.isReadyStatus) {
+      await redisClient.set(cacheKey, JSON.stringify(response), { EX: 60 });
+    }
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+}
 async function getEditDonorProfile(req, res) {
   const userID = parseInt(req.params.userId, 10);
 
@@ -146,159 +321,55 @@ async function getEditDonorProfile(req, res) {
   }
 }
 
-async function editDonorProfile(req, res) {
-  const { fullname, phone, mail } = req.body;
-  const userId = parseInt(req.params.userId, 10);
-
+async function getUserApplications(req, res, next) {
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { userId: userId },
-      { name: fullname, mobile_number: phone, email: mail },
-      { new: true }
-    );
+    const userId = req.user.id; // From JWT
+    
+    // 1. PAGINATION (Limit to latest 5 for the dashboard)
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; 
+    const skip = (page - 1) * limit;
 
-    res.status(200).json({
-      success: true,
-      message: "Donor profile updated successfully.",
-      user: updatedUser,
-    });
-  } catch (error) {
-    console.error("Error updating donor profile:", error);
-    error.message = "Failed to update profile due to a server error.";
-    next(error);
-  }
-}
+    const cacheKey = `user_apps:${userId}:p${page}`;
 
+    // 2. REDIS CHECK
+    if (redisClient.isReadyStatus) {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        console.log("⚡ REDIS HIT: Serving Job Applications from cache");
+        return res.status(200).json(JSON.parse(cached));
+      }
+    }
 
+    console.log("🐢 DB HIT: Searching MongoDB for Job Applications...");
 
-async function getUserActivity(req, res, next) {
-  try {
-    const userIdParam = req.params.userId;
-    const userId = isNaN(userIdParam) ? userIdParam : Number(userIdParam);
-
-    const [eventsParticipated, fundraisersContributed, donationsMoney, donationsItems] = await Promise.all([
-      UserRegisteredEvent.find({ userId }).populate("eventObjectId").lean(),
-      UserContributedFundraiser.find({ userId }).lean(),
-      DonationMoney.find({ userId }).lean(),
-      donate_items.find({ userId }).lean()
-    ]);
-
-    // 1. HELPER: Attach Care Home metadata for Direct/Item donations
-    const attachCareHomeDetails = async (donations) => {
-      return Promise.all(
-        donations.map(async (don) => {
-          const carehome = await Carehome.findOne({ carehomeId: don.carehomeId })
-            .select("care_home_name imagePath")
-            .lean();
-          return { 
-            ...don, 
-            carehomeDetails: carehome || { care_home_name: "Care Home Unavailable" } 
-          };
-        })
-      );
-    };
-
-    const enrichWithNGOName = async (items) => {
-      return Promise.all(
-        items.map(async (item) => {
-          const ngo = await NGO.findOne({ ngoId: item.ngoId }).select("Ngoname").lean();
-          return {
-            ...item,
-            ngoName: ngo ? ngo.Ngoname : "Partner NGO"
-          };
-        })
-      );
-    };
-
-    const enrichedMoney = await attachCareHomeDetails(donationsMoney);
-    const enrichedItems = await attachCareHomeDetails(donationsItems);
-    const enrichedFundraisers = await enrichWithNGOName(fundraisersContributed);
-    const enrichedEvents = await enrichWithNGOName(eventsParticipated);
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        events_participated: enrichedEvents.filter(evt => new Date(evt.event_date) < new Date()),
-        events_upcoming: enrichedEvents.filter(evt => new Date(evt.event_date) > new Date()),
-        contributedFundraisers: enrichedFundraisers, 
-        donations_money: enrichedMoney,
-        donations_items: enrichedItems,
-      },
-    });
-  } catch (error) {
-    next(error); 
-  }
-}
-
-async function getTickerData(req, res,next) {
-  try {
-    const recentMoney = await DonationMoney.find()
-      .sort({ donated_at: -1 })
-      .limit(4)
-      .lean();
-
-    const recentFundraiser = await UserContributedFundraiser.find()
-      .sort({ contributed_at: -1 })
-      .limit(4)
-      .lean();
-
-    const combineData = async (list, type) => {
-      return Promise.all(
-        list.map(async (item) => {
-          const user = await User.findOne({ userId: item.userId }).lean();
-          return {
-            name: user ? user.name : "Anonymous",
-            amount:
-              type === "money" ? item.amount_donated : item.amount_contributed,
-            date: type === "money" ? item.donated_at : item.contributed_at,
-          };
-        })
-      );
-    };
-
-    const moneyFormatted = await combineData(recentMoney, "money");
-    const fundraiserFormatted = await combineData(
-      recentFundraiser,
-      "fundraiser"
-    );
-
-    const tickerData = [...moneyFormatted, ...fundraiserFormatted].sort(
-      (a, b) => b.date - a.date
-    );
-
-    res.status(200).json({ success: true, data: tickerData });
-  } catch (error) {
-    console.error("Ticker Data Error:", error);
-    error.message = "Failed to fetch ticker data";
-    next(error);
-  }
-}
-
-async function getUserApplications(req, res) {
-  try {
-    const userId = req.user.id;
-
-    const applications = await Application.find({ userId: userId })
+    // 3. PROJECTION: Only fetch what we show on the card
+    const applications = await Application.find({ userId })
       .populate({
         path: "jobId",
         model: "CareHomeJob",
-        select: "title type pay",
+        select: "title type pay" // <--- PROJECTION
       })
       .populate({
-  path: "carehomeId",
-  model: "Carehome",
-  select: "care_home_name city state",
-})
+        path: "carehomeId",
+        model: "Carehome",
+        select: "care_home_name city state" // <--- PROJECTION
+      })
       .sort({ appliedAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
-    res.status(200).json({
-      success: true,
-      applications: applications,
-    });
+    const response = { success: true, applications };
+
+    // 4. SAVE TO REDIS
+    if (redisClient.isReadyStatus) {
+      await redisClient.set(cacheKey, JSON.stringify(response), { EX: 300 });
+    }
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Error fetching user applications:", error);
-    error.message = "Server error";
     next(error);
   }
 }

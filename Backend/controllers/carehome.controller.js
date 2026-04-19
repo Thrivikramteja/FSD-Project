@@ -1,6 +1,8 @@
 const path = require("path");
 const bcrypt = require("bcrypt");
-
+const redisClient = require('../redis'); // Path to the file you just created
+const mongoose = require('mongoose');
+const { sendNotification } = require('../services/notificationService');
 const { Carehome } = require("../models/carehome.model");
 const { DonationMoney, donate_items } = require("../models/carehome.model");
 const { donate_items_mes, user_message } = require("../models/user.model");
@@ -111,7 +113,16 @@ async function rejectApplication(req, res, next) {
       console.error("Rejection Email failed:", err);
     }
 
-    res.status(200).json({ success: true });
+    const io = req.app.get('io');
+await sendNotification(io, {
+    recipientId:   Number(application.userId),
+    recipientRole: 'Donor',
+    type:          'application_rejected',
+    message:       `Your application for "${application.jobId?.title}" was not selected this time`,
+    link: `/my-applications`
+});
+
+res.status(200).json({ success: true });
   } catch (err) {
     console.error("Reject Action Error:", err);
     err.message = "Failed to process application rejection.";
@@ -144,13 +155,19 @@ async function acceptApplication(req, res, next) {
       return res.status(400).json({ error: "Job not found" });
     }
 
-    try {
-      await sendAcceptedEmail(user.email, user.name, job.title);
-    } catch (err) {
-      console.error("Email failed but status was updated:", err);
-    }
+    // Background Email
+    sendAcceptedEmail(user.email, user.name, application.jobId?.title)
+      .catch(err => console.error("Background Email Error:", err));
+const io = req.app.get('io');
+await sendNotification(io, {
+    recipientId:   Number(application.userId),
+    recipientRole: 'Donor',
+    type:          'application_accepted',
+    message:       `Congratulations! Your application for "${application.jobId?.title}" has been accepted`,
+    link: `/donor-dashboard/${application.userId}`
+});
 
-    res.status(200).json({ success: true });
+res.status(200).json({ success: true });
   } catch (err) {
     next(err);
   }
@@ -203,6 +220,16 @@ async function get_don_items(req, res,next) {
     });
 
     await newDonationMessage.save();
+
+    // Notify the carehome that an item donation request arrived
+const io = req.app.get('io');
+await sendNotification(io, {
+    recipientId:   carehomeId,
+    recipientRole: 'Carehome',
+    type:          'item_donation',
+    message:       `New item donation request — ${category} at ${location}`,
+    link: `/carehome-dashboard/${carehomeId}#pending-items`
+});
 
     res.status(200).json({
       success: true,
@@ -455,10 +482,7 @@ async function getCarehomeProfile(req, res,next) {
 }
 
 // Helper to resolve numeric Carehome ID to MongoDB ObjectId
-async function getMongoIdFromNumericId(numericId) {
-  const carehome = await Carehome.findOne({ carehomeId: numericId });
-  return carehome ? carehome._id : null;
-}
+
 
 async function post_createjob(req, res,next) {
   try {
@@ -555,10 +579,6 @@ async function getCarehomePublic(req, res,next) {
 // Remember to add getCarehomePublic to the module.exports at the end of the file!
 
 // Helper to resolve numeric IDs to MongoDB ObjectIds
-// async function getMongoIdFromNumericId(numericId) {
-//   const carehome = await Carehome.findOne({ carehomeId: numericId });
-//   return carehome ? carehome._id : null;
-// }
 
 async function getCareHome_Jobs(req, res,next) {
   try {

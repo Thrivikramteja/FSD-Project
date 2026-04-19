@@ -14,10 +14,10 @@ const ListJobPage = () => {
   const userRole = auth?.role;
 
   const [allJobs, setAllJobs] = useState([]);
-  const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // NEW
+  const [error, setError] = useState(null);
   
+  // --- UPDATED STATE: Managing search and filters via State ---
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTypes, setSelectedTypes] = useState([]);
@@ -25,10 +25,20 @@ const ListJobPage = () => {
   const [selectedJob, setSelectedJob] = useState(null); 
   const [isApplying, setIsApplying] = useState(false);
 
+  // --- OPTIMIZED FETCH: Triggers whenever search or filters change ---
   useEffect(() => {
     const fetchJobs = async () => {
+      setLoading(true);
       try {
-        const response = await fetch('http://localhost:3000/api/jobs', {
+        const params = new URLSearchParams();
+        if (searchTerm) params.append("q", searchTerm);
+        
+        // Convert the array to a comma-separated string for the backend
+        if (selectedTypes.length > 0) {
+          params.append("types", selectedTypes.join(','));
+        }
+
+        const response = await fetch(`http://localhost:3000/api/jobs?${params.toString()}`, {
           credentials: 'include' 
         });
 
@@ -38,58 +48,31 @@ const ListJobPage = () => {
         }
 
         const data = await response.json();
-        const jobs = data.jobs || [];
-        setAllJobs(jobs);
-        setFilteredJobs(jobs);
+        // The server now returns exactly what we need, so we set allJobs directly
+        setAllJobs(data.jobs || []);
 
       } catch (err) {
         console.error('Error fetching jobs:', err);
         setError(err.message || "Job fetch failed");
-
+        // Keeping your original error redirect logic
         setTimeout(() => {
           window.location.href = "/error";
         }, 5000);
-
       } finally {
         setLoading(false);
       }
     };
 
-    fetchJobs();
-  }, []);
+    // Debounce timer: Waits 400ms after you stop typing before hitting the server
+    const debounceTimer = setTimeout(fetchJobs, 400);
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, selectedTypes]); // Dependencies updated
 
-  const applyFilters = () => {
-    let result = allJobs;
-
-    if (searchTerm) {
-      const lowerTerm = searchTerm.toLowerCase();
-      result = result.filter(job => 
-        job.title.toLowerCase().includes(lowerTerm) ||
-        (job.description && job.description.toLowerCase().includes(lowerTerm)) ||
-        (job.location && job.location.toLowerCase().includes(lowerTerm))
-      );
-    }
-
-    if (selectedTypes.length > 0) {
-      result = result.filter(job => 
-        selectedTypes.includes(job.type.toLowerCase())
-      );
-    }
-
-    setFilteredJobs(result);
-    setShowFilterDropdown(false); 
-  };
-
-  const handleSearch = () => applyFilters();
-  const handleKeyPress = (e) => { if (e.key === 'Enter') handleSearch(); };
-
-  const handleCheckboxChange = (e) => {
-    const value = e.target.value;
-    if (e.target.checked) {
-      setSelectedTypes([...selectedTypes, value]);
-    } else {
-      setSelectedTypes(selectedTypes.filter(type => type !== value));
-    }
+  // --- UPDATED: No longer needs client-side filter logic since Backend does it ---
+  const handleCheckboxChange = (type) => {
+    setSelectedTypes(prev => 
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
   };
 
   const handleApplyClick = (job) => {
@@ -97,7 +80,6 @@ const ListJobPage = () => {
       alert("Only registered Donors can apply for jobs.");
       return;
     }
-
     setSelectedJob({ id: job._id, title: job.title, pay: job.pay });
   };
 
@@ -115,10 +97,7 @@ const ListJobPage = () => {
       });
 
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Application failed");
-      }
+      if (!response.ok) throw new Error(result.message || "Application failed");
 
       alert("Success! Your application has been sent.");
       setSelectedJob(null); 
@@ -126,11 +105,6 @@ const ListJobPage = () => {
     } catch (error) {
       console.error("Apply error:", error);
       alert(error.message || "Server error");
-
-      setTimeout(() => {
-        window.location.href = "/error";
-      }, 5000);
-
     } finally {
       setIsApplying(false);
     }
@@ -146,6 +120,44 @@ const ListJobPage = () => {
         </p>
       )}
 
+      {/* --- ADDED: Search and Filter UI Section --- */}
+      <div className={styles.searchFilterContainer}>
+        <div className={styles.filterSection}>
+          <button 
+            className={styles.filterBtn} 
+            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+          >
+            📂 Filter {selectedTypes.length > 0 && `(${selectedTypes.length})`}
+          </button>
+
+          {showFilterDropdown && (
+            <div className={styles.filterDropdown}>
+              <h3>Job Type</h3>
+              {['Caretaker', 'Part-time', 'Full-time', 'Other'].map(type => (
+                <label key={type} className={styles.checkboxLabel}>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedTypes.includes(type)}
+                    onChange={() => handleCheckboxChange(type)}
+                  />
+                  {type}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.searchSection}>
+          <input 
+            type="text" 
+            className={styles.searchInput}
+            placeholder="Search by role or location..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
       {selectedJob && (
         <ApplyModal 
           jobTitle={selectedJob.title}
@@ -158,12 +170,13 @@ const ListJobPage = () => {
 
       <main className={styles.mainContent}>
         {loading ? (
-          <div className={styles.loader}>Loading available opportunities...</div>
-        ) : filteredJobs.length === 0 ? (
-          <div className={styles.noResults}>No jobs match your current filters.</div>
+          <div className={styles.loader}>Optimizing results...</div>
+        ) : allJobs.length === 0 ? (
+          <div className={styles.noResults}>No jobs match your search/filters.</div>
         ) : (
           <div className={styles.gridContainer}>
-            {filteredJobs.map(job => (
+            {/* MAPPING over allJobs because server already filtered them */}
+            {allJobs.map(job => (
               <div className={styles.jobCard} key={job._id}>
                 <div className={styles.cardHeader}>
                   <span className={styles.typeBadge}>{job.type}</span>

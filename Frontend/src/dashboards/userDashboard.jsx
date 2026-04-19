@@ -15,6 +15,8 @@ export default function DonorDashboard() {
   const [showEditForm, setShowEditForm] = useState(false);
   const [activity, setActivity] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [saveError, setSaveError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -50,7 +52,7 @@ export default function DonorDashboard() {
     }
 
     const loggedInUser = auth.user;
-    const currentId = loggedInUser._id || loggedInUser.userId;
+    const currentId = loggedInUser.userId || loggedInUser._id;
 
     if (currentId.toString() !== id.toString()) {
       navigate(`/donor-dashboard/${currentId}`);
@@ -61,7 +63,7 @@ export default function DonorDashboard() {
     setFormData({
       name: loggedInUser.name,
       email: loggedInUser.email,
-      phone: loggedInUser.phone || "",
+      phone: loggedInUser.mobile_number || loggedInUser.phone || "",
     });
   }, [auth, id, navigate]);
 
@@ -106,15 +108,62 @@ export default function DonorDashboard() {
     });
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    updateUser({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-    });
-    setUser((prev) => ({ ...prev, ...formData }));
-    setShowEditForm(false);
+
+    if (!user?.userId) {
+      setSaveError("Unable to identify this donor profile.");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setSaveError("");
+
+      const response = await fetch(`http://localhost:3000/api/donor/${user.userId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullname: formData.name,
+          mail: formData.email,
+          phone: formData.phone,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to update donor profile.");
+      }
+
+      const savedUser = {
+        ...user,
+        ...(result.user || {}),
+        name: result.user?.name ?? formData.name,
+        email: result.user?.email ?? formData.email,
+        mobile_number:
+          result.user?.mobile_number ??
+          result.user?.phone ??
+          formData.phone,
+      };
+
+      updateUser(savedUser);
+      setUser(savedUser);
+      setFormData({
+        name: savedUser.name || "",
+        email: savedUser.email || "",
+        phone: savedUser.mobile_number || savedUser.phone || "",
+      });
+      setShowEditForm(false);
+    } catch (error) {
+      console.error("Donor profile update failed:", error);
+      setSaveError(error.message || "Failed to update donor profile.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -322,13 +371,14 @@ export default function DonorDashboard() {
                   <div className={styles.profileView}>
                     <p><strong>Name:</strong> {user.name}</p>
                     <p><strong>Email:</strong> {user.email}</p>
-                    <p><strong>Phone:</strong> {user.phone || "N/A"}</p>
+                    <p><strong>Phone:</strong> {user.mobile_number || user.phone || "N/A"}</p>
                     <button className={styles.editBtn} onClick={() => setShowEditForm(true)}>
                       Edit My Profile
                     </button>
                   </div>
                 ) : (
                   <form className={styles.editForm} onSubmit={handleSave}>
+                    {saveError ? <p className={styles.noData}>{saveError}</p> : null}
                     <label>Name</label>
                     <input type="text" name="name" value={formData.name} onChange={handleChange} />
                     <label>Email</label>
@@ -336,8 +386,20 @@ export default function DonorDashboard() {
                     <label>Phone</label>
                     <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
                     <div className={styles.formActions}>
-                      <button type="submit" className={styles.saveBtn}>Save</button>
-                      <button type="button" className={styles.cancelBtn} onClick={() => setShowEditForm(false)}>Cancel</button>
+                      <button type="submit" className={styles.saveBtn} disabled={isSaving}>
+                        {isSaving ? "Saving..." : "Save"}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.cancelBtn}
+                        onClick={() => {
+                          setSaveError("");
+                          setShowEditForm(false);
+                        }}
+                        disabled={isSaving}
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </form>
                 )}

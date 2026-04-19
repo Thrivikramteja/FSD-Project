@@ -1,0 +1,75 @@
+.pageWrapper {
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.headerRow h1 { color: #064e3b; }
+
+.backBtn {
+    background: none;
+    border: none;
+    color: #059669;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.searchBar {
+    width: 350px;
+    padding: 12px 20px;
+    border-radius: 50px;
+    border: 1px solid #dcfce7;
+    outline: none;
+}
+
+.searchBar:focus { border-color: #10b981; }
+
+.tableContainer {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.listTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.listTable th {
+    background: #064e3b;
+    color: white;
+    padding: 15px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.listTable td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+.bold { font-weight: 700; color: #1e293b; }
+.amount { color: #059669; font-weight: 800; }
+.purpose { color: #64748b; font-style: italic; }
+
+.noData { text-align: center; padding: 40px; color: #94a3b8; }

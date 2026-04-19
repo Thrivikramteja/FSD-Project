@@ -69,6 +69,7 @@
   padding: 0 30px;
 }
 
+
 .profile-card {
   text-align: center;
   margin-bottom: 30px;
@@ -256,4 +257,66 @@ th {
   display: block;
   margin: 0 auto 30px auto;
   box-shadow: 0 4px 15px rgba(6, 78, 59, 0.2);
+}
+/* --- Dashboard Search and Pagination Styles --- */
+
+.dash-table-container {
+  margin-bottom: 50px;
+  padding: 0 30px; /* Aligns with your page headings */
+}
+
+.dash-search {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 20px;
+  margin-bottom: 15px;
+  border-radius: 50px;
+  border: 2px solid #ecfdf5; /* Very light mint */
+  background: white;
+  font-size: 14px;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.dash-search:focus {
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+  width: 350px; /* Subtle expansion on focus */
+}
+
+.load-more-btn {
+  display: block;
+  margin: -20px auto 20px auto; /* Pulls it closer to the bottom of the table */
+  background: #ecfdf5;
+  color: #064e3b;
+  border: 1px solid #10b981;
+  padding: 8px 25px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.load-more-btn:hover {
+  background: #10b981;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(6, 78, 59, 0.15);
+}
+
+/* Specific styling for the Corporate table in the dashboard */
+.corporate-amount {
+  color: #059669;
+  font-weight: 700;
+}
+
+/* Ensure the table IDs still have their background but no side margins 
+   (since the container handles padding now) */
+#ongoing_fund, #completed_fund, #upcoming_ev {
+  margin: 0 0 20px 0 !important; 
 }

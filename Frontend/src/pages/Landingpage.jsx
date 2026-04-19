@@ -66,6 +66,7 @@ export default function LandingPage() {
             </div>
 
             <div className="features-grid">
+              {/* For Donors */}
               <div className="feature-card">
                 <div className="icon-wrapper donor-icon">🤝</div>
                 <h3>For Donors</h3>
@@ -82,6 +83,7 @@ export default function LandingPage() {
                 </button>
               </div>
 
+              {/* For NGOs */}
               <div className="feature-card">
                 <div className="icon-wrapper ngo-icon">🏢</div>
                 <h3>For NGOs</h3>
@@ -98,6 +100,7 @@ export default function LandingPage() {
                 </button>
               </div>
 
+              {/* For Care Homes */}
               <div className="feature-card">
                 <div className="icon-wrapper home-icon">🏠</div>
                 <h3>For Care Homes</h3>
@@ -111,6 +114,23 @@ export default function LandingPage() {
                   onClick={() => navigate("/signup")}
                 >
                   Join the Network →
+                </button>
+              </div>
+
+              {/* NEW: For Corporates */}
+              <div className="feature-card">
+                <div className="icon-wrapper corporate-icon">💼</div> {/* You can use 🏢 or 👔 too */}
+                <h3>For Corporates</h3>
+                <p>
+                  Drive social impact through CSR initiatives. Make high-value 
+                  bulk donations to verified NGOs and receive official 80G tax 
+                  certificates for your records.
+                </p>
+                <button
+                  className="feature-link"
+                  onClick={() => navigate("/all-ngos")} // Redirects to the list of NGOs
+                >
+                  View NGO Partners →
                 </button>
               </div>
             </div>

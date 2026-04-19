@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/authContext";
 import styles from "../styles/CareHeader.module.css";
+import NotificationBell from './NotificationBell';
+
 
 const CareHeader = ({ careid }) => {
   const { logout } = useContext(AuthContext);
@@ -47,6 +49,7 @@ const CareHeader = ({ careid }) => {
                 Impact Stories
               </Link>
             </li>
+            <NotificationBell />
             <li>
               <button onClick={handleLogout} className={styles.logoutBtn}>
                 Logout

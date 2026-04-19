@@ -49,6 +49,15 @@ const NGOProfile = () => {
                         <div className={styles.contactItem}><strong>Phone:</strong> <span>{ngo.phone}</span></div>
                     </div>
                 </section>
+                <div className={styles.corporateBox}>
+                        <span>Represent a Corporate Entity?</span>
+                        <button 
+                            className={styles.corporateBtn}
+                            onClick={() => navigate(`/corporate-donate/${id}`)}
+                        >
+                             Corporate Partnership
+                        </button>
+                    </div>
 
                 <div className={styles.layout}>
                     <div className={styles.activeColumn}>

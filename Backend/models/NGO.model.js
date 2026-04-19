@@ -28,6 +28,10 @@ const ngoSchema = new mongoose.Schema({
 });
 
 ngoSchema.plugin(AutoIncrement, { inc_field: "ngoId" });
+ngoSchema.index(
+  { Ngoname: "text", email: "text" },
+  { weights: { Ngoname: 10, email: 5 } }
+);
 
 const eventSchema = new mongoose.Schema({
   ngoId: {
@@ -62,6 +66,14 @@ const eventSchema = new mongoose.Schema({
     required: true, 
   },
 });
+//indices
+eventSchema.index({ ngoId: 1, event_date: 1 });
+eventSchema.index({ ngoId: 1 });
+eventSchema.index({ event_date: 1 });
+eventSchema.index(
+  { event_name: "text", event_location: "text" },
+  { weights: { event_name: 10, event_location: 5 } }
+);
 
 // NGO Schema Methods
 ngoSchema.methods.storeNGO = async function storeNGO() {
@@ -260,13 +272,9 @@ ngoSchema.statics.get_stats = async function (ngoId, callback) {
 };
 
 ngoSchema.statics.get_all_ngos = async function () {
-  try {
-    const ngos = await this.find({});
-    return ngos; // Return the fetched NGOs
-  } catch (err) {
-    console.error("Error while fetching NGOs", err);
-    throw err; // Throw the error to let the caller handle it
-  }
+  return await this.find({})
+    .select("-password -otpCode -otpExpires") // Projection: exclude sensitive data
+    .lean(); 
 };
 
 ngoSchema.statics.get_rev = async function(ngoID)
