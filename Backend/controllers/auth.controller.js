@@ -153,7 +153,8 @@ async function verifyOTP(req, res, next) {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "none",
-      secure: false, 
+      secure: true,  // HTTPS required for sameSite: "none"
+      domain: ".onrender.com"  // Allow cookie sharing across Render domains
     });
 
     let dashboardUrl = "";

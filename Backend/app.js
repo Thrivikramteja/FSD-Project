@@ -41,10 +41,13 @@ app.use(cookieParser());
 // --- UPDATED CORS FOR EXPRESS ---
 app.use(cors({ 
   origin: function (origin, callback) {
+    // Allow no origin (same-origin requests)
     if (!origin) return callback(null, true);
-    // Allow Render Frontend and Localhost
+    
+    // Allow Render Frontend, localhost, and any .onrender.com domain
     if (
       origin === "https://fsd-project-frontend.onrender.com" || 
+      origin.includes("onrender.com") ||
       origin.startsWith('http://localhost:')
     ) {
       return callback(null, true);
