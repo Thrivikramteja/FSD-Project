@@ -55,3 +55,13 @@ jobs:
       - name: Run Frontend Tests
         working-directory: ./Frontend
         run: npm test
+
+deploy:
+    name: Deploy to Render
+    needs: [backend-tests, frontend-tests] # ⚠️ This ensures we ONLY deploy if both suites pass
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/karthik_job' # Only deploy when you push to your branch
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: |
+          curl -f ${{ secrets.RENDER_DEPLOY_HOOK }}
