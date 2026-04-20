@@ -22,7 +22,7 @@ const AdminDashboard = () => {
 
     return (
         <div className={styles.adminWrapper}>
-            {/* Massive Header Section */}
+            {/* Massive Header section */}
             <div className={styles.heroHeader}>
                 <div className={styles.headerContent}>
                     <div className={styles.topHeaderRow}>
