@@ -223,7 +223,8 @@ async function getUserActivity(req, res, next) {
       }
     }
 
-    console.log("🐢 DB HIT: Crawling MongoDB for activity...");
+
+    console.log(" DataBase HIT: Crawling MongoDB for activity...");
 
     // 2. OPTIMIZED FETCH
     const [events, fundraisers, money, items] = await Promise.all([
