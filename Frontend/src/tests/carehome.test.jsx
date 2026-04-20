@@ -14,7 +14,7 @@ vi.mock("../styles/donate_mon.css",               () => ({ default: {} }));
 vi.mock("../config/headerConfig", () => ({ headerConfig: { landing: [] } }));
 
 delete window.location;
-window.location = { href: "" };
+ window.location = { href: "" };
 
 import CarehomeDashboard from "../pages/CarehomeDashboard";
 import EditProfile       from "../pages/EditProfileCarehome";
