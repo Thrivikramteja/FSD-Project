@@ -294,20 +294,37 @@ async function registerCarehome(req, res,next) {
 }
 
 const enrichMessagesWithUser = async (messages) => {
-  return Promise.all(
-    messages.map(async (msg) => {
+  try {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return [];
+    }
 
-      const user = await User.findOne({ userId: msg.userId })
-        .select("name mobile_number -_id")
-        .lean();
-        
-      return {
-        ...msg.toObject(), 
-        userName: user ? user.name : "Anonymous Donor",
-        userPhone: user ? user.mobile_number : "N/A"
-      };
-    })
-  );
+    return Promise.all(
+      messages.map(async (msg) => {
+        try {
+          const user = await User.findOne({ userId: msg.userId })
+            .select("name mobile_number -_id")
+            .lean();
+          
+          // Handle both Mongoose docs and plain objects
+          const msgObj = msg.toObject ? msg.toObject() : msg;
+          
+          return {
+            ...msgObj, 
+            userName: user ? user.name : "Anonymous Donor",
+            userPhone: user ? user.mobile_number : "N/A"
+          };
+        } catch (err) {
+          console.error("Error enriching message:", err);
+          const msgObj = msg.toObject ? msg.toObject() : msg;
+          return { ...msgObj, userName: "Anonymous Donor", userPhone: "N/A" };
+        }
+      })
+    );
+  } catch (err) {
+    console.error("Error in enrichMessagesWithUser:", err);
+    return [];
+  }
 };
 
 async function getCarehome(req, res, next) {
@@ -318,17 +335,36 @@ async function getCarehome(req, res, next) {
   }
 
   try {
+    console.log("Dashboard load: Starting for carehomeId:", careid);
+    
     const ongoing_fund = await Carehome.ongoing_fund(careid);
+    console.log("✓ ongoing_fund loaded");
+    
     const completed_fund = await Carehome.completed_fund(careid);
+    console.log("✓ completed_fund loaded");
+    
     const recentDonations = await Carehome.recentDonations(careid);
+    console.log("✓ recentDonations loaded");
+    
     const getname = await Carehome.getname(careid);
+    console.log("✓ getname loaded");
+    
     const wishlist = await Carehome.getWishlist(careid);
+    console.log("✓ wishlist loaded");
+    
     const stats = await Carehome.get_carehome_stats(careid);
+    console.log("✓ stats loaded");
+    
     const items = await donate_items.get_item_donations(careid);
+    console.log("✓ items loaded");
 
     const rawMessages = await Carehome.getMessages(careid);
+    console.log("✓ rawMessages loaded, count:", rawMessages ? rawMessages.length : 0);
     
-    const messages = await enrichMessagesWithUser(rawMessages);
+    const messages = rawMessages && rawMessages.length > 0 
+      ? await enrichMessagesWithUser(rawMessages)
+      : [];
+    console.log("✓ messages enriched");
 
     res.json({
       name: getname.care_home_name,
@@ -344,8 +380,9 @@ async function getCarehome(req, res, next) {
       userRole: req.user.role,
     });
   } catch (err) {
-    console.log(err);
-    err.message = "Dashboard load failed";
+    console.error("Dashboard load error:", err.message);
+    console.error("Full error:", err);
+    err.message = "Dashboard load failed - " + err.message;
     next(err);
   }
 }
