@@ -37,10 +37,18 @@ app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// --- UPDATED CORS FOR EXPRESS ---
 app.use(cors({ 
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (origin.startsWith('http://localhost:')) return callback(null, true);
+    // Allow Render Frontend and Localhost
+    if (
+      origin === "https://fsd-project-frontend.onrender.com" || 
+      origin.startsWith('http://localhost:')
+    ) {
+      return callback(null, true);
+    }
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true 
@@ -136,12 +144,17 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Socket.io Setup
+// --- UPDATED CORS FOR SOCKET.IO ---
 const io = new Server(server, {
     cors: {
         origin: function(origin) {
             if (!origin) return true;
-            if (origin.startsWith('http://localhost:')) return true;
+            if (
+              origin === "https://fsd-project-frontend.onrender.com" || 
+              origin.startsWith('http://localhost:')
+            ) {
+              return true;
+            }
             return false;
         },
         credentials: true
@@ -156,8 +169,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// --- THE FIX ---
-// This ensures the server only listens when you run it normally, NOT during tests.
+// Start Server
 if (process.env.NODE_ENV !== 'test') {
     const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {
@@ -165,5 +177,4 @@ if (process.env.NODE_ENV !== 'test') {
     });
 }
 
-// Export the objects so tests can use them
 module.exports = { app, server, io };
