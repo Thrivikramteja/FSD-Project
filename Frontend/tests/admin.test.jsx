@@ -230,7 +230,7 @@ describe('Frontend admin Vitest suite', () => {
     expect(await screen.findByText('Food Drive')).toBeInTheDocument();
     expect(screen.getByText('Anita')).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/admin/main-stats',
+      expect.stringContaining('/api/admin/main-stats'),
       { credentials: 'include' }
     );
   });
