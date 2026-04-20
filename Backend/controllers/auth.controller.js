@@ -152,7 +152,7 @@ async function verifyOTP(req, res, next) {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       secure: false, 
     });
 
