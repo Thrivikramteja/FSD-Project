@@ -6,7 +6,7 @@ const upload = require("../multerConfig");
 
 const authenticate = require("../middlewares/auth.middleware");
 const authorizeRoles = require("../middlewares/role.middleware");
-
+//
 router.get(
   "/api/carehome-dashboard/:carehomeId",
   authenticate,
