@@ -54,7 +54,7 @@ beforeEach(async () => {
   await Event.deleteMany({});
   await CreatedFundraiser.deleteMany({});
   await UserRegisteredEvent.deleteMany({});
-});
+},10000);
 
 afterAll(async () => {
   await mongoose.connection.close();

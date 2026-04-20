@@ -50,7 +50,7 @@ beforeEach(async () => {
   await DonationMoney.deleteMany({});
   await CareHomeJob.deleteMany({});
   await User.deleteMany({});
-});
+},10000);
 
 afterAll(async () => {
   await mongoose.connection.close();
