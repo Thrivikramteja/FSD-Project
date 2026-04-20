@@ -743,7 +743,7 @@ async function createImpactStory(req, res, next) {
     const videos = req.files
       .filter(file => file.mimetype.startsWith('video/'))
       .map(file => file.path.replace(/\\/g, '/').split('public/')[1] || file.path);
-    
+    //
     const mongoId = await getMongoIdFromNumericId(req.user.id);
     if (!mongoId) {
       return res.status(404).json({ message: 'Carehome not found' });
