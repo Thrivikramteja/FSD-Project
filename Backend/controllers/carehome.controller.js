@@ -344,6 +344,7 @@ async function getCarehome(req, res, next) {
       userRole: req.user.role,
     });
   } catch (err) {
+    console.log(err);
     err.message = "Dashboard load failed";
     next(err);
   }
