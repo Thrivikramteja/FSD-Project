@@ -1,0 +1,57 @@
+name: CareConnect Full Stack CI
+
+on:
+  push:
+    branches: [ "karthik_job" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  backend-tests:
+    name: Backend Test Suite
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Backend Dependencies
+        working-directory: ./Backend
+        run: npm ci
+
+      - name: Run Backend Tests
+        working-directory: ./Backend
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          JWT_SECRET: test_secret_key
+          NODE_ENV: test
+        run: npm test -- --forceExit
+
+  frontend-tests:
+    name: Frontend Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies
+        working-directory: ./Frontend
+        run: npm ci
+
+      - name: Run Frontend Tests
+        working-directory: ./Frontend
+        run: npm test
