@@ -9,12 +9,12 @@ const NgoControl = () => {
     const [reason, setReason] = useState("");
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/admin/all-ngos-manage', { credentials: 'include' })
+        fetch(`${import.meta.env.VITE_API_URL}/api/admin/all-ngos-manage`, { credentials: 'include' })
             .then(res => res.json()).then(data => setNgos(data.ngos || []));
     }, []);
 
     const fetchNgoStats = async (ngo) => {
-        const res = await fetch(`http://localhost:3000/api/admin/ngo-manage-stats/${ngo.ngoId}`, { credentials: 'include' });
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/ngo-manage-stats/${ngo.ngoId}`, { credentials: 'include' });
         const json = await res.json();
         setAuditNgo(json.stats);
     };
@@ -22,7 +22,7 @@ const NgoControl = () => {
     const confirmDelete = async () => {
         if (!reason) return alert("Reason required");
        await fetch(
-                    `http://localhost:3000/api/admin/delete-ngo?ngoId=${deleteTarget.ngoId}&email=${deleteTarget.email}&name=${deleteTarget.Ngoname}&reason=${encodeURIComponent(reason)}`,
+                    `${import.meta.env.VITE_API_URL}/api/admin/delete-ngo?ngoId=${deleteTarget.ngoId}&email=${deleteTarget.email}&name=${deleteTarget.Ngoname}&reason=${encodeURIComponent(reason)}`,
                     {
                         method: 'DELETE',
                         credentials: 'include'

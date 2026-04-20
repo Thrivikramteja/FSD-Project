@@ -13,7 +13,7 @@ const DetailsPage = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/NGO-dashboard/${ngoID}/details/${type}/${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/NGO-dashboard/${ngoID}/details/${type}/${id}`, {
           method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include'
         });
         const result = await response.json();

@@ -18,7 +18,7 @@ const AllEvents = () => {
         const queryParams = new URLSearchParams({ page: 1 });
         if (searchTerm) queryParams.append("q", searchTerm);
 
-        const response = await fetch(`http://localhost:3000/api/events?${queryParams.toString()}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/events?${queryParams.toString()}`);
         if (!response.ok) throw new Error("Failed to fetch events");
         
         const result = await response.json();
@@ -36,7 +36,7 @@ const AllEvents = () => {
 
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x250?text=No+Image";
-    return path.startsWith("http") ? path : `http://localhost:3000${path.startsWith("/") ? path : `/${path}`}`;
+    return path.startsWith("http") ? path : `${import.meta.env.VITE_API_URL}${path.startsWith("/") ? path : `/${path}`}`;
   };
 
   return (

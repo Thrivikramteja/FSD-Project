@@ -29,7 +29,7 @@ const AllFundraisers = () => {
         if (searchTerm) queryParams.append("q", searchTerm);
         if (selectedTags.length > 0) queryParams.append("tags", selectedTags.join(","));
 
-        const response = await fetch(`http://localhost:3000/fundraisers?${queryParams.toString()}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/fundraisers?${queryParams.toString()}`);
         if (!response.ok) throw new Error("Fetch failed");
 
         const data = await response.json();
@@ -56,7 +56,7 @@ const AllFundraisers = () => {
 
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x250?text=No+Image";
-    return path.startsWith("http") ? path : `http://localhost:3000${path.startsWith("/") ? path : `/${path}`}`;
+    return path.startsWith("http") ? path : `${import.meta.env.VITE_API_URL}${path.startsWith("/") ? path : `/${path}`}`;
   };
 
   const handleDonateClick = (fund) => {

@@ -39,7 +39,7 @@ export default function DonorSignup() {
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
-            const response = await fetch("http://localhost:3000/api/signup", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/signup`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

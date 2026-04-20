@@ -10,7 +10,7 @@ const AdminFundraisers = () => {
     const [donors, setDonors] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/admin/fundraisers-analytics', { credentials: 'include' })
+        fetch(`${import.meta.env.VITE_API_URL}/api/admin/fundraisers-analytics`, { credentials: 'include' })
             .then(res => {
                 if (!res.ok) throw new Error(`API Error: ${res.status}`);
                 return res.json();
@@ -30,7 +30,7 @@ const AdminFundraisers = () => {
     const handleViewDonors = async (f) => {
         setSelectedFundraiser(f);
         try {
-            const res = await fetch(`http://localhost:3000/api/admin/fundraiser-donors/${f._id}`, { credentials: 'include' });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/fundraiser-donors/${f._id}`, { credentials: 'include' });
             if (!res.ok) throw new Error(`API Error: ${res.status}`);
             const json = await res.json();
             setDonors(json.donorList || []);

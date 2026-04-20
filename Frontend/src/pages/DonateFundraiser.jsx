@@ -25,7 +25,7 @@ const DonateFundraiser = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/me", {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
                     credentials: "include"
                 });
 
@@ -69,7 +69,7 @@ const DonateFundraiser = () => {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:3000/api/donate/${ngoId}/${name_fund}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/donate/${ngoId}/${name_fund}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

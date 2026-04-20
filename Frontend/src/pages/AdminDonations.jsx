@@ -8,7 +8,7 @@ const AdminDonations = () => {
     const [donors, setDonors] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/admin/donations-analytics', { credentials: 'include' })
+        fetch(`${import.meta.env.VITE_API_URL}/api/admin/donations-analytics`, { credentials: 'include' })
             .then(res => {
                 if (!res.ok) throw new Error(`API Error: ${res.status}`);
                 return res.json();
@@ -28,7 +28,7 @@ const AdminDonations = () => {
     const handleAudit = async (home) => {
         setAuditHome(home);
         try {
-            const res = await fetch(`http://localhost:3000/api/admin/carehome-donors/${home.carehomeId}`, { credentials: 'include' });
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/carehome-donors/${home.carehomeId}`, { credentials: 'include' });
             if (!res.ok) throw new Error(`API Error: ${res.status}`);
             const json = await res.json();
             setDonors(json.donorList || []);

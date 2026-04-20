@@ -38,7 +38,7 @@ const DonorRegistration = () => {
 
         const fetchEventInfo = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/event-details/${ngoId}/${eventName}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/event-details/${ngoId}/${eventName}`);
                 const data = await response.json();
                 if (data.success) setEventDetails(data.event);
             } catch (err) {
@@ -57,7 +57,7 @@ const DonorRegistration = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:3000/registerUser/${ngoId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/registerUser/${ngoId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/me", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
           credentials: "include",
         });
 
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch("http://localhost:3000/api/logout", {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/logout`, {
       method: "POST",
       credentials: "include"
     });

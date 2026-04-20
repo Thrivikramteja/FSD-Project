@@ -9,12 +9,12 @@ const CarehomeControl = () => {
     const [reason, setReason] = useState("");
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/admin/all-carehomes-manage', { credentials: 'include' })
+        fetch(`${import.meta.env.VITE_API_URL}/api/admin/all-carehomes-manage`, { credentials: 'include' })
             .then(res => res.json()).then(data => setHomes(data.carehomes || []));
     }, []);
 
     const fetchHomeStats = async (home) => {
-        const res = await fetch(`http://localhost:3000/api/admin/carehome-manage-stats/${home.carehomeId}`, { credentials: 'include' });
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/carehome-manage-stats/${home.carehomeId}`, { credentials: 'include' });
         const json = await res.json();
         setAuditHome(json.stats);
     };
@@ -22,7 +22,7 @@ const CarehomeControl = () => {
     const confirmDelete = async () => {
         if (!reason) return alert("Reason is required.");
         await fetch(
-                     `http://localhost:3000/api/admin/delete-carehome?carehomeId=${deleteTarget.carehomeId}&email=${deleteTarget.email}&name=${deleteTarget.care_home_name}&reason=${encodeURIComponent(reason)}`,
+                     `${import.meta.env.VITE_API_URL}/api/admin/delete-carehome?carehomeId=${deleteTarget.carehomeId}&email=${deleteTarget.email}&name=${deleteTarget.care_home_name}&reason=${encodeURIComponent(reason)}`,
                         {
                             method: 'DELETE',
                             credentials: 'include'

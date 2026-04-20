@@ -79,7 +79,7 @@ export default function CarehomeRegistration() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/registerCarehome",
+        `${import.meta.env.VITE_API_URL}/api/registerCarehome`,
         {
           method: "POST",
           body: formData,

@@ -20,7 +20,7 @@ const CorporateDonation = () => {
     useEffect(() => {
         const fetchNGO = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/NGOs/profile/${id}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/NGOs/profile/${id}`);
                 const result = await response.json();
                 setNgo(result.data.ngo);
                 setLoading(false);
@@ -34,7 +34,7 @@ const CorporateDonation = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:3000/api/b2b/corporate/donate', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/b2b/corporate/donate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...formData, ngoId: id })

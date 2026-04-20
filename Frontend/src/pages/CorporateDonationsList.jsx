@@ -15,7 +15,7 @@ const CorporateDonationsList = () => {
         const fetchDonations = async () => {
             try {
                 // Reusing your existing dashboard endpoint logic
-                const response = await fetch(`http://localhost:3000/api/ngo-dashboard/${ngoID}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ngo-dashboard/${ngoID}`, {
                     credentials: "include"
                 });
                 const result = await response.json();

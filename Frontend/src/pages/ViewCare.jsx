@@ -20,7 +20,7 @@ const ViewCare = () => {
   useEffect(() => {
     const fetchCareDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/carehomes/viewcare/${carehomeId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/carehomes/viewcare/${carehomeId}`);
 
         if (!response.ok) {
           const errData = await response.json();
@@ -58,7 +58,7 @@ const ViewCare = () => {
       cleanPath = "/" + cleanPath;
     }
 
-    return `http://localhost:3000${cleanPath}`;
+    return `${import.meta.env.VITE_API_URL}${cleanPath}`;
   };
 
   const calculateAvg = () => {

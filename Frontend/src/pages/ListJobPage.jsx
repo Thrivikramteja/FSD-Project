@@ -38,7 +38,7 @@ const ListJobPage = () => {
           params.append("types", selectedTypes.join(','));
         }
 
-        const response = await fetch(`http://localhost:3000/api/jobs?${params.toString()}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs?${params.toString()}`, {
           credentials: 'include' 
         });
 
@@ -86,7 +86,7 @@ const ListJobPage = () => {
   const handleFinalSubmit = async (formData) => {
     setIsApplying(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/applications/apply`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/applications/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

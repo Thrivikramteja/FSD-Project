@@ -23,11 +23,11 @@ const CarehomeDashboard = () => {
   const fetchData = async () => {
     try {
       const dashRes = await fetch(
-        `http://localhost:3000/api/carehome-dashboard/${careid}`,
+        `${import.meta.env.VITE_API_URL}/api/carehome-dashboard/${careid}`,
         { credentials: "include" }
       );
       const jobsRes = await fetch(
-        `http://localhost:3000/api/carehome/my-jobs`,
+        `${import.meta.env.VITE_API_URL}/api/carehome/my-jobs`,
         { credentials: "include" }
       );
 
@@ -51,7 +51,7 @@ const CarehomeDashboard = () => {
   const handleViewApplicants = async (jobId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/carehome/jobs/${jobId}/applicants`,
+        `${import.meta.env.VITE_API_URL}/api/carehome/jobs/${jobId}/applicants`,
         { credentials: "include" }
       );
       const result = await response.json();
@@ -68,7 +68,7 @@ const CarehomeDashboard = () => {
     setApplicants((prev) =>
       prev.map((a) => (a._id === app._id ? { ...a, status: "Accepted" } : a))
     );
-    await fetch(`http://localhost:3000/api/applications/${app._id}/accept`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/applications/${app._id}/accept`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -79,7 +79,7 @@ const CarehomeDashboard = () => {
     setApplicants((prev) =>
       prev.map((a) => (a._id === app._id ? { ...a, status: "Rejected" } : a))
     );
-    await fetch(`http://localhost:3000/api/applications/${app._id}/reject`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/applications/${app._id}/reject`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -88,7 +88,7 @@ const CarehomeDashboard = () => {
 
   const handleItemAction = async (msg, action) => {
     try {
-      const response = await fetch("http://localhost:3000/donate_item/action", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/donate_item/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -118,7 +118,7 @@ const CarehomeDashboard = () => {
     formData.append('description', storyDescription);
     storyFiles.forEach(file => formData.append('media', file));
     try {
-      const response = await fetch('http://localhost:3000/api/carehome/impact-story', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/carehome/impact-story`, {
         method: 'POST',
         credentials: 'include',
         body: formData,

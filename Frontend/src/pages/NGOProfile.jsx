@@ -14,7 +14,7 @@ const NGOProfile = () => {
     useEffect(() => {
         const fetchNGOFullDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/NGOs/profile/${id}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/NGOs/profile/${id}`);
                 if (!response.ok) throw new Error("Failed to fetch NGO profile");
                 
                 const result = await response.json();

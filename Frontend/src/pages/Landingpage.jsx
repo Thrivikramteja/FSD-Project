@@ -22,7 +22,7 @@ export default function LandingPage() {
 
     const fetchTicker = async () => {
       try {
-        const response = await fetch("http://localhost:3000/ticker-data");
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/ticker-data`);
 
         if (!response.ok) {
           const errData = await response.json();
