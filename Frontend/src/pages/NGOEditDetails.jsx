@@ -21,7 +21,7 @@ const NGOEditDetails = () => {
             useEffect(() => {
                 const fetchDetails = async () => {
                     try {
-                        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/NGO-dashboard/${ngoID}/details`, {
+                        const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/NGO-dashboard/${ngoID}/details`, {
                             method: 'GET',
                             credentials: 'include', 
                             headers: { 'Content-Type': 'application/json' }
@@ -54,7 +54,7 @@ const NGOEditDetails = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/NGO-dashboard/${ngoID}/edit`, {
+            const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/NGO-dashboard/${ngoID}/edit`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },

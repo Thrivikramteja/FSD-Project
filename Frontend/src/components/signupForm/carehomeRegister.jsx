@@ -79,7 +79,7 @@ export default function CarehomeRegistration() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/registerCarehome`,
+        `https://fsd-project-backend-2bms.onrender.com/api/registerCarehome`,
         {
           method: "POST",
           body: formData,

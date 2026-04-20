@@ -19,7 +19,7 @@ const AllNgos = () => {
         const queryParams = new URLSearchParams({ page: 1 });
         if (searchTerm) queryParams.append("q", searchTerm);
 
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ngos?${queryParams.toString()}`);
+        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngos?${queryParams.toString()}`);
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         
         const result = await response.json();

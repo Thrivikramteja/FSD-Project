@@ -27,7 +27,7 @@ export default function DonorDashboard() {
   // --- ADDED FETCH FUNCTION ---
   const downloadReceipt = async (type, id) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/receipts/${type}/${id}`, {
+      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/receipts/${type}/${id}`, {
         credentials: "include",
       });
       const blob = await response.blob();
@@ -70,7 +70,7 @@ export default function DonorDashboard() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/activity/${user.userId}`, {
+    fetch(`https://fsd-project-backend-2bms.onrender.com/api/activity/${user.userId}`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -81,7 +81,7 @@ export default function DonorDashboard() {
       })
       .catch((err) => console.error("Activity Fetch Error:", err));
 
-    fetch(`${import.meta.env.VITE_API_URL}/my-applications`, {
+    fetch(`https://fsd-project-backend-2bms.onrender.com/my-applications`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -120,7 +120,7 @@ export default function DonorDashboard() {
       setIsSaving(true);
       setSaveError("");
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/donor/${user.userId}`, {
+      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/donor/${user.userId}`, {
         method: "PUT",
         credentials: "include",
         headers: {

@@ -62,7 +62,7 @@ export default function NGORegister() {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ngo/register`, {
+      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

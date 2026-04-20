@@ -12,7 +12,7 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/api/admin/main-stats`, { credentials: 'include' })
+        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/main-stats`, { credentials: 'include' })
             .then(res => res.json())
             .then(data => setStats(data))
             .catch(err => console.error('Error loading stats:', err));

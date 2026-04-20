@@ -35,7 +35,7 @@ const DonateMoneyPage = () => {
 
     const fetchCareHomes = useCallback(async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/carehomes`); 
+            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehomes`); 
 
             if (!response.ok) {
                 const errData = await response.json();
@@ -99,7 +99,7 @@ const DonateMoneyPage = () => {
         if (!userDetails.pan) { alert('PAN is required'); return; }
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/carehome/${selectedHomeId}/donate-money`, {
+            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehome/${selectedHomeId}/donate-money`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

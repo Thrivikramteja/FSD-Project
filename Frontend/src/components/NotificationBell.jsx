@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { io } from 'socket.io-client';
 import { AuthContext } from './authContext';
 
-const socket = io(import.meta.env.VITE_API_URL, { withCredentials: true });
+const socket = io('https://fsd-project-backend-2bms.onrender.com', { withCredentials: true });
 
 const NotificationBell = () => {
     const { auth } = useContext(AuthContext);

@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
+        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/me`, {
           credentials: "include",
         });
 
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch(`${import.meta.env.VITE_API_URL}/api/logout`, {
+    await fetch(`https://fsd-project-backend-2bms.onrender.com/api/logout`, {
       method: "POST",
       credentials: "include"
     });

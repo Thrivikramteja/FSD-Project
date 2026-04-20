@@ -24,7 +24,7 @@ const CreateFundraiser = () => {
   useEffect(() => {
     const fetchCarehomes = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/carehomes-list`);
+        const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehomes-list`);
         if (!res.ok) throw new Error("Failed to load carehomes");
         const data = await res.json();
         setCarehomes(data);
@@ -63,7 +63,7 @@ const CreateFundraiser = () => {
     dataToSend.append('image', imageFile);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ngo-dashboard/${ngoID}/create-fundraiser`, {
+      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo-dashboard/${ngoID}/create-fundraiser`, {
         method: 'POST',
         body: dataToSend,
         credentials: 'include'

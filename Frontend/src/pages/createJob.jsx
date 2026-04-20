@@ -56,7 +56,7 @@ pay: formData.pay ? parseFloat(formData.pay) : null,
 };
 
 try {
-const response = await fetch(`${import.meta.env.VITE_API_URL}/carehome-dashboard/post-job`, {
+const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/carehome-dashboard/post-job`, {
 method: "POST",
 headers: { "Content-Type": "application/json" },
 body: JSON.stringify(dataToSend),

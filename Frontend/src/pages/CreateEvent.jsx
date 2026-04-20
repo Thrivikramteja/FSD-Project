@@ -51,7 +51,7 @@ const CreateEvent = () => {
     dataToSend.append('image', imageFile);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ngo/${ngoID}/create-event`, {
+      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo/${ngoID}/create-event`, {
         method: 'POST',
         body: dataToSend,
         credentials: 'include'

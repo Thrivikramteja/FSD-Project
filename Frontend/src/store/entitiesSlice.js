@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchLandingData = createAsyncThunk(
   "entities/fetchLandingData",
   async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api`); 
+    const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api`); 
     const data = await res.json();
     return data;
   }

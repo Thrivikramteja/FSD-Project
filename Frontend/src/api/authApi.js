@@ -1,5 +1,4 @@
-// This looks for VITE_API_URL in Render. If it's not there, it uses localhost.
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const BASE_URL = "https://fsd-project-backend-2bms.onrender.com";
 
 export const checkSession = async () => {
   const res = await fetch(`${BASE_URL}/api/me`, {

@@ -14,7 +14,7 @@ const AdminEvents = () => {
 
     useEffect(() => {
         
-        fetch(`${import.meta.env.VITE_API_URL}/api/admin/events-analytics`, { credentials: 'include' })
+        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/events-analytics`, { credentials: 'include' })
             .then(res => res.ok ? res.json() : Promise.reject(`Error: ${res.status}`))
             .then(json => setData(json))
             .catch(err => { 
@@ -29,7 +29,7 @@ const AdminEvents = () => {
         setAuditLoading(true);
         try {
             
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/event-registrations/${event._id}`, { 
+            const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/event-registrations/${event._id}`, { 
                 credentials: 'include' 
             });
             const json = await res.json();

@@ -47,7 +47,7 @@ function Loginpage() {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
+      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/login`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -91,7 +91,7 @@ function Loginpage() {
     setError("");
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/forgot-password`,
+        `https://fsd-project-backend-2bms.onrender.com/api/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -128,7 +128,7 @@ function Loginpage() {
     setError("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/verify-otp`, {
+      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

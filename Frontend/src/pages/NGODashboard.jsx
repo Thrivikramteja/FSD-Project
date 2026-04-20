@@ -31,7 +31,7 @@ const NGODashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ngo-dashboard/${ngoID}`, {
+        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo-dashboard/${ngoID}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

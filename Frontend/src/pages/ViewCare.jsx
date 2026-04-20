@@ -20,7 +20,7 @@ const ViewCare = () => {
   useEffect(() => {
     const fetchCareDetails = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/carehomes/viewcare/${carehomeId}`);
+        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehomes/viewcare/${carehomeId}`);
 
         if (!response.ok) {
           const errData = await response.json();
@@ -58,7 +58,7 @@ const ViewCare = () => {
       cleanPath = "/" + cleanPath;
     }
 
-    return `${import.meta.env.VITE_API_URL}${cleanPath}`;
+    return `https://fsd-project-backend-2bms.onrender.com${cleanPath}`;
   };
 
   const calculateAvg = () => {

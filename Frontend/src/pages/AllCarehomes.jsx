@@ -16,8 +16,8 @@ const AllCarehomes = () => {
       setLoading(true);
       try {
         const url = searchTerm 
-? `${import.meta.env.VITE_API_URL}/api/carehomes?q=${searchTerm}`
-          : `${import.meta.env.VITE_API_URL}/api/carehomes`;
+? `https://fsd-project-backend-2bms.onrender.com/api/carehomes?q=${searchTerm}`
+          : `https://fsd-project-backend-2bms.onrender.com/api/carehomes`;
 
         const response = await fetch(url);
         if (!response.ok) throw new Error("Fetch failed");
@@ -37,7 +37,7 @@ const AllCarehomes = () => {
 
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x250?text=No+Image";
-    return path.startsWith("http") ? path : `${import.meta.env.VITE_API_URL}${path.startsWith("/") ? path : `/${path}`}`;
+    return path.startsWith("http") ? path : `https://fsd-project-backend-2bms.onrender.com${path.startsWith("/") ? path : `/${path}`}`;
   };
 
   return (
