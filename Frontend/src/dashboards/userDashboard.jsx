@@ -243,7 +243,7 @@ export default function DonorDashboard() {
                       </div>
                       
 
-                      <p><strong>NGO:</strong> {fund.ngoName || "Partner NGO"}</p>
+                      <p><strong>NGO :</strong> {fund.ngoName || "Partner NGO"}</p>
                       
                       <p className={styles.highlightText}>
                         Contributed: ₹{fund.amount_contributed}

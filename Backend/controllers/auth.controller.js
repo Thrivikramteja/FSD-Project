@@ -154,7 +154,7 @@ async function verifyOTP(req, res, next) {
       httpOnly: true,
       sameSite: "none",
       secure: true,  // HTTPS required for sameSite: "none"
-      domain: ".onrender.com"  // Allow cookie sharing across Render domains
+      maxAge: 24 * 60 * 60 * 1000 // Allow cookie sharing across Render domains
     });
 
     let dashboardUrl = "";
