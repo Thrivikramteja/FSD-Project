@@ -113,7 +113,6 @@ describe("Auth API Tests (CareConnect)", () => {
     request(app).post("/api/signup").send({
       fullname: "Test User",
       mail: email,
-      password: "123456",
       phone: "9999999999",
       checkbox: false,
     });
