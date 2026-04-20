@@ -62,6 +62,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/karthik_job'
     steps:
-      - name: Trigger Render Deploy Hook
+      - name: Trigger Render Deploy Hooks
         run: |
+          # Pings the Backend
           curl -f ${{ secrets.RENDER_DEPLOY_HOOK }}
+          # Pings the Frontend
+          curl -f ${{ secrets.RENDER_FRONTEND_HOOK }}

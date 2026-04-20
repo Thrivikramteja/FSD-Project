@@ -1,20 +1,14 @@
-# Use Node.js 20 Alpine
-FROM node:20-alpine
-
-# Set the working directory
-WORKDIR /usr/src/app
-
-# Copy package files
+FROM node:20-alpine AS build
+WORKDIR /app
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy the rest of the frontend code
 COPY . .
+RUN npm run build
 
-# Expose the Vite default port
-EXPOSE 5173
-
-# Start the Vite development server and expose it to the network
-CMD ["npm", "run", "dev", "--", "--host"]
+FROM node:20-alpine
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=build /app/dist ./dist
+# Render will use the PORT environment variable (default 10000)
+EXPOSE 10000
+CMD ["serve", "-s", "dist", "-l", "10000"]
