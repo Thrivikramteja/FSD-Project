@@ -5,11 +5,14 @@ const generateOTP = () => {
 };
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, 
   auth: {
     user: "chinnikarth22@gmail.com", 
-    pass: "jfou vgpy hjtr ltqb",      
+    pass: "jfou vgpy hjtr ltqb",       
   },
+  family: 4 
 });
 
 const sendOTPEmail = async (email, otp) => {
