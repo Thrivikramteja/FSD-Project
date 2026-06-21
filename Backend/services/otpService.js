@@ -4,16 +4,16 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, 
-  auth: {
-    user: "chinnikarth22@gmail.com", 
-    pass: "jfou vgpy hjtr ltqb",       
-  },
-  family: 4 
-});
+// const transporter = nodemailer.createTransport({
+//   host: "smtp.gmail.com",
+//   port: 465,
+//   secure: true, 
+//   auth: {
+//     user: "chinnikarth22@gmail.com", 
+//     pass: "jfou vgpy hjtr ltqb",       
+//   },
+//   family: 4 
+// });
 
 const sendOTPEmail = async (email, otp) => {
   const mailOptions = {
