@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const nodemailer = require("nodemailer");
 const redisClient = require("../redis"); 
 
 const { NGO, Event } = require("../models/NGO.model");
@@ -16,14 +15,6 @@ const CACHE_TTL_SECONDS = 30;
 const DONOR_COLLECTION = User.collection.collectionName;
 const NGO_COLLECTION = NGO.collection.collectionName;
 const CAREHOME_COLLECTION = Carehome.collection.collectionName;
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 /**
  * REDIS OPTIMIZATION HELPERS
@@ -300,16 +291,7 @@ const deleteDonorWithEmail = async (req, res) => {
     try {
         await User.deleteOne({ userId: Number(userId) });
 
-        await transporter.sendMail({
-            from: `"CareConnect Admin" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "Account Deactivation Notice",
-            html: `<div style="font-family: sans-serif; border: 1px solid #E0EADD; padding: 20px;">
-                    <h2 style="color: #1B4332;">Hi ${name},</h2>
-                    <p>Your donor account has been removed by the admin.</p>
-                    <p><b>Reason:</b> ${reason}</p>
-                   </div>`
-        });
+      console.log(`Donor account deleted; email notification skipped for ${email} (${name}). Reason: ${reason}`);
 
         res.status(200).json({ success: true });
 
@@ -346,18 +328,7 @@ const deleteNgoWithEmail = async (req, res) => {
     try {
         await NGO.deleteOne({ ngoId: Number(ngoId) });
 
-        await transporter.sendMail({
-            from: `"CareConnect Admin" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "Partnership Deactivation Notice - CareConnect",
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #E0EADD;">
-                    <h2 style="color: #1B4332;">Hello ${name},</h2>
-                    <p>We regret to inform you that your NGO partnership has been terminated.</p>
-                    <p><b>Reason for Deactivation:</b></p>
-                    <p style="padding: 15px; background: #F8FAF9; border-left: 4px solid #D63031;">${reason}</p>
-                </div>`
-        });
+      console.log(`NGO account deleted; email notification skipped for ${email} (${name}). Reason: ${reason}`);
 
         res.status(200).json({ success: true });
 
@@ -397,20 +368,7 @@ const deleteCarehomeWithEmail = async (req, res) => {
     try {
         await Carehome.deleteOne({ carehomeId: Number(carehomeId) });
 
-        await transporter.sendMail({
-            from: `"CareConnect Admin" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "Platform De-listing Notice: Carehome Profile",
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #E0EADD;">
-                    <h2 style="color: #1B4332;">Hello Management, ${name},</h2>
-                    <p>Your carehome profile has been removed from our active database.</p>
-                    <p><b>Official Reason:</b></p>
-                    <div style="padding: 15px; background: #F8FAF9; border-left: 4px solid #D63031;">
-                        ${reason}
-                    </div>
-                </div>`
-        });
+      console.log(`Carehome account deleted; email notification skipped for ${email} (${name}). Reason: ${reason}`);
 
         res.status(200).json({ success: true });
 

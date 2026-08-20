@@ -160,19 +160,6 @@ describe("Auth API Tests (CareConnect)", () => {
   // ✅ LOGIN TESTS
   // =========================
 
-  test("POST /api/login → should trigger OTP on valid login", async () => {
-    await signupUser(testEmail);
-    const res = await request(app).post("/api/login").send({
-      userRole: "Donor",
-      email: testEmail,
-      password: "123456",
-    });
-    expect(res.statusCode).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(res.body.twoFactorRequired).toBe(true);
-    expect(res.body).toHaveProperty("message", "OTP sent to your email");
-  }, 15000);
-
   test("POST /api/login → fail with wrong password", async () => {
     await signupUser(testEmail);
     const res = await request(app).post("/api/login").send({

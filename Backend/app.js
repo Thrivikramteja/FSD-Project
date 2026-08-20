@@ -6,7 +6,6 @@ const morgan = require("morgan");
 const rfs = require("rotating-file-stream");
 const fs = require("fs"); 
 const swaggerUi = require("swagger-ui-express"); 
-const sendErrorEmail = require("./services/errorMailer.js");
 require("./data/database.js");
 require("dotenv").config();
 
@@ -133,12 +132,6 @@ app.use((err, req, res, next) => {
 
   if (process.env.NODE_ENV !== 'test') {
     console.error(`[ERROR ${status}]:`, message);
-    sendErrorEmail({
-      message,
-      stack: err.stack,
-      route: req.originalUrl,
-      method: req.method
-    });
   }
 
   res.status(status).json({

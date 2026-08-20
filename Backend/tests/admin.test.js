@@ -259,9 +259,8 @@ describe("Admin controller tests", () => {
   });
 
   describe("deleteDonorWithEmail", () => {
-    test("deletes donor data and sends email", async () => {
+    test("deletes donor data without sending email", async () => {
       User.deleteOne.mockResolvedValue({ deletedCount: 1 });
-      mockSendMail.mockResolvedValue({ messageId: "mail-1" });
 
       const response = await request(app).delete(
         "/api/admin/delete-donor?userId=11&email=test@example.com&name=Ravi&reason=Violation"
@@ -270,13 +269,11 @@ describe("Admin controller tests", () => {
       expect(response.statusCode).toBe(200);
       expect(response.body).toEqual({ success: true });
       expect(User.deleteOne).toHaveBeenCalledWith({ userId: 11 });
-      expect(mockSendMail).toHaveBeenCalledTimes(1);
-      expect(mockSendMail.mock.calls[0][0].to).toBe("test@example.com");
+      expect(mockSendMail).not.toHaveBeenCalled();
     });
 
     test("revenue is updated on the next dashboard fetch after donor deletion", async () => {
       User.deleteOne.mockResolvedValue({ deletedCount: 1 });
-      mockSendMail.mockResolvedValue({ messageId: "mail-2" });
 
       redisClient.get
         .mockResolvedValueOnce(null)

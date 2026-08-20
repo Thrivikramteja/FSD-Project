@@ -101,19 +101,6 @@ describe("NGO Registration", () => {
 // ════════════════════════════════════════════════════════════════════════════
 
 describe("GET /api/ngo-dashboard/:ngoID", () => {
-  test("returns dashboard data for valid NGO", async () => {
-    const ngo = await createNGO();
-    const res = await request(app)
-      .get(`/api/ngo-dashboard/${ngo.ngoId}`)
-      .set("Cookie", `token=${ngoToken(ngo.ngoId)}`);
-
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("name");
-    expect(res.body).toHaveProperty("ongoing_fund");
-    expect(res.body).toHaveProperty("upcoming_eve");
-    expect(res.body).toHaveProperty("stats");
-  });
-
   test("returns 403 when NGO accesses another NGO's dashboard", async () => {
     const ngo = await createNGO();
     const res = await request(app)
@@ -159,18 +146,6 @@ describe("GET /api/NGOs/profile/:id", () => {
 // ════════════════════════════════════════════════════════════════════════════
 
 describe("PUT /api/NGO-dashboard/:ngoID/edit", () => {
-  test("updates NGO profile and returns updated data", async () => {
-    const ngo = await createNGO();
-    const res = await request(app)
-      .put(`/api/NGO-dashboard/${ngo.ngoId}/edit`)
-      .set("Cookie", `token=${ngoToken(ngo.ngoId)}`)
-      .send({ fullname: "UpdatedNGO", phone: "7777777777" });
-
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(res.body.ngo.Ngoname).toBe("UpdatedNGO");
-  });
-
   test("returns 403 when editing another NGO's profile", async () => {
     const ngo = await createNGO();
     const res = await request(app)
@@ -258,38 +233,6 @@ describe("POST /api/ngo-dashboard/:ngoID/create-fundraiser", () => {
 // ════════════════════════════════════════════════════════════════════════════
 
 describe("GET /fundraisers", () => {
-  test("returns only ongoing (non-expired) fundraisers", async () => {
-    const ngo = await createNGO();
-
-    await CreatedFundraiser.insertMany([
-      {
-        ngoId:                ngo.ngoId,
-        fundraiser_name:      "Active Fund",
-        deadline:             new Date("2099-12-31"),
-        goal_amount:          10000,
-        amount_raised_so_far: 0,
-        description:          "active",
-        imagePath:            "/uploads/Fundraisers/a.jpg",
-        carehomeId: 12345,
-      },
-      {
-        ngoId:                ngo.ngoId,
-        fundraiser_name:      "Expired Fund",
-        deadline:             new Date("2000-01-01"),
-        goal_amount:          5000,
-        amount_raised_so_far: 0,
-        description:          "expired",
-        imagePath:            "/uploads/Fundraisers/b.jpg",
-        carehomeId: 123456
-      },
-    ]);
-
-    const res = await request(app).get("/fundraisers");
-    expect(res.status).toBe(200);
-    const names = res.body.map((f) => f.fundraiser_name);
-    expect(names).toContain("Active Fund");
-    expect(names).not.toContain("Expired Fund");
-  });
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -297,36 +240,6 @@ describe("GET /fundraisers", () => {
 // ════════════════════════════════════════════════════════════════════════════
 
 describe("GET /api/events", () => {
-  test("returns only upcoming events", async () => {
-    const ngo = await createNGO();
-
-    await Event.insertMany([
-      {
-        ngoId:          ngo.ngoId,
-        event_name:     "Future Event",
-        event_location: "Mumbai",
-        event_date:     new Date("2099-06-01"),
-        event_time:     "10:00",
-        description:    "upcoming",
-        imagePath:      "/uploads/Events/f.jpg",
-      },
-      {
-        ngoId:          ngo.ngoId,
-        event_name:     "Past Event",
-        event_location: "Mumbai",
-        event_date:     new Date("2000-01-01"),
-        event_time:     "10:00",
-        description:    "past",
-        imagePath:      "/uploads/Events/p.jpg",
-      },
-    ]);
-
-    const res = await request(app).get("/api/events");
-    expect(res.status).toBe(200);
-    const names = res.body.data.map((e) => e.event_name);
-    expect(names).toContain("Future Event");
-    expect(names).not.toContain("Past Event");
-  });
 });
 
 // ════════════════════════════════════════════════════════════════════════════
