@@ -1,13 +1,20 @@
 import React, { useState, useContext } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import styles from "../styles/login.module.css";
+
 import { AuthContext } from "../components/authContext";
+
 import OtpVerification from "./OtpVerification";
+
 import ForgotPassword from "./ForgotPassword";
-import { toast } from 'react-toastify';
+
+import { toast } from "react-toastify";
 
 function Loginpage() {
   const { login } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -17,55 +24,104 @@ function Loginpage() {
   });
 
   const [error, setError] = useState("");
+
   const [showOtp, setShowOtp] = useState(false);
+
   const [isVerifying, setIsVerifying] = useState(false);
+
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
   const [tempAuthData, setTempAuthData] = useState(null);
+
   const [showForgot, setShowForgot] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const validateForm = () => {
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+    const emailPattern =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (!emailPattern.test(formData.email.trim())) {
       setError("Enter a valid email address.");
       return false;
     }
+
     if (formData.password.trim().length < 6) {
       setError("Password must be at least 6 characters.");
       return false;
     }
+
     setError("");
+
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+
+    /**
+     * Prevent duplicate requests caused by:
+     *
+     * - pressing Enter multiple times
+     * - clicking Login multiple times
+     * - slow Render response
+     */
+    if (isLoggingIn) {
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoggingIn(true);
 
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/login`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://fsd-project-backend-2bms.onrender.com/api/login",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         if (data.twoFactorRequired) {
-          setTempAuthData({ email: data.email, role: formData.userRole });
+          setTempAuthData({
+            email: data.email,
+            role: formData.userRole,
+          });
+
           setShowOtp(true);
         } else {
           const userRole = data.role;
-          login({ user: data.user, role: data.role });
-          toast.success('Login successful!');
+
+          login({
+            user: data.user,
+            role: data.role,
+          });
+
+          if (data.otpFallback) {
+            toast.info(
+              "OTP service is temporarily unavailable. Logged in using fallback authentication."
+            );
+          } else {
+            toast.success("Login successful!");
+          }
+
           if (userRole === "Admin") {
             navigate("/admin-dashboard");
           } else {
@@ -74,45 +130,72 @@ function Loginpage() {
         }
       } else {
         setError(data.message || "Login failed.");
+
+        if (response.status === 429) {
+          toast.info(data.message || "Please wait before requesting another OTP.");
+        } else if (response.status === 503) {
+          toast.error(
+            data.message || "OTP service is temporarily unavailable."
+          );
+        }
       }
     } catch (err) {
       console.error(err);
+
       setError("Something went wrong. Please try again.");
-      toast.error('Login failed. Please try again.');
+
+      toast.error("Login failed. Please try again.");
 
       setTimeout(() => {
         window.location.href = "/error";
       }, 5000);
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
   const handleForgotRequest = async (email, role) => {
     setIsVerifying(true);
+
     setError("");
+
     try {
       const response = await fetch(
-        `https://fsd-project-backend-2bms.onrender.com/api/forgot-password`,
+        "https://fsd-project-backend-2bms.onrender.com/api/forgot-password",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, userRole: role }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            userRole: role,
+          }),
         }
       );
 
       const data = await response.json();
 
       if (response.ok) {
-        setTempAuthData({ email, role });
+        setTempAuthData({
+          email,
+          role,
+        });
+
         setShowForgot(false);
+
         setShowOtp(true);
-        toast.success('Password reset code sent to your email!');
+
+        toast.success("Password reset code sent to your email!");
       } else {
         setError(
-          data.message || "User not found. Check email or sign up newly."
+          data.message ||
+            "User not found. Check email or sign up newly."
         );
       }
     } catch (err) {
       console.log(err);
+
       setError("Connection error. Please try again.");
 
       setTimeout(() => {
@@ -125,34 +208,47 @@ function Loginpage() {
 
   const handleVerifyOtp = async (otpCode) => {
     setIsVerifying(true);
+
     setError("");
 
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: tempAuthData.email,
-          otp: otpCode,
-          userRole: tempAuthData.role,
-        }),
-        credentials: "include",
-      });
+      const response = await fetch(
+        "https://fsd-project-backend-2bms.onrender.com/api/verify-otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: tempAuthData.email,
+            otp: otpCode,
+            userRole: tempAuthData.role,
+          }),
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        login({ user: data.user, role: data.role });
-        toast.success('OTP verified successfully!');
+        login({
+          user: data.user,
+          role: data.role,
+        });
+
+        toast.success("OTP verified successfully!");
+
         if (data.redirect) {
           navigate(data.redirect);
         }
       } else {
         setError(data.message || "Invalid OTP");
+
         toast.error(data.message || "Invalid OTP");
       }
     } catch (err) {
       console.error(err);
+
       setError("Verification failed. Please try again.");
 
       setTimeout(() => {
@@ -197,11 +293,13 @@ function Loginpage() {
           <p className={styles.loginAs}>
             Login As:
             <br />
+
             <select
               name="userRole"
               className={styles.roleSelect}
               value={formData.userRole}
               onChange={handleChange}
+              disabled={isLoggingIn}
             >
               <option value="Donor">Donor</option>
               <option value="NGO">NGO</option>
@@ -213,6 +311,7 @@ function Loginpage() {
           <p>
             <label className={styles.loginLabel}>E-Mail</label>
             <br />
+
             <input
               className={styles.loginInput}
               type="email"
@@ -220,12 +319,14 @@ function Loginpage() {
               value={formData.email}
               onChange={handleChange}
               required
+              disabled={isLoggingIn}
             />
           </p>
 
           <p>
             <label className={styles.loginLabel}>Password</label>
             <br />
+
             <input
               className={styles.loginInput}
               type="password"
@@ -233,6 +334,7 @@ function Loginpage() {
               value={formData.password}
               onChange={handleChange}
               required
+              disabled={isLoggingIn}
             />
           </p>
 
@@ -244,10 +346,14 @@ function Loginpage() {
             }}
           >
             <span
-              onClick={() => setShowForgot(true)}
+              onClick={() => {
+                if (!isLoggingIn) {
+                  setShowForgot(true);
+                }
+              }}
               style={{
                 color: "#10b981",
-                cursor: "pointer",
+                cursor: isLoggingIn ? "not-allowed" : "pointer",
                 fontSize: "13px",
                 fontWeight: "600",
                 textDecoration: "underline",
@@ -257,8 +363,12 @@ function Loginpage() {
             </span>
           </p>
 
-          <button type="submit" className={styles.loginButton}>
-            Login
+          <button
+            type="submit"
+            className={styles.loginButton}
+            disabled={isLoggingIn}
+          >
+            {isLoggingIn ? "Logging in..." : "Login"}
           </button>
         </form>
       </main>
