@@ -17,6 +17,7 @@ export default function LandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [tickerData, setTickerData] = useState([]);
+  const [, setError] = useState(null);
 
   useEffect(() => {
     dispatch(fetchLandingData());
