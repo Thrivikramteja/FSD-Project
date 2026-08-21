@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/header';
@@ -14,7 +15,7 @@ const NGOProfile = () => {
     useEffect(() => {
         const fetchNGOFullDetails = async () => {
             try {
-                const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/NGOs/profile/${id}`);
+                const response = await apiFetch(`/api/NGOs/profile/${id}`);
                 if (!response.ok) throw new Error("Failed to fetch NGO profile");
                 
                 const result = await response.json();

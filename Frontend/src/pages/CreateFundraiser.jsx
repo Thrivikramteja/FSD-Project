@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/footer';
@@ -24,7 +25,7 @@ const CreateFundraiser = () => {
   useEffect(() => {
     const fetchCarehomes = async () => {
       try {
-        const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehomes-list`);
+        const res = await apiFetch(`/api/carehomes-list`);
         if (!res.ok) throw new Error("Failed to load carehomes");
         const data = await res.json();
         setCarehomes(data);
@@ -63,7 +64,7 @@ const CreateFundraiser = () => {
     dataToSend.append('image', imageFile);
 
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo-dashboard/${ngoID}/create-fundraiser`, {
+      const response = await apiFetch(`/api/ngo-dashboard/${ngoID}/create-fundraiser`, {
         method: 'POST',
         body: dataToSend,
         credentials: 'include'

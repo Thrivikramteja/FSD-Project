@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
@@ -19,7 +20,7 @@ const AllNgos = () => {
         const queryParams = new URLSearchParams({ page: 1 });
         if (searchTerm) queryParams.append("q", searchTerm);
 
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngos?${queryParams.toString()}`);
+        const response = await apiFetch(`/api/ngos?${queryParams.toString()}`);
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         
         const result = await response.json();

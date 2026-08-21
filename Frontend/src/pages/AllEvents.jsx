@@ -1,8 +1,10 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { headerConfig } from "../config/headerConfig";
+import { apiUrl } from "../services/api";
 import styles from "../styles/events.module.css"; 
 
 const AllEvents = () => {
@@ -18,7 +20,7 @@ const AllEvents = () => {
         const queryParams = new URLSearchParams({ page: 1 });
         if (searchTerm) queryParams.append("q", searchTerm);
 
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/events?${queryParams.toString()}`);
+        const response = await apiFetch(`/api/events?${queryParams.toString()}`);
         if (!response.ok) throw new Error("Failed to fetch events");
         
         const result = await response.json();
@@ -36,7 +38,7 @@ const AllEvents = () => {
 
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x250?text=No+Image";
-    return path.startsWith("http") ? path : `https://fsd-project-backend-2bms.onrender.com${path.startsWith("/") ? path : `/${path}`}`;
+    return path.startsWith("http") ? path : apiUrl(path);
   };
 
   return (

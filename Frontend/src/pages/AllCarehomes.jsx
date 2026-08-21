@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { headerConfig } from "../config/headerConfig";
+import { apiFetch, apiUrl } from "../services/api";
 import "../styles/carehome.css";
 
 const AllCarehomes = () => {
@@ -15,11 +16,11 @@ const AllCarehomes = () => {
     const fetchCareHomes = async () => {
       setLoading(true);
       try {
-        const url = searchTerm 
-? `https://fsd-project-backend-2bms.onrender.com/api/carehomes?q=${searchTerm}`
-          : `https://fsd-project-backend-2bms.onrender.com/api/carehomes`;
+        const url = searchTerm
+          ? `/api/carehomes?q=${searchTerm}`
+          : "/api/carehomes";
 
-        const response = await fetch(url);
+        const response = await apiFetch(url);
         if (!response.ok) throw new Error("Fetch failed");
 
         const data = await response.json();
@@ -37,7 +38,7 @@ const AllCarehomes = () => {
 
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x250?text=No+Image";
-    return path.startsWith("http") ? path : `https://fsd-project-backend-2bms.onrender.com${path.startsWith("/") ? path : `/${path}`}`;
+    return path.startsWith("http") ? path : apiUrl(path);
   };
 
   return (

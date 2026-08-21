@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Ngoheader';
@@ -13,7 +14,7 @@ const DetailsPage = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/NGO-dashboard/${ngoID}/details/${type}/${id}`, {
+        const response = await apiFetch(`/api/NGO-dashboard/${ngoID}/details/${type}/${id}`, {
           method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include'
         });
         const result = await response.json();

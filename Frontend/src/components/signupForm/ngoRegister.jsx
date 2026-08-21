@@ -1,3 +1,4 @@
+import { apiFetch } from "../../services/api";
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -62,7 +63,7 @@ export default function NGORegister() {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo/register`, {
+      const response = await apiFetch(`/api/ngo/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

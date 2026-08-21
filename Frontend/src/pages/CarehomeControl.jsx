@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/UserControl.module.css';
 
@@ -9,20 +10,19 @@ const CarehomeControl = () => {
     const [reason, setReason] = useState("");
 
     useEffect(() => {
-        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/all-carehomes-manage`, { credentials: 'include' })
+        apiFetch(`/api/admin/all-carehomes-manage`, { credentials: 'include' })
             .then(res => res.json()).then(data => setHomes(data.carehomes || []));
     }, []);
 
     const fetchHomeStats = async (home) => {
-        const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/carehome-manage-stats/${home.carehomeId}`, { credentials: 'include' });
+        const res = await apiFetch(`/api/admin/carehome-manage-stats/${home.carehomeId}`, { credentials: 'include' });
         const json = await res.json();
         setAuditHome(json.stats);
     };
 
     const confirmDelete = async () => {
         if (!reason) return alert("Reason is required.");
-        await fetch(
-                     `https://fsd-project-backend-2bms.onrender.com/api/admin/delete-carehome?carehomeId=${deleteTarget.carehomeId}&email=${deleteTarget.email}&name=${deleteTarget.care_home_name}&reason=${encodeURIComponent(reason)}`,
+        await apiFetch(`/api/admin/delete-carehome?carehomeId=${deleteTarget.carehomeId}&email=${deleteTarget.email}&name=${deleteTarget.care_home_name}&reason=${encodeURIComponent(reason)}`,
                         {
                             method: 'DELETE',
                             credentials: 'include'

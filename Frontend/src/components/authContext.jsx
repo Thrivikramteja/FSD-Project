@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
@@ -12,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/me`, {
+        const response = await apiFetch(`/api/me`, {
           credentials: "include",
         });
 
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch(`https://fsd-project-backend-2bms.onrender.com/api/logout`, {
+    await apiFetch(`/api/logout`, {
       method: "POST",
       credentials: "include"
     });

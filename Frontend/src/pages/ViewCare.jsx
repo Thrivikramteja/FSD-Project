@@ -1,7 +1,9 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/header';
 import Footer from '../components/footer';
+import { apiUrl } from '../services/api';
 import '../styles/view_care.css'; 
 
 const ViewCare = () => {
@@ -20,7 +22,7 @@ const ViewCare = () => {
   useEffect(() => {
     const fetchCareDetails = async () => {
       try {
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehomes/viewcare/${carehomeId}`);
+        const response = await apiFetch(`/api/carehomes/viewcare/${carehomeId}`);
 
         if (!response.ok) {
           const errData = await response.json();
@@ -58,7 +60,7 @@ const ViewCare = () => {
       cleanPath = "/" + cleanPath;
     }
 
-    return `https://fsd-project-backend-2bms.onrender.com${cleanPath}`;
+    return apiUrl(cleanPath);
   };
 
   const calculateAvg = () => {

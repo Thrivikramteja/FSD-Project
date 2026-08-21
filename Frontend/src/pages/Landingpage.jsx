@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLandingData } from "../store/entitiesSlice";
@@ -22,7 +23,7 @@ export default function LandingPage() {
 
     const fetchTicker = async () => {
       try {
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/ticker-data`);
+        const response = await apiFetch(`/ticker-data`);
 
         if (!response.ok) {
           const errData = await response.json();

@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/header';
@@ -20,7 +21,7 @@ const CorporateDonation = () => {
     useEffect(() => {
         const fetchNGO = async () => {
             try {
-                const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/NGOs/profile/${id}`);
+                const response = await apiFetch(`/api/NGOs/profile/${id}`);
                 const result = await response.json();
                 setNgo(result.data.ngo);
                 setLoading(false);
@@ -34,7 +35,7 @@ const CorporateDonation = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/b2b/corporate/donate`, {
+            const response = await apiFetch(`/api/b2b/corporate/donate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...formData, ngoId: id })

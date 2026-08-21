@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/authContext";
@@ -11,7 +12,7 @@ const CareHeader = ({ careid }) => {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/logout", { method: "POST", credentials: "include" });
+      await apiFetch("/api/logout", { method: "POST", credentials: "include" });
     } catch (err) {
       console.error("Logout failed", err);
     }

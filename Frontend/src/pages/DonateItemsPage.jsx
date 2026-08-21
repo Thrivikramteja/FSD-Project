@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/header'; 
 import Footer from '../components/footer'; 
@@ -23,7 +24,7 @@ const DonatePage = () => {
 
     const fetchCareHomes = useCallback(async () => {
         try {
-            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehomes`); 
+            const response = await apiFetch(`/api/carehomes`); 
             
             if (!response.ok) {
                 const errData = await response.json();
@@ -71,7 +72,7 @@ const DonatePage = () => {
         setError(null);
 
         try {
-            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com${ENDPOINT_URL}`, {
+            const response = await apiFetch(`${ENDPOINT_URL}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

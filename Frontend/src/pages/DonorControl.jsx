@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/UserControl.module.css';
 
@@ -10,13 +11,13 @@ const DonorControl = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/all-donors`, { credentials: 'include' })
+        apiFetch(`/api/admin/all-donors`, { credentials: 'include' })
             .then(res => res.json()).then(data => setDonors(data.donors || []));
     }, []);
 
     const handleAudit = async (user) => {
         setLoading(true);
-        const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/donor-stats/${user.userId}`, { credentials: 'include' });
+        const res = await apiFetch(`/api/admin/donor-stats/${user.userId}`, { credentials: 'include' });
         const json = await res.json();
         setSelectedDonor(json.stats);
         setLoading(false);
@@ -24,8 +25,7 @@ const DonorControl = () => {
 
     const confirmDelete = async () => {
         if (!reason) return alert("Reason is required");
-       await fetch(
-                `https://fsd-project-backend-2bms.onrender.com/api/admin/delete-donor?userId=${deleteTarget.userId}&email=${deleteTarget.email}&name=${deleteTarget.name}&reason=${encodeURIComponent(reason)}`,
+       await apiFetch(`/api/admin/delete-donor?userId=${deleteTarget.userId}&email=${deleteTarget.email}&name=${deleteTarget.name}&reason=${encodeURIComponent(reason)}`,
                 {
                     method: 'DELETE',
                     credentials: 'include'

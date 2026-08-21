@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/authContext';
@@ -38,7 +39,7 @@ const ListJobPage = () => {
           params.append("types", selectedTypes.join(','));
         }
 
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/jobs?${params.toString()}`, {
+        const response = await apiFetch(`/api/jobs?${params.toString()}`, {
           credentials: 'include' 
         });
 
@@ -86,7 +87,7 @@ const ListJobPage = () => {
   const handleFinalSubmit = async (formData) => {
     setIsApplying(true);
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/applications/apply`, {
+      const response = await apiFetch(`/api/applications/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import CareHeader from "../components/CareHeader";
@@ -21,7 +22,7 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`/api/carehome/profile/${careid}`, {
+        const res = await apiFetch(`/api/carehome/profile/${careid}`, {
           credentials: "include",
         });
 
@@ -87,7 +88,7 @@ const EditProfile = () => {
     }
 
     try {
-      const response = await fetch(`/api/carehome/${careid}`, {
+      const response = await apiFetch(`/api/carehome/${careid}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -1,3 +1,4 @@
+import { apiFetch } from "../../services/api";
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -39,7 +40,7 @@ export default function DonorSignup() {
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
-            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/signup`, {
+            const response = await apiFetch(`/api/signup`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

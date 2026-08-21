@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/ngo_das.css";
@@ -31,7 +32,7 @@ const NGODashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo-dashboard/${ngoID}`, {
+        const response = await apiFetch(`/api/ngo-dashboard/${ngoID}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

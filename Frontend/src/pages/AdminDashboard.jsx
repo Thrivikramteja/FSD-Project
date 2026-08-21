@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminEvents from './AdminEvents';
@@ -12,7 +13,7 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     
     useEffect(() => {
-        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/main-stats`, { credentials: 'include' })
+        apiFetch(`/api/admin/main-stats`, { credentials: 'include' })
             .then(res => res.json())
             .then(data => setStats(data))
             .catch(err => console.error('Error loading stats:', err));

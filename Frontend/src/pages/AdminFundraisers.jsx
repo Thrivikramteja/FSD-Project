@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/AdminFundraisers.module.css';
 
@@ -10,7 +11,7 @@ const AdminFundraisers = () => {
     const [donors, setDonors] = useState([]);
 
     useEffect(() => {
-        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/fundraisers-analytics`, { credentials: 'include' })
+        apiFetch(`/api/admin/fundraisers-analytics`, { credentials: 'include' })
             .then(res => {
                 if (!res.ok) throw new Error(`API Error: ${res.status}`);
                 return res.json();
@@ -30,7 +31,7 @@ const AdminFundraisers = () => {
     const handleViewDonors = async (f) => {
         setSelectedFundraiser(f);
         try {
-            const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/fundraiser-donors/${f._id}`, { credentials: 'include' });
+            const res = await apiFetch(`/api/admin/fundraiser-donors/${f._id}`, { credentials: 'include' });
             if (!res.ok) throw new Error(`API Error: ${res.status}`);
             const json = await res.json();
             setDonors(json.donorList || []);

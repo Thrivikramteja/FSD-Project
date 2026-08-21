@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useContext, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/header';
@@ -38,7 +39,7 @@ const DonorRegistration = () => {
 
         const fetchEventInfo = async () => {
             try {
-                const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/event-details/${ngoId}/${eventName}`);
+                const response = await apiFetch(`/api/event-details/${ngoId}/${eventName}`);
                 const data = await response.json();
                 if (data.success) setEventDetails(data.event);
             } catch (err) {
@@ -57,7 +58,7 @@ const DonorRegistration = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/registerUser/${ngoId}`, {
+            const response = await apiFetch(`/registerUser/${ngoId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

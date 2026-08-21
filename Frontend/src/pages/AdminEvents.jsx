@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/AdminEvents.module.css';
 
@@ -14,7 +15,7 @@ const AdminEvents = () => {
 
     useEffect(() => {
         
-        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/events-analytics`, { credentials: 'include' })
+        apiFetch(`/api/admin/events-analytics`, { credentials: 'include' })
             .then(res => res.ok ? res.json() : Promise.reject(`Error: ${res.status}`))
             .then(json => setData(json))
             .catch(err => { 
@@ -29,7 +30,7 @@ const AdminEvents = () => {
         setAuditLoading(true);
         try {
             
-            const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/event-registrations/${event._id}`, { 
+            const res = await apiFetch(`/api/admin/event-registrations/${event._id}`, { 
                 credentials: 'include' 
             });
             const json = await res.json();

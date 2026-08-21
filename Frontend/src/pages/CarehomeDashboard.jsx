@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import CareHeader from "../components/CareHeader";
@@ -22,12 +23,10 @@ const CarehomeDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const dashRes = await fetch(
-        `https://fsd-project-backend-2bms.onrender.com/api/carehome-dashboard/${careid}`,
+      const dashRes = await apiFetch(`/api/carehome-dashboard/${careid}`,
         { credentials: "include" }
       );
-      const jobsRes = await fetch(
-        `https://fsd-project-backend-2bms.onrender.com/api/carehome/my-jobs`,
+      const jobsRes = await apiFetch(`/api/carehome/my-jobs`,
         { credentials: "include" }
       );
 
@@ -50,8 +49,7 @@ const CarehomeDashboard = () => {
 
   const handleViewApplicants = async (jobId) => {
     try {
-      const response = await fetch(
-        `https://fsd-project-backend-2bms.onrender.com/api/carehome/jobs/${jobId}/applicants`,
+      const response = await apiFetch(`/api/carehome/jobs/${jobId}/applicants`,
         { credentials: "include" }
       );
       const result = await response.json();
@@ -68,7 +66,7 @@ const CarehomeDashboard = () => {
     setApplicants((prev) =>
       prev.map((a) => (a._id === app._id ? { ...a, status: "Accepted" } : a))
     );
-    await fetch(`https://fsd-project-backend-2bms.onrender.com/api/applications/${app._id}/accept`, {
+    await apiFetch(`/api/applications/${app._id}/accept`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -79,7 +77,7 @@ const CarehomeDashboard = () => {
     setApplicants((prev) =>
       prev.map((a) => (a._id === app._id ? { ...a, status: "Rejected" } : a))
     );
-    await fetch(`https://fsd-project-backend-2bms.onrender.com/api/applications/${app._id}/reject`, {
+    await apiFetch(`/api/applications/${app._id}/reject`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -88,7 +86,7 @@ const CarehomeDashboard = () => {
 
   const handleItemAction = async (msg, action) => {
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/donate_item/action`, {
+      const response = await apiFetch(`/donate_item/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -118,7 +116,7 @@ const CarehomeDashboard = () => {
     formData.append('description', storyDescription);
     storyFiles.forEach(file => formData.append('media', file));
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehome/impact-story`, {
+      const response = await apiFetch(`/api/carehome/impact-story`, {
         method: 'POST',
         credentials: 'include',
         body: formData,

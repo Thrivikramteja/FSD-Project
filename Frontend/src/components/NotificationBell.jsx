@@ -1,8 +1,10 @@
+import { apiFetch } from "../services/api";
 import React, { useEffect, useState, useContext } from 'react';
 import { io } from 'socket.io-client';
 import { AuthContext } from './authContext';
+import { apiUrl } from '../services/api';
 
-const socket = io('https://fsd-project-backend-2bms.onrender.com', { withCredentials: true });
+const socket = io(apiUrl('/'), { withCredentials: true });
 
 const NotificationBell = () => {
     const { auth } = useContext(AuthContext);
@@ -31,7 +33,7 @@ const NotificationBell = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res  = await fetch('/api/notifications', { credentials: 'include' });
+            const res  = await apiFetch('/api/notifications', { credentials: 'include' });
             const data = await res.json();
             if (data.success) {
                 setNotifications(data.notifications);
@@ -43,7 +45,7 @@ const NotificationBell = () => {
     };
 
     const handleClick = async (notification) => {
-    await fetch(`/api/notifications/${notification._id}/read`, {
+    await apiFetch(`/api/notifications/${notification._id}/read`, {
         method: 'PATCH',
         credentials: 'include'
     });
@@ -55,7 +57,7 @@ const NotificationBell = () => {
     setOpen(false);
 
     // Navigate and scroll to section
-    const [path, anchor] = notification.link.split('#');
+    const [, anchor] = notification.link.split('#');
     window.location.href = notification.link;
     
     if (anchor) {
@@ -67,7 +69,7 @@ const NotificationBell = () => {
 };
 
     const markAllRead = async () => {
-        await fetch('/api/notifications/read-all', {
+        await apiFetch('/api/notifications/read-all', {
             method: 'PATCH',
             credentials: 'include'
         });

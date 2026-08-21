@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/UserControl.module.css';
 
@@ -9,20 +10,19 @@ const NgoControl = () => {
     const [reason, setReason] = useState("");
 
     useEffect(() => {
-        fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/all-ngos-manage`, { credentials: 'include' })
+        apiFetch(`/api/admin/all-ngos-manage`, { credentials: 'include' })
             .then(res => res.json()).then(data => setNgos(data.ngos || []));
     }, []);
 
     const fetchNgoStats = async (ngo) => {
-        const res = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/admin/ngo-manage-stats/${ngo.ngoId}`, { credentials: 'include' });
+        const res = await apiFetch(`/api/admin/ngo-manage-stats/${ngo.ngoId}`, { credentials: 'include' });
         const json = await res.json();
         setAuditNgo(json.stats);
     };
 
     const confirmDelete = async () => {
         if (!reason) return alert("Reason required");
-       await fetch(
-                    `https://fsd-project-backend-2bms.onrender.com/api/admin/delete-ngo?ngoId=${deleteTarget.ngoId}&email=${deleteTarget.email}&name=${deleteTarget.Ngoname}&reason=${encodeURIComponent(reason)}`,
+       await apiFetch(`/api/admin/delete-ngo?ngoId=${deleteTarget.ngoId}&email=${deleteTarget.email}&name=${deleteTarget.Ngoname}&reason=${encodeURIComponent(reason)}`,
                     {
                         method: 'DELETE',
                         credentials: 'include'

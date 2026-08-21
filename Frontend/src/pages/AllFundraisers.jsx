@@ -1,9 +1,11 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import { AuthContext } from '../components/authContext';
 import { headerConfig } from "../config/headerConfig"; 
+import { apiUrl } from "../services/api";
 import '../styles/fundraisers.css'; 
 
 const AllFundraisers = () => {
@@ -29,7 +31,7 @@ const AllFundraisers = () => {
         if (searchTerm) queryParams.append("q", searchTerm);
         if (selectedTags.length > 0) queryParams.append("tags", selectedTags.join(","));
 
-        const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/fundraisers?${queryParams.toString()}`);
+        const response = await apiFetch(`/fundraisers?${queryParams.toString()}`);
         if (!response.ok) throw new Error("Fetch failed");
 
         const data = await response.json();
@@ -56,7 +58,7 @@ const AllFundraisers = () => {
 
   const getImageUrl = (path) => {
     if (!path) return "https://via.placeholder.com/400x250?text=No+Image";
-    return path.startsWith("http") ? path : `https://fsd-project-backend-2bms.onrender.com${path.startsWith("/") ? path : `/${path}`}`;
+    return path.startsWith("http") ? path : apiUrl(path);
   };
 
   const handleDonateClick = (fund) => {

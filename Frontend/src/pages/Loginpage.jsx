@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useContext } from "react";
 
 import { useNavigate } from "react-router-dom";
@@ -84,8 +85,7 @@ function Loginpage() {
     setIsLoggingIn(true);
 
     try {
-      const response = await fetch(
-        "https://fsd-project-backend-2bms.onrender.com/api/login",
+      const response = await apiFetch("/api/login",
         {
           method: "POST",
           credentials: "include",
@@ -160,8 +160,7 @@ function Loginpage() {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://fsd-project-backend-2bms.onrender.com/api/forgot-password",
+      const response = await apiFetch("/api/forgot-password",
         {
           method: "POST",
           headers: {
@@ -212,8 +211,7 @@ function Loginpage() {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://fsd-project-backend-2bms.onrender.com/api/verify-otp",
+      const response = await apiFetch("/api/verify-otp",
         {
           method: "POST",
           headers: {

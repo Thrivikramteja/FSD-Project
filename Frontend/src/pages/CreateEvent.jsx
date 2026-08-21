@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import styles from '../styles/createEvent.module.css'; // Updated to module
@@ -51,7 +52,7 @@ const CreateEvent = () => {
     dataToSend.append('image', imageFile);
 
     try {
-      const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo/${ngoID}/create-event`, {
+      const response = await apiFetch(`/api/ngo/${ngoID}/create-event`, {
         method: 'POST',
         body: dataToSend,
         credentials: 'include'

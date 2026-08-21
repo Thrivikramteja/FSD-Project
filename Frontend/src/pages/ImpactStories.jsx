@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import { headerConfig } from '../config/headerConfig';
 import styles from '../styles/ImpactStories.module.css';
 import { toast } from 'react-toastify';
+import { apiFetch } from '../services/api';
 
 const ImpactStories = () => {
   const [stories, setStories] = useState([]);
@@ -17,9 +17,10 @@ const ImpactStories = () => {
   const hasLoadToastShownRef = useRef(false);
 
   useEffect(() => {
-    axios.get('/api/impact-stories')
-      .then(res => {
-        setStories(res.data.stories);
+    apiFetch('/api/impact-stories')
+      .then(res => res.json())
+      .then(data => {
+        setStories(data.stories);
         setLoading(false);
         if (!hasLoadToastShownRef.current) {
           toast.success('Impact stories loaded successfully!');

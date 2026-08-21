@@ -1,11 +1,9 @@
-const BASE_URL = "https://fsd-project-backend-2bms.onrender.com";
+import { apiFetch, apiUrl } from "../services/api";
 
 export const checkSession = async () => {
-  const res = await fetch(`${BASE_URL}/api/me`, {
-    credentials: "include",
-  });
+  const res = await apiFetch("/api/me");
 
-  console.log("Checking session at:", `${BASE_URL}/api/me`);
+  console.log("Checking session at:", apiUrl("/api/me"));
 
   if (!res.ok) {
     throw new Error("Not authenticated");

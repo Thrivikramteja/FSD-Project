@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import { useRef } from "react";
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Heart, Sparkles, Shield, Award, TrendingUp, Users, CheckCircle2, ArrowRight } from 'lucide-react';
@@ -35,7 +36,7 @@ const DonateMoneyPage = () => {
 
     const fetchCareHomes = useCallback(async () => {
         try {
-            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehomes`); 
+            const response = await apiFetch(`/api/carehomes`); 
 
             if (!response.ok) {
                 const errData = await response.json();
@@ -99,7 +100,7 @@ const DonateMoneyPage = () => {
         if (!userDetails.pan) { alert('PAN is required'); return; }
 
         try {
-            const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/carehome/${selectedHomeId}/donate-money`, {
+            const response = await apiFetch(`/api/carehome/${selectedHomeId}/donate-money`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

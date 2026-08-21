@@ -1,10 +1,7 @@
-const BASE_URL = "https://fsd-project-backend-2bms.onrender.com";
+import { apiFetch } from "../services/api";
 
 export const apiClient = async (path, options = {}, accessToken) => {
-  // This combines the BASE_URL with the path you want to call
-  const url = `${BASE_URL}${path}`;
-
-  const res = await fetch(url, {
+  const res = await apiFetch(path, {
     ...options,
     headers: {
       ...options.headers,

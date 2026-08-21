@@ -1,3 +1,4 @@
+import { apiFetch } from "../../services/api";
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -78,8 +79,7 @@ export default function CarehomeRegistration() {
     }
 
     try {
-      const response = await fetch(
-        `https://fsd-project-backend-2bms.onrender.com/api/registerCarehome`,
+      const response = await apiFetch(`/api/registerCarehome`,
         {
           method: "POST",
           body: formData,

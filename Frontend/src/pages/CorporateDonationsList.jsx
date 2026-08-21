@@ -1,3 +1,4 @@
+import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from "../components/Ngoheader";
@@ -15,7 +16,7 @@ const CorporateDonationsList = () => {
         const fetchDonations = async () => {
             try {
                 // Reusing your existing dashboard endpoint logic
-                const response = await fetch(`https://fsd-project-backend-2bms.onrender.com/api/ngo-dashboard/${ngoID}`, {
+                const response = await apiFetch(`/api/ngo-dashboard/${ngoID}`, {
                     credentials: "include"
                 });
                 const result = await response.json();
