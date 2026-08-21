@@ -337,26 +337,26 @@ async function getCarehome(req, res, next) {
   try {
     console.log("Dashboard load: Starting for carehomeId:", careid);
     
-    const ongoing_fund = await Carehome.ongoing_fund(careid);
-    console.log("✓ ongoing_fund loaded");
-    
-    const completed_fund = await Carehome.completed_fund(careid);
-    console.log("✓ completed_fund loaded");
-    
-    const recentDonations = await Carehome.recentDonations(careid);
-    console.log("✓ recentDonations loaded");
-    
-    const getname = await Carehome.getname(careid);
-    console.log("✓ getname loaded");
-    
-    const wishlist = await Carehome.getWishlist(careid);
-    console.log("✓ wishlist loaded");
-    
-    const stats = await Carehome.get_carehome_stats(careid);
-    console.log("✓ stats loaded");
-    
-    const items = await donate_items.get_item_donations(careid);
-    console.log("✓ items loaded");
+  const ongoing_fund = await Carehome.ongoing_fund(careid);
+  console.log("✓ ongoing_fund loaded");
+
+  const completed_fund = await Carehome.completed_fund(careid);
+  console.log("✓ completed_fund loaded");
+
+  const recentDonations =
+      await Carehome.getRecentDonationsOptimized(careid);
+
+  const getname = await Carehome.getname(careid);
+  console.log("✓ getname loaded");
+
+  const wishlist = await Carehome.getWishlist(careid);
+  console.log("✓ wishlist loaded");
+
+  const stats = await Carehome.get_carehome_stats_optimized(careid);
+  console.log("✓ stats loaded");
+
+  const items = await donate_items.get_item_donations(careid);
+  console.log("✓ items loaded");
 
     const rawMessages = await Carehome.getMessages(careid);
     console.log("✓ rawMessages loaded, count:", rawMessages ? rawMessages.length : 0);
