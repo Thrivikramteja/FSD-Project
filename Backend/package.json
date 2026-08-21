@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
-    "test": "cross-env NODE_ENV=test jest --coverage --runInBand --forceExit --detectOpenHandles"
+    "test": "cross-env NODE_ENV=test jest --maxWorkers=50% --coverage=false --detectOpenHandles",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --maxWorkers=50%",
+    "test:ci": "cross-env NODE_ENV=test jest --coverage --runInBand --forceExit"
   },
   "jest": {
     "testEnvironment": "node"

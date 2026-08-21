@@ -17,30 +17,44 @@ const redisClient = redis.createClient({
 
 // --- Lifecycle Tracking ---
 redisClient.isReadyStatus = false;
+redisClient.isReady = false;
 
 redisClient.on('error', (err) => {
     redisClient.isReadyStatus = false;
-    console.error('❌ Redis Client Error:', err.message);
+    redisClient.isReady = false;
+    if (process.env.NODE_ENV !== 'test') {
+        console.error('❌ Redis Client Error:', err.message);
+    }
 });
 
 redisClient.on('connect', () => {
-    console.log('⏳ Redis: Connection initiated...');
+    if (process.env.NODE_ENV !== 'test') {
+        console.log('⏳ Redis: Connection initiated...');
+    }
 });
 
 redisClient.on('ready', () => {
     redisClient.isReadyStatus = true;
-    console.log('✅ Redis Cache: Connected and Ready');
+    redisClient.isReady = true;
+    if (process.env.NODE_ENV !== 'test') {
+        console.log('✅ Redis Cache: Connected and Ready');
+    }
 });
 
 redisClient.on('end', () => {
     redisClient.isReadyStatus = false;
-    console.log('🔌 Redis: Connection closed');
+    redisClient.isReady = false;
+    if (process.env.NODE_ENV !== 'test') {
+        console.log('🔌 Redis: Connection closed');
+    }
 });
 
 /**
  * ASYNC CONNECTION INITIALIZER
- * This prevents "Client is closed" errors by ensuring the connect() 
+ * This prevents "Client is closed" errors by ensuring the connect()
  * is called only once and handled correctly.
+ * In test runs without a Redis server configured, skip the connection attempt
+ * to avoid hanging the suite on a localhost timeout.
  */
 const connectRedis = async () => {
     try {
@@ -48,10 +62,15 @@ const connectRedis = async () => {
             await redisClient.connect();
         }
     } catch (err) {
-        console.error('❌ Redis Connection Failed:', err);
+        if (process.env.NODE_ENV !== 'test') {
+            console.error('❌ Redis Connection Failed:', err);
+        }
     }
 };
 
-connectRedis();
+const shouldSkipRedisInTest = process.env.NODE_ENV === 'test' && !process.env.REDIS_URL;
+if (!shouldSkipRedisInTest) {
+    connectRedis();
+}
 
 module.exports = redisClient;

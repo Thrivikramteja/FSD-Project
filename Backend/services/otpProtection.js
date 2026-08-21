@@ -1,4 +1,4 @@
-const redisClient = require("./redis");
+const redisClient = require("../redis");
 
 const OTP_EMAIL_COOLDOWN_SECONDS = Number(
   process.env.OTP_EMAIL_COOLDOWN_SECONDS || 60
