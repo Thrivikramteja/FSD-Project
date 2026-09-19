@@ -3,6 +3,7 @@ const { DonationMoney, Carehome } = require('../models/carehome.model');
 const { UserContributedFundraiser, UserRegisteredEvent } = require('../models/user.model');
 const { NGO } = require('../models/NGO.model');
 const {User} = require('../models/user.model');
+const { PaymentTransaction } = require('../models/paymentTransaction.model');
 
 const downloadImpactReceipt = async (req, res, next) => {
     const { type, id } = req.params;
@@ -22,7 +23,18 @@ const downloadImpactReceipt = async (req, res, next) => {
         } else if (type === 'fundraiser') {
             const c = await UserContributedFundraiser.findById(id).lean();
             const n = await NGO.findOne({ ngoId: c.ngoId }).lean();
-            rData = { title: "Fundraiser Receipt", beneficiary: n?.Ngoname, amount: c.amount_contributed, date: c.contributed_at, extra: `Campaign: ${c.fundraiser_name}`, typeLabel: "Non-Profit Partner" };
+            // Look for a linked Cashfree PaymentTransaction (new payment-backed record)
+            const paymentTxn = await PaymentTransaction.findOne({ donationRecordId: c._id }).lean();
+            rData = {
+                title: "Fundraiser Receipt",
+                beneficiary: n?.Ngoname,
+                amount: c.amount_contributed,
+                date: c.contributed_at,
+                extra: `Campaign: ${c.fundraiser_name}`,
+                typeLabel: "Non-Profit Partner",
+                // New payment-backed fields (null for legacy records)
+                paymentTxn: paymentTxn || null,
+            };
         } else if (type === 'event') {
             const e = await UserRegisteredEvent.findById(id).lean();
             const n = await NGO.findOne({ ngoId: e.ngoId }).lean();
@@ -69,24 +81,50 @@ const downloadImpactReceipt = async (req, res, next) => {
 
         // --- IMPACT CALCULATION BOX ---
         if (rData.amount > 0) {
-            const fee = rData.amount * 0.08;
-            const net = rData.amount - fee;
-
             doc.moveDown(2);
             const boxY = doc.y;
-            doc.rect(60, boxY, 492, 100).fill('#F4F7F5'); // Light Sage Background
-            doc.rect(60, boxY, 492, 100).stroke('#E0EADD');
 
-            doc.fillColor('#333333').fontSize(11).font('Helvetica').text('Gross Contribution', 80, boxY + 20);
-            doc.text(`INR ${rData.amount.toLocaleString()}`, 400, boxY + 20, { align: 'right', width: 130 });
+            if (rData.paymentTxn) {
+                // ── NEW: Cashfree-backed donation ──────────────────────────────
+                // Tip is an ADDITIONAL donor payment, not a deduction from the fundraiser.
+                const txn = rData.paymentTxn;
+                const boxH = 120;
+                doc.rect(60, boxY, 492, boxH).fill('#F4F7F5');
+                doc.rect(60, boxY, 492, boxH).stroke('#E0EADD');
 
-            doc.fillColor('#D63031').text('Platform Commission (8%)', 80, boxY + 40);
-            doc.text(`- INR ${fee.toFixed(2)}`, 400, boxY + 40, { align: 'right', width: 130 });
+                doc.fillColor('#333333').fontSize(11).font('Helvetica').text('Fundraiser Contribution', 80, boxY + 15);
+                doc.text(`INR ${txn.donationAmount.toLocaleString()}`, 400, boxY + 15, { align: 'right', width: 130 });
 
-            doc.strokeColor('#E0EADD').moveTo(80, boxY + 65).lineTo(530, boxY + 65).stroke();
+                doc.fillColor('#10b981').text('Platform Tip (8% — Additional)', 80, boxY + 38);
+                doc.text(`+ INR ${txn.platformTip.toFixed(2)}`, 400, boxY + 38, { align: 'right', width: 130 });
 
-            doc.fillColor('#1B4332').fontSize(14).font('Helvetica-Bold').text('Net Community Impact', 80, boxY + 75);
-            doc.text(`INR ${net.toLocaleString()}`, 380, boxY + 75, { align: 'right', width: 150 });
+                doc.strokeColor('#E0EADD').moveTo(80, boxY + 65).lineTo(530, boxY + 65).stroke();
+
+                doc.fillColor('#1B4332').fontSize(14).font('Helvetica-Bold').text('Total Charged to Donor', 80, boxY + 75);
+                doc.text(`INR ${txn.totalAmount.toLocaleString()}`, 380, boxY + 75, { align: 'right', width: 150 });
+
+                doc.fillColor('#6B705C').fontSize(9).font('Helvetica-Oblique')
+                   .text('The full fundraiser contribution goes to the campaign. The platform tip is a separate donor charge.', 80, boxY + 100, { width: 450 });
+
+            } else {
+                // ── LEGACY: pre-Cashfree donation (retain existing display) ───
+                const fee = rData.amount * 0.08;
+                const net = rData.amount - fee;
+                const boxH = 100;
+                doc.rect(60, boxY, 492, boxH).fill('#F4F7F5');
+                doc.rect(60, boxY, 492, boxH).stroke('#E0EADD');
+
+                doc.fillColor('#333333').fontSize(11).font('Helvetica').text('Gross Contribution', 80, boxY + 20);
+                doc.text(`INR ${rData.amount.toLocaleString()}`, 400, boxY + 20, { align: 'right', width: 130 });
+
+                doc.fillColor('#D63031').text('Platform Commission (8%)', 80, boxY + 40);
+                doc.text(`- INR ${fee.toFixed(2)}`, 400, boxY + 40, { align: 'right', width: 130 });
+
+                doc.strokeColor('#E0EADD').moveTo(80, boxY + 65).lineTo(530, boxY + 65).stroke();
+
+                doc.fillColor('#1B4332').fontSize(14).font('Helvetica-Bold').text('Net Community Impact', 80, boxY + 75);
+                doc.text(`INR ${net.toLocaleString()}`, 380, boxY + 75, { align: 'right', width: 150 });
+            }
         } else {
             doc.moveDown(3);
             doc.fillColor('#10b981').fontSize(14).font('Helvetica-Bold').text('STATUS: PARTICIPATION VERIFIED', { characterSpacing: 1 });

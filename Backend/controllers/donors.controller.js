@@ -100,6 +100,16 @@ async function get_carehomeid(ngoId, fundraiser_name) {
 }
 
 async function contributed_fund(req, res,next) {
+  // Feature flag: when CASHFREE_ENABLED=true, this legacy endpoint is disabled.
+  // Fundraiser donations must go through /api/payment/initiate instead.
+  // This prevents bypassing Cashfree payment confirmation.
+  if (process.env.CASHFREE_ENABLED === 'true') {
+    return res.status(403).json({
+      success: false,
+      message: 'Direct donations are disabled. Please use the payment checkout flow.',
+    });
+  }
+
   try {
     const ngoId = req.params.ngoId;
     const fundraiser_name = req.params.fundraiser_name;

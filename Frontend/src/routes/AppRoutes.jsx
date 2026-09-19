@@ -29,6 +29,8 @@ import CorporateDonation from "../pages/CorporateDonation"; // ADDED IMPORT
 import ImpactStories from "../pages/ImpactStories";
 import DetailsPage from "../pages/DetailsPage";
 import CorporateDonationsList from "../pages/CorporateDonationsList";
+import PaymentResult from "../pages/PaymentResult";
+
 
 const AppRoutes = () => {
   return (
@@ -75,6 +77,10 @@ const AppRoutes = () => {
       <Route path="/impact-stories" element={<ImpactStories />} />
 
       <Route path="/NGO-dashboard/:ngoID/corporate-donations" element={<CorporateDonationsList />} />
+
+      {/* Payment result page — backend-confirmed status after Cashfree checkout */}
+      <Route path="/payment/result" element={<PaymentResult />} />
+
 
       {/* Protected Routes */}
       <Route

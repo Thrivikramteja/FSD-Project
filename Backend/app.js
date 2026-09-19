@@ -12,6 +12,23 @@ require("dotenv").config();
 const http = require('http');
 const { Server } = require('socket.io');
 
+// ---------------------------------------------------------------------------
+// Routes — all requires at top level to avoid temporal dead-zone issues
+// ---------------------------------------------------------------------------
+const baseRoutes         = require("./routes/base.routes.js");
+const authRoutes         = require("./routes/auth.routes.js");
+const carehomeRoutes     = require("./routes/carehomes.routes.js");
+const donorRoutes        = require("./routes/donors.routes.js");
+const NGORoutes          = require("./routes/NGO.routes.js");
+const adminRoutes        = require("./routes/admin.routes.js");
+const impactStoriesRoutes = require("./routes/impactStories.routes.js");
+const notificationRoutes = require('./routes/notification.routes.js');
+// Payment routes — Cashfree integration (feature-flagged)
+const paymentRoutes      = require('./routes/payment.routes.js');
+
+// ---------------------------------------------------------------------------
+// App + Server
+// ---------------------------------------------------------------------------
 const accessLogStream = rfs.createStream("access.log", {
   interval: "1d",
   path: path.join(__dirname, "accessLogs"),
@@ -33,6 +50,18 @@ app.use(
 }));
 
 app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
+
+// ---------------------------------------------------------------------------
+// IMPORTANT: Payment routes are mounted BEFORE express.json().
+// The Cashfree webhook handler registers its own express.raw({ type: 'application/json' })
+// middleware inline so it receives the raw body for HMAC-SHA256 signature verification.
+// Mounting paymentRoutes here, before express.json(), ensures that the webhook path
+// is handled by express.raw() rather than having the body pre-parsed as JSON.
+// All other routes (initiate, status) are also in paymentRoutes and work fine
+// because those handlers don't need raw body access.
+// ---------------------------------------------------------------------------
+app.use(paymentRoutes);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -55,16 +84,6 @@ app.use(cors({
   },
   credentials: true 
 }));
-
-// Routes
-const baseRoutes = require("./routes/base.routes.js");
-const authRoutes = require("./routes/auth.routes.js");
-const carehomeRoutes = require("./routes/carehomes.routes.js");
-const donorRoutes = require("./routes/donors.routes.js");
-const NGORoutes = require("./routes/NGO.routes.js");
-const adminRoutes = require("./routes/admin.routes.js");
-const impactStoriesRoutes = require("./routes/impactStories.routes.js");
-const notificationRoutes = require('./routes/notification.routes.js');
 
 app.use(require("./routes/corporate.routes"));
 app.use(baseRoutes);
@@ -158,6 +177,9 @@ const io = new Server(server, {
 });
 
 app.set('io', io);
+// Expose io globally so the webhook controller can send Socket.IO notifications.
+// The webhook handler has no access to req.app, so global._ccIO is the bridge.
+global._ccIO = io;
 
 io.on('connection', (socket) => {
     socket.on('join', ({ userId, role }) => {

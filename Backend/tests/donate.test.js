@@ -162,4 +162,20 @@ describe('CareConnect: Donate Money (contributed_fund)', () => {
 
         expect(res.statusCode).toBe(500);
     });
-});
+
+    // ─── TEST 5: Feature flag blocks old endpoint when CASHFREE_ENABLED=true ──
+    test('POST /api/donate/:ngoId/:fundraiser_name returns 403 when CASHFREE_ENABLED=true', async () => {
+        const originalValue = process.env.CASHFREE_ENABLED;
+        process.env.CASHFREE_ENABLED = 'true';
+
+        const res = await request(app)
+            .post('/api/donate/1/Help Kids')
+            .send({ your_amount: 100 });
+
+        process.env.CASHFREE_ENABLED = originalValue;
+
+        expect(res.statusCode).toBe(403);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toMatch(/disabled/i);
+    });
+});
