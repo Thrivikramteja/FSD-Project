@@ -107,23 +107,25 @@ const downloadImpactReceipt = async (req, res, next) => {
                    .text('The full fundraiser contribution goes to the campaign. The platform tip is a separate donor charge.', 80, boxY + 100, { width: 450 });
 
             } else {
-                // ── LEGACY: pre-Cashfree donation (retain existing display) ───
-                const fee = rData.amount * 0.08;
-                const net = rData.amount - fee;
+                // ── LEGACY: pre-Cashfree donation ────────────────────────────
+                // No platform tip was collected for these records — showing a
+                // fabricated 8% deduction was misleading.  Display the honest
+                // breakdown: donor paid exactly rData.amount; all of it went to
+                // the fundraiser.
                 const boxH = 100;
                 doc.rect(60, boxY, 492, boxH).fill('#F4F7F5');
                 doc.rect(60, boxY, 492, boxH).stroke('#E0EADD');
 
-                doc.fillColor('#333333').fontSize(11).font('Helvetica').text('Gross Contribution', 80, boxY + 20);
+                doc.fillColor('#333333').fontSize(11).font('Helvetica').text('Donation Amount', 80, boxY + 20);
                 doc.text(`INR ${rData.amount.toLocaleString()}`, 400, boxY + 20, { align: 'right', width: 130 });
 
-                doc.fillColor('#D63031').text('Platform Commission (8%)', 80, boxY + 40);
-                doc.text(`- INR ${fee.toFixed(2)}`, 400, boxY + 40, { align: 'right', width: 130 });
+                doc.strokeColor('#E0EADD').moveTo(80, boxY + 50).lineTo(530, boxY + 50).stroke();
 
-                doc.strokeColor('#E0EADD').moveTo(80, boxY + 65).lineTo(530, boxY + 65).stroke();
+                doc.fillColor('#1B4332').fontSize(14).font('Helvetica-Bold').text('Fundraiser Impact', 80, boxY + 60);
+                doc.text(`INR ${rData.amount.toLocaleString()}`, 380, boxY + 60, { align: 'right', width: 150 });
 
-                doc.fillColor('#1B4332').fontSize(14).font('Helvetica-Bold').text('Net Community Impact', 80, boxY + 75);
-                doc.text(`INR ${net.toLocaleString()}`, 380, boxY + 75, { align: 'right', width: 150 });
+                doc.fillColor('#6B705C').fontSize(9).font('Helvetica-Oblique')
+                   .text('The full contribution went directly to the fundraiser campaign.', 80, boxY + 85, { width: 450 });
             }
         } else {
             doc.moveDown(3);

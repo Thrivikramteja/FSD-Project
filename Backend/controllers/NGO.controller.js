@@ -12,6 +12,11 @@ const { nextTick } = require("process");
 const {UserContributedFundraiser} = require('../models/user.model');
 const CorporateDonation = require("../models/corporateDonation.model");
 const { sendNotification } = require('../services/notificationService');
+const {
+  invalidateFundraiserCaches,
+  invalidateNgoCaches,
+  invalidateDonorActivity,
+} = require('../services/cacheHelpers');
 
 //We eliminated the N+1 query problem by using MongoDB aggregation with $lookup and optimized joins using projection pipelines.”
 async function get_allngo(req, res, next) {
@@ -289,10 +294,12 @@ async function editNGOProfile(req, res, next) {
     }
 
     // --- PURGE REDIS CACHE ---
-    // Clears the specific dashboard and the global NGO list to prevent stale data
+    // Clears the specific NGO dashboard and all paginated NGO list variants.
+    // NOTE: the old code called del('ngos:list') which was the wrong key;
+    //       real keys are ngos:<q>:p<page> — invalidateNgoCaches() pattern-scans them.
     await Promise.all([
       redisClient.del(`dash:ngo:${ngoID}`),
-      redisClient.del(`ngos:list`)
+      invalidateNgoCaches(),
     ]);
 
     res.status(200).json({
@@ -342,7 +349,11 @@ async function createEvent(req, res, next) {
     await newEvent.save();
 
     // --- CACHE PURGE ---
-    await redisClient.del(cacheKey);
+    // Invalidate NGO dashboard AND public events listing (all query/page variants)
+    await Promise.all([
+      redisClient.del(cacheKey),
+      invalidateNgoCaches(),
+    ]);
 
     res.status(200).json({
       success: true,
@@ -398,8 +409,11 @@ async function createFundraiser(req, res, next) {
     await newFundraiser.save();
 
     // --- CACHE PURGE ---
-    // Invalidate the NGO dashboard so the new fundraiser appears instantly
-    await redisClient.del(cacheKey); 
+    // Invalidate the NGO dashboard AND the public fundraiser listing
+    await Promise.all([
+      invalidateFundraiserCaches(ngoID),
+      invalidateNgoCaches(),
+    ]);
 
     res.status(200).json({
       message: "Fundraiser created successfully",
@@ -494,6 +508,10 @@ async function registerUser(req, res, next) {
         message:       `A donor just registered for your event "${event}"`,
         link:          `/NGO-dashboard/${ngoId}`
     });
+
+    // Invalidate donor's activity cache so registration appears immediately.
+    // Fire-and-forget: a slow/unreachable Redis must not delay the HTTP response.
+    invalidateDonorActivity(userId).catch(() => {});
 
     res.status(200).json({ message: "Registration successful!", success: true });
   } catch (error) {

@@ -11,7 +11,12 @@ const { sendNotification } = require('../services/notificationService');
 
 const Application = require("../models/Application");
 
-const redisClient = require('../redis'); 
+const redisClient = require('../redis');
+const {
+  invalidateFundraiserCaches,
+  invalidateDonorActivity,
+  invalidateTicker,
+} = require('../services/cacheHelpers');
 
 
 async function getdonor(req, res, next) {
@@ -160,6 +165,17 @@ await sendNotification(io, {
       { new: true }
     );
 
+    // --- CACHE INVALIDATION ---
+    // Clears all caches that become stale after a fundraiser donation:
+    //   - donor's own activity feed
+    //   - public donation ticker
+    //   - public fundraiser listing + NGO dashboard (amount_raised_so_far changed)
+    await Promise.all([
+      invalidateDonorActivity(userId),
+      invalidateTicker(),
+      invalidateFundraiserCaches(ngoId),
+    ]);
+
     res
       .status(200)
       .json({ success: true, message: "Contribution recorded successfully" });
@@ -198,8 +214,11 @@ async function editDonorProfile(req, res, next) {
     }
 
     // --- PURGE REDIS CACHE ---
-    // Clears the donor's dashboard/applications cache to ensure the new name shows up
-    await redisClient.del(`user:apps:${userId}`);
+    // Clears the donor's activity cache (contributions, events) and all
+    // paginated application pages so the new name shows up immediately.
+    // NOTE: the old code called del('user:apps:<userId>') — wrong key;
+    //       real keys are user_apps:<userId>:p<page>.
+    await invalidateDonorActivity(userId);
 
     res.status(200).json({
       success: true,
@@ -237,11 +256,45 @@ async function getUserActivity(req, res, next) {
     console.log(" DataBase HIT: Crawling MongoDB for activity...");
 
     // 2. OPTIMIZED FETCH
+    // UserContributedFundraiser uses $lookup to attach ngoName in one query (no N+1).
+    // UserRegisteredEvent uses $lookup to attach ngoName for the event organiser.
     const [events, fundraisers, money, items] = await Promise.all([
-      UserRegisteredEvent.find({ userId }).populate("eventObjectId", "event_name event_date").lean(),
-      UserContributedFundraiser.find({ userId }).lean(),
-      DonationMoney.find({ userId }).populate("carehomeId", "care_home_name imagePath").lean(),
-      donate_items.find({ userId }).populate("carehomeId", "care_home_name imagePath").lean()
+      UserRegisteredEvent.aggregate([
+        { $match: { userId } },
+        {
+          $lookup: {
+            from: 'ngos',
+            localField: 'ngoId',
+            foreignField: 'ngoId',
+            as: '_ngo',
+          },
+        },
+        {
+          $addFields: {
+            ngoName: { $arrayElemAt: ['$_ngo.Ngoname', 0] },
+          },
+        },
+        { $project: { _ngo: 0 } },
+      ]),
+      UserContributedFundraiser.aggregate([
+        { $match: { userId } },
+        {
+          $lookup: {
+            from: 'ngos',
+            localField: 'ngoId',
+            foreignField: 'ngoId',
+            as: '_ngo',
+          },
+        },
+        {
+          $addFields: {
+            ngoName: { $arrayElemAt: ['$_ngo.Ngoname', 0] },
+          },
+        },
+        { $project: { _ngo: 0 } },
+      ]),
+      DonationMoney.find({ userId }).populate('carehomeId', 'care_home_name imagePath').lean(),
+      donate_items.find({ userId }).populate('carehomeId', 'care_home_name imagePath').lean()
     ]);
 
     // 3. PROJECTION & FORMATTING
