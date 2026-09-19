@@ -118,7 +118,7 @@ async function contributed_fund(req, res,next) {
   try {
     const ngoId = req.params.ngoId;
     const fundraiser_name = req.params.fundraiser_name;
-    const amount_contributed = req.body.your_amount;
+    const amount_contributed = Number(req.body.your_amount) || req.body.your_amount;
 
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Authentication required" });
