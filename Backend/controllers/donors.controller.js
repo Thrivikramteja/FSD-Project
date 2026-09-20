@@ -210,28 +210,34 @@ async function contributed_fund(req, res,next) {
       link: `/NGO-dashboard/${ngoId}`
     });
 
-    // Update the specific fundraiser raised amount by its unique _id
-    let updatedFund = await CreatedFundraiser.findOneAndUpdate(
-      { _id: fundraiser._id },
-      { $inc: { amount_raised_so_far: Number(amount_contributed) } },
-      { new: true }
-    );
-
-    if (!updatedFund && fundraiser._id && typeof CreatedFundraiser.findByIdAndUpdate === 'function') {
-      updatedFund = await CreatedFundraiser.findByIdAndUpdate(
-        fundraiser._id,
+    // Update the fundraiser raised amount
+    let updatedFund;
+    if (fundraiserId) {
+      updatedFund = await CreatedFundraiser.findOneAndUpdate(
+        { _id: fundraiser._id },
         { $inc: { amount_raised_so_far: Number(amount_contributed) } },
         { new: true }
       );
-    }
-
-    // Fallback for unit tests mocking { ngoId, fundraiser_name }
-    if (!updatedFund) {
+      if (!updatedFund && typeof CreatedFundraiser.findByIdAndUpdate === 'function') {
+        updatedFund = await CreatedFundraiser.findByIdAndUpdate(
+          fundraiser._id,
+          { $inc: { amount_raised_so_far: Number(amount_contributed) } },
+          { new: true }
+        );
+      }
+    } else {
       updatedFund = await CreatedFundraiser.findOneAndUpdate(
         { ngoId, fundraiser_name },
         { $inc: { amount_raised_so_far: Number(amount_contributed) } },
         { new: true }
       );
+      if (!updatedFund && fundraiser._id && typeof CreatedFundraiser.findByIdAndUpdate === 'function') {
+        updatedFund = await CreatedFundraiser.findByIdAndUpdate(
+          fundraiser._id,
+          { $inc: { amount_raised_so_far: Number(amount_contributed) } },
+          { new: true }
+        );
+      }
     }
 
     if (updatedFund) {
