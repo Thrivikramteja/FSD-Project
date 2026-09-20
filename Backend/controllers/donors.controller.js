@@ -196,31 +196,24 @@ async function contributed_fund(req, res,next) {
       link: `/NGO-dashboard/${ngoId}`
     });
 
-    // Increment the amount raised directly on the fundraiser document
-    if (typeof fundraiser.amount_raised_so_far !== 'undefined') {
-      fundraiser.amount_raised_so_far = (Number(fundraiser.amount_raised_so_far) || 0) + Number(amount_contributed);
-      if (typeof fundraiser.save === 'function') {
-        await fundraiser.save();
-        console.log(`📈 [Donation] Fundraiser document saved with new amount_raised_so_far: ₹${fundraiser.amount_raised_so_far}`);
-      }
-    }
-
-    await CreatedFundraiser.findOneAndUpdate(
+    // Update the fundraiser raised amount exactly once in MongoDB
+    let updatedFund = await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
       { $inc: { amount_raised_so_far: Number(amount_contributed) } },
       { new: true }
     );
 
-    // Fallback/direct update by _id if supported (e.g. real Mongoose model)
-    if (typeof CreatedFundraiser.findByIdAndUpdate === 'function' && fundraiser._id) {
-      const updatedFund = await CreatedFundraiser.findByIdAndUpdate(
+    // Fallback update by _id only if the filter above did not match
+    if (!updatedFund && fundraiser._id && typeof CreatedFundraiser.findByIdAndUpdate === 'function') {
+      updatedFund = await CreatedFundraiser.findByIdAndUpdate(
         fundraiser._id,
         { $inc: { amount_raised_so_far: Number(amount_contributed) } },
         { new: true }
       );
-      if (updatedFund) {
-        console.log(`📈 [Donation] Updated fundraiser via findByIdAndUpdate: total raised now ₹${updatedFund.amount_raised_so_far}`);
-      }
+    }
+
+    if (updatedFund) {
+      console.log(`📈 [Donation] Fundraiser amount updated: total raised is now ₹${updatedFund.amount_raised_so_far}`);
     }
 
     // --- CACHE INVALIDATION ---
