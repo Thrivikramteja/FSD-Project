@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { Carehome, DonationMoney, donate_items } = require("../models/carehome.model");
 const { NGO } = require('../models/NGO.model');
 const {
