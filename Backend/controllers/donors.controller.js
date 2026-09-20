@@ -68,13 +68,24 @@ async function getdonor(req, res, next) {
 
 async function get_deadline(ngoId, fundraiser_name) {
   try {
-    const fundraiser = await CreatedFundraiser.findOne(
+    const decodedName = decodeURIComponent(fundraiser_name).trim();
+    let fundraiser = await CreatedFundraiser.findOne(
       { 
         ngoId: Number(ngoId), 
         fundraiser_name: fundraiser_name,
       },
       { deadline: 1, _id: 1 } 
     );
+
+    if (!fundraiser && decodedName !== fundraiser_name) {
+      fundraiser = await CreatedFundraiser.findOne(
+        { 
+          ngoId: Number(ngoId), 
+          fundraiser_name: decodedName,
+        },
+        { deadline: 1, _id: 1 } 
+      );
+    }
 
     if (!fundraiser) {
       throw new Error(`Lookup Failed: No fundraiser named "${fundraiser_name}" for NGO ID ${ngoId}`);
@@ -88,16 +99,24 @@ async function get_deadline(ngoId, fundraiser_name) {
 
 async function get_carehomeid(ngoId, fundraiser_name) {
   try {
-    const fundraiser = await CreatedFundraiser.findOne(
-      { ngoId: ngoId, fundraiser_name: fundraiser_name },
+    const decodedName = decodeURIComponent(fundraiser_name).trim();
+    let fundraiser = await CreatedFundraiser.findOne(
+      { ngoId: Number(ngoId) || ngoId, fundraiser_name: fundraiser_name },
       { carehomeId: 1, _id: 0 }
     );
+
+    if (!fundraiser && decodedName !== fundraiser_name) {
+      fundraiser = await CreatedFundraiser.findOne(
+        { ngoId: Number(ngoId) || ngoId, fundraiser_name: decodedName },
+        { carehomeId: 1, _id: 0 }
+      );
+    }
 
     if (!fundraiser) {
       throw new Error("Fundraiser not found");
     }
 
-    return fundraiser.carehomeId; // Return the deadline
+    return fundraiser.carehomeId;
   } catch (error) {
     console.error("Error fetching deadline:", error);
     throw error;
@@ -128,19 +147,31 @@ async function contributed_fund(req, res,next) {
     console.log("JWT User ID contributing: " + userId);
 
     const deadline = await get_deadline(ngoId, fundraiser_name);
-    const fundraiser = await CreatedFundraiser.findOne({
+    let fundraiser = await CreatedFundraiser.findOne({
       ngoId,
       fundraiser_name,
     });
+
+    if (!fundraiser) {
+      const decodedName = decodeURIComponent(fundraiser_name).trim();
+      const parsedNgoId = Number(ngoId);
+      fundraiser = await CreatedFundraiser.findOne({
+        $or: [
+          { ngoId: parsedNgoId, fundraiser_name: decodedName },
+          { ngoId: parsedNgoId, fundraiser_name: fundraiser_name },
+          { ngoId: ngoId, fundraiser_name: decodedName },
+        ]
+      });
+    }
 
     if (!fundraiser) {
       return res.status(404).json({ message: "Fundraiser not found" });
     }
 
     const newContribution = new UserContributedFundraiser({
-      userId: userId,
-      ngoId: ngoId,
-      fundraiser_name: fundraiser_name,
+      userId: Number(userId) || userId,
+      ngoId: Number(ngoId) || ngoId,
+      fundraiser_name: fundraiser.fundraiser_name || fundraiser_name,
       amount_contributed: amount_contributed,
       contributed_at: new Date(),
       deadline: deadline,
@@ -150,20 +181,29 @@ async function contributed_fund(req, res,next) {
     await newContribution.save();
 
     // Notify the NGO that a donation was made
-const io = req.app.get('io');
-await sendNotification(io, {
-    recipientId:   Number(ngoId),
-    recipientRole: 'NGO',
-    type:          'donation',
-    message:       `A donor contributed ₹${amount_contributed} to "${fundraiser_name}"`,
-    link: `/NGO-dashboard/${ngoId}`
-});
+    const io = req.app.get('io');
+    await sendNotification(io, {
+      recipientId:   Number(ngoId),
+      recipientRole: 'NGO',
+      type:          'donation',
+      message:       `A donor contributed ₹${amount_contributed} to "${fundraiser.fundraiser_name || fundraiser_name}"`,
+      link: `/NGO-dashboard/${ngoId}`
+    });
 
-    await CreatedFundraiser.findOneAndUpdate(
+    const updated = await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
       { $inc: { amount_raised_so_far: amount_contributed } },
       { new: true }
     );
+
+    // Fallback by ID if query filter didn't match (e.g. type or string encoding mismatch)
+    if (!updated && fundraiser._id) {
+      await CreatedFundraiser.findByIdAndUpdate(
+        fundraiser._id,
+        { $inc: { amount_raised_so_far: amount_contributed } },
+        { new: true }
+      );
+    }
 
     // --- CACHE INVALIDATION ---
     // Clears all caches that become stale after a fundraiser donation:
@@ -174,6 +214,7 @@ await sendNotification(io, {
       invalidateDonorActivity(userId),
       invalidateTicker(),
       invalidateFundraiserCaches(ngoId),
+      invalidateFundraiserCaches(Number(ngoId)),
     ]);
 
     res

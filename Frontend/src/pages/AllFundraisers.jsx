@@ -98,7 +98,7 @@ const AllFundraisers = () => {
 
         <input 
           type="text" className="fund-search-input"
-          placeholder="Search (Optimized)..."
+          placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
