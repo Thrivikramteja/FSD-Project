@@ -215,20 +215,6 @@ async function getallFundraisers(req, res, next) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const cacheKey = `fund:${q || 'all'}:${tags || 'none'}`; // Key
-
-    if (redisClient.isReadyStatus) {
-      try {
-        const cached = await redisClient.get(cacheKey); // Cache-Check
-        if (cached) {
-          res.setHeader('X-Response-Source', 'Redis');
-          return res.json(JSON.parse(cached));
-        }
-      } catch (err) {
-        console.error('[Redis getallFundraisers error]:', err.message);
-      }
-    }
-
     let query = { deadline: { $gte: today } }; // Base
     let projection = { 
       fundraiser_name: 1, goal_amount: 1, amount_raised_so_far: 1, 
@@ -254,14 +240,6 @@ async function getallFundraisers(req, res, next) {
     const fundraisers = await CreatedFundraiser.find(query, projection)
       .sort(sort)
       .lean(); // Performance
-
-    if (redisClient.isReadyStatus) {
-      try {
-        await redisClient.setEx(cacheKey, 300, JSON.stringify(fundraisers)); // Store-Cache
-      } catch (err) {
-        console.error('[Redis setEx getallFundraisers error]:', err.message);
-      }
-    }
 
     res.setHeader('X-Response-Source', 'Database');
     res.json(fundraisers);

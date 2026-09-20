@@ -146,6 +146,8 @@ async function contributed_fund(req, res,next) {
     const userId = req.user.id;
     console.log("JWT User ID contributing: " + userId);
 
+    console.log(`💰 [Donation] Processing contribution of ₹${amount_contributed} by User ${userId} for NGO ${ngoId}, Fundraiser: "${fundraiser_name}"`);
+
     const deadline = await get_deadline(ngoId, fundraiser_name);
     let fundraiser = await CreatedFundraiser.findOne({
       ngoId,
@@ -165,8 +167,11 @@ async function contributed_fund(req, res,next) {
     }
 
     if (!fundraiser) {
+      console.warn(`⚠️ [Donation] Fundraiser not found: NGO ${ngoId}, Name "${fundraiser_name}"`);
       return res.status(404).json({ message: "Fundraiser not found" });
     }
+
+    console.log(`📌 [Donation] Found fundraiser "${fundraiser.fundraiser_name}" (ID: ${fundraiser._id}), Current Raised: ₹${fundraiser.amount_raised_so_far || 0}`);
 
     const newContribution = new UserContributedFundraiser({
       userId: Number(userId) || userId,
@@ -179,6 +184,7 @@ async function contributed_fund(req, res,next) {
     });
 
     await newContribution.save();
+    console.log(`✅ [Donation] UserContributedFundraiser saved for User ${userId}`);
 
     // Notify the NGO that a donation was made
     const io = req.app.get('io');
@@ -190,19 +196,31 @@ async function contributed_fund(req, res,next) {
       link: `/NGO-dashboard/${ngoId}`
     });
 
-    const updated = await CreatedFundraiser.findOneAndUpdate(
+    // Increment the amount raised directly on the fundraiser document
+    if (typeof fundraiser.amount_raised_so_far !== 'undefined') {
+      fundraiser.amount_raised_so_far = (Number(fundraiser.amount_raised_so_far) || 0) + Number(amount_contributed);
+      if (typeof fundraiser.save === 'function') {
+        await fundraiser.save();
+        console.log(`📈 [Donation] Fundraiser document saved with new amount_raised_so_far: ₹${fundraiser.amount_raised_so_far}`);
+      }
+    }
+
+    await CreatedFundraiser.findOneAndUpdate(
       { ngoId, fundraiser_name },
-      { $inc: { amount_raised_so_far: amount_contributed } },
+      { $inc: { amount_raised_so_far: Number(amount_contributed) } },
       { new: true }
     );
 
-    // Fallback by ID if query filter didn't match (e.g. type or string encoding mismatch)
-    if (!updated && fundraiser._id) {
-      await CreatedFundraiser.findByIdAndUpdate(
+    // Fallback/direct update by _id if supported (e.g. real Mongoose model)
+    if (typeof CreatedFundraiser.findByIdAndUpdate === 'function' && fundraiser._id) {
+      const updatedFund = await CreatedFundraiser.findByIdAndUpdate(
         fundraiser._id,
-        { $inc: { amount_raised_so_far: amount_contributed } },
+        { $inc: { amount_raised_so_far: Number(amount_contributed) } },
         { new: true }
       );
+      if (updatedFund) {
+        console.log(`📈 [Donation] Updated fundraiser via findByIdAndUpdate: total raised now ₹${updatedFund.amount_raised_so_far}`);
+      }
     }
 
     // --- CACHE INVALIDATION ---
@@ -216,6 +234,7 @@ async function contributed_fund(req, res,next) {
       invalidateFundraiserCaches(ngoId),
       invalidateFundraiserCaches(Number(ngoId)),
     ]);
+    console.log(`🧹 [Donation] Caches invalidated for User ${userId} and NGO ${ngoId}`);
 
     res
       .status(200)
