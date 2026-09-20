@@ -52,39 +52,59 @@ app.use(
 app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
 
 // ---------------------------------------------------------------------------
-// IMPORTANT: Payment routes are mounted BEFORE express.json().
-// The Cashfree webhook handler registers its own express.raw({ type: 'application/json' })
-// middleware inline so it receives the raw body for HMAC-SHA256 signature verification.
-// Mounting paymentRoutes here, before express.json(), ensures that the webhook path
-// is handled by express.raw() rather than having the body pre-parsed as JSON.
-// All other routes (initiate, status) are also in paymentRoutes and work fine
-// because those handlers don't need raw body access.
+// 1. CORS Middleware (Mounted first to handle all preflight OPTIONS and API requests)
 // ---------------------------------------------------------------------------
-app.use(paymentRoutes);
+const allowedOrigins = [
+  "https://fsd-project-frontend.onrender.com",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
 
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    // Allow Render Frontend, localhost, and any .onrender.com domain
+    if (
+      allowedOrigins.includes(origin) ||
+      origin === "https://fsd-project-frontend.onrender.com" ||
+      origin.includes("onrender.com") ||
+      origin.startsWith("http://localhost:") ||
+      origin.startsWith("http://127.0.0.1:")
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+};
+
+app.use(cors(corsOptions));
+
+// ---------------------------------------------------------------------------
+// 2. Cashfree Webhook Route (Mounted BEFORE global express.json())
+// Cashfree HMAC verification requires the raw byte stream (express.raw).
+// ---------------------------------------------------------------------------
+const { cashfreeWebhook } = require("./controllers/payment.controller");
+app.post(
+  "/api/payment/cashfree/webhook",
+  express.raw({ type: "application/json" }),
+  cashfreeWebhook
+);
+
+// ---------------------------------------------------------------------------
+// 3. Body & Cookie Parsers (For standard JSON, URL-encoded, and cookie requests)
+// ---------------------------------------------------------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// --- UPDATED CORS FOR EXPRESS ---
-app.use(cors({ 
-  origin: function (origin, callback) {
-    // Allow no origin (same-origin requests)
-    if (!origin) return callback(null, true);
-    
-    // Allow Render Frontend, localhost, and any .onrender.com domain
-    if (
-      origin === "https://fsd-project-frontend.onrender.com" || 
-      origin.includes("onrender.com") ||
-      origin.startsWith('http://localhost:')
-    ) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true 
-}));
-
+// ---------------------------------------------------------------------------
+// 4. API & Payment Routes (Mounted AFTER express.json() and cookieParser())
+// ---------------------------------------------------------------------------
+app.use(paymentRoutes);
 app.use(require("./routes/corporate.routes"));
 app.use(baseRoutes);
 app.use(authRoutes);

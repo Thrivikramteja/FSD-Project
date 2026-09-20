@@ -28,14 +28,9 @@ router.post(
  * Protected: Donor only.
  * Body: { ngoId, fundraiser_name, donationAmount }
  * Returns: { paymentSessionId, ccOrderId, transactionId, donationAmount, platformTip, totalAmount }
- *
- * NOTE: express.json() is applied inline because this router is mounted in app.js
- * BEFORE the global express.json() middleware (required so the webhook can receive
- * raw bytes for HMAC verification). The JSON parser is scoped only to this route.
  */
 router.post(
   '/api/payment/initiate',
-  express.json(),
   authenticate,
   authorizeRoles('Donor'),
   initiateFundraiserPayment
