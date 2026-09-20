@@ -1,6 +1,6 @@
 import { apiFetch } from "../services/api";
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import styles from '../styles/DonateFundraiser.module.css';
@@ -35,6 +35,9 @@ const CASHFREE_ENABLED = import.meta.env.VITE_CASHFREE_ENABLED === 'true';
 const DonateFundraiser = () => {
     const { ngoId, name_fund } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const [searchParams] = useSearchParams();
+    const fundraiserId = location.state?.fundraiserId || searchParams.get('id');
     
     const [userData, setUserData] = useState({
         name: "", 
@@ -95,6 +98,7 @@ const DonateFundraiser = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                fundraiserId: fundraiserId,
                 your_amount: amount,
                 pan: pan,
                 full_name: userData.name,
@@ -125,6 +129,7 @@ const DonateFundraiser = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                fundraiserId: fundraiserId,
                 ngoId,
                 fundraiser_name: name_fund,
                 donationAmount: amount,

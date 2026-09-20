@@ -66,7 +66,9 @@ const AllFundraisers = () => {
       alert("Donor login required");
       return;
     }
-    navigate(`/donate_fundraiser/${fund.ngoId}/${fund.fundraiser_name}`);
+    navigate(`/donate_fundraiser/${fund.ngoId}/${encodeURIComponent(fund.fundraiser_name)}?id=${fund._id}`, {
+      state: { fundraiserId: fund._id }
+    });
   };
 
   return (

@@ -82,7 +82,7 @@ async function initiateFundraiserPayment(req, res, next) {
     }
 
     // 3. Extract and validate inputs
-    const { ngoId, fundraiser_name, donationAmount: rawAmount } = req.body;
+    const { ngoId, fundraiser_name, donationAmount: rawAmount, fundraiserId } = req.body;
 
     if (!ngoId || !fundraiser_name) {
       return res.status(400).json({ success: false, message: 'ngoId and fundraiser_name are required' });
@@ -104,10 +104,16 @@ async function initiateFundraiserPayment(req, res, next) {
     }
 
     // 4. Verify fundraiser exists and is still active
-    const fundraiser = await CreatedFundraiser.findOne({
-      ngoId: Number(ngoId),
-      fundraiser_name,
-    });
+    let fundraiser;
+    if (fundraiserId && mongoose.Types.ObjectId.isValid(fundraiserId)) {
+      fundraiser = await CreatedFundraiser.findById(fundraiserId);
+    }
+    if (!fundraiser) {
+      fundraiser = await CreatedFundraiser.findOne({
+        ngoId: Number(ngoId),
+        fundraiser_name,
+      });
+    }
     if (!fundraiser) {
       return res.status(404).json({ success: false, message: 'Fundraiser not found' });
     }
